@@ -91,6 +91,7 @@ summary(aac_intakes_outcomes)
 aac_intakes_outcomes$animal_id_outcome <- as.character(aac_intakes_outcomes$animal_id_outcome)
 aac_intakes_outcomes$date_of_birth <- anytime(aac_intakes_outcomes$date_of_birth)
 
+aac_intakes_outcomes$sex_upon_outcome[is.na(aac_intakes_outcomes$sex_upon_outcome)] <- "Unknown"
 aac_intakes_outcomes$sex_upon_outcome_first <- as.factor(sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_outcome), " "), "[", 1))
 aac_intakes_outcomes$sex_upon_outcome_second <- sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_outcome), " "), "[", 2)
 aac_intakes_outcomes$sex_upon_outcome_second[is.na(aac_intakes_outcomes$sex_upon_outcome_second)] <- "Unknown"
@@ -105,9 +106,11 @@ aac_intakes_outcomes$dob_month <- as.factor(aac_intakes_outcomes$dob_month)
 aac_intakes_outcomes$dob_year <- as.factor(aac_intakes_outcomes$dob_year)
 aac_intakes_outcomes$animal_id_intake <- as.character(aac_intakes_outcomes$animal_id_intake)
 
+aac_intakes_outcomes$sex_upon_intake[is.na(aac_intakes_outcomes$sex_upon_intake)] <- "Unknown"
 aac_intakes_outcomes$sex_upon_intake_first <- as.factor(sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_intake), " "), "[", 1))
 aac_intakes_outcomes$sex_upon_intake_second <- sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_intake), " "), "[", 2)
 aac_intakes_outcomes$sex_upon_intake_second[is.na(aac_intakes_outcomes$sex_upon_intake_second)] <- "Unknown"
+aac_intakes_outcomes$sex_upon_intake_first[is.na(aac_intakes_outcomes$sex_upon_intake_first)] <- "Unknown"
 aac_intakes_outcomes$sex_upon_intake_second <- as.factor(aac_intakes_outcomes$sex_upon_intake_second)
 
 aac_intakes_outcomes$count <- as.numeric(aac_intakes_outcomes$count)
@@ -194,6 +197,19 @@ table(aac_intakes_outcomes$outcome_number, aac_intakes_outcomes$intake_number)
 * age_upon_intake_group - Die Gruppierung ist anhand falscher Cluster, je nach Tierarten bedeutet Alter etwas anderes. 
 * age_upon_outcome, age_upon_outcome_year - Diese Variablen enthalten dieselben Informationen wie `age_upon_outcome_days`.
 * age_upon_outcome_group - Die Gruppierung ist anhand falscher Cluster, je nach Tierarten bedeutet Alter etwas anderes.
+
+## Prüfung auf fehlende Werte
+
+```{r}
+summary(aac_intakes_outcomes2)
+unique(aac_intakes_outcomes2$outcome_type)
+table(aac_intakes_outcomes2$outcome_type)
+
+v = as.vector(which(aac_intakes_outcomes2$outcome_type == ""))
+aac_intakes_outcomes2 <- aac_intakes_outcomes2[-v,]
+
+```
+
 
 
 ## old
