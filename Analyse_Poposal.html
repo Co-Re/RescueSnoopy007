@@ -205,7 +205,7 @@ $(document).ready(function () {
 <p>Der Datensatz enthält unter anderem folgende Variablen:</p>
 <ul>
 <li>animal_id - eindeutige ID des Tieres</li>
-<li>age_upon_outcome - Alter des Tieres bei Oucome</li>
+<li>age_upon_outcome - Alter des Tieres bei Outcome</li>
 <li>date_of_birth - Geburtsdatum des Tieres (geschätzt, wenn dieses nicht bekannt war)</li>
 <li>outcome_subtype - spezifische Beschreibung des Outcomes</li>
 <li>outcome_type - Art des Outcomes</li>
@@ -227,13 +227,13 @@ $(document).ready(function () {
 </ul>
 <p>Neben diesen Variablen existierten weitere Variablen, die beispielsweise Zeiträume in einem anderen Format darstellen.</p>
 </div>
-<div id="hintergrundinformationen-zum-datensatz" class="section level2">
-<h2>Hintergrundinformationen zum Datensatz</h2>
-<p>Die Daten wurden vom Austin Animal Center erhoben. Dieses Animal Center ist das größte Tierheim in den USA, in dem keine Tiere getötet werden und kann bis zu 18.000 Tiere pro Jahr aufnehmen. Die Daten werden im Rahmen der Austin’s Open Data Intitiative online bereitgestellt.</p>
+<div id="hintergrundinformationen-zum-datensatsz" class="section level2">
+<h2>Hintergrundinformationen zum Datensatsz</h2>
+<p>Die Daten wurden vom Austin Animal Center erhoben. Dieses Animal Center ist das größte Tierheim in den USA, in dem keine Tiere getötet werden und kann bis zu 18.000 Tiere pro Jahr aufnehmen. Es werden alle Arten von Tieren aufgenommen. Das Tierheim befindet sich im Travis County im US-Bundesstaat Texas. Die Daten werden im Rahmen der Austin’s Open Data Intitiative online bereitgestellt.</p>
 <p>Der Datensatz enthält n = 79.672 Observationen und 41 Variablen.<br />
 Die Daten stammen aus der Zeit zwischen Oktober 2013 bis April 2018 (Outcomes).<br />
 Die Tiere sind zwischen 0-25 Jahre alt, der Median liegt bei 1 Jahr, die Geschlechtsverteilung männlicher und weiblicher Tiere liegt fast bei 50/50.<br />
-Mehr als die Hälfte der Tiere sind HUnde, gefolgt von Katzen und einigen Vögeln (&lt;500). Etwa 4.500 Tiere sind keiner Spezies zugeordnet.<br />
+Mehr als die Hälfte der Tiere sind Hunde, gefolgt von Katzen und einigen Vögeln (&lt;500). Etwa 4.500 Tiere sind keiner Spezies zugeordnet.<br />
 Knapp die Hälfte der im Datensatz enthaltenen Tiere wurde adoptiert.</p>
 </div>
 <div id="statistische-lernaufgabe" class="section level2">
@@ -299,6 +299,91 @@ Wir haben uns für diesen Datensatz mit dieser Fragestellung entschieden, da ein
 ##  $ intake_number             : num  1 2 3 1 1 1 1 1 1 1 ...
 ##  $ time_in_shelter           : Factor w/ 29319 levels &quot;0 days 00:00:00.000000000&quot;,..: 823 1788 1579 18415 173 1229 258 308 23250 79 ...
 ##  $ time_in_shelter_days      : num  0.588 1.26 1.114 4.97 0.119 ...</code></pre>
+<pre class="r"><code>head(aac_intakes_outcomes)</code></pre>
+<pre><code>##   age_upon_outcome animal_id_outcome       date_of_birth outcome_subtype
+## 1         10 years           A006100 2007-07-09 00:00:00                
+## 2          7 years           A006100 2007-07-09 00:00:00                
+## 3          6 years           A006100 2007-07-09 00:00:00                
+## 4         10 years           A047759 2004-04-02 00:00:00         Partner
+## 5         16 years           A134067 1997-10-16 00:00:00                
+## 6         15 years           A141142 1998-06-01 00:00:00                
+##      outcome_type sex_upon_outcome age_upon_outcome_.days.
+## 1 Return to Owner    Neutered Male                    3650
+## 2 Return to Owner    Neutered Male                    2555
+## 3 Return to Owner    Neutered Male                    2190
+## 4        Transfer    Neutered Male                    3650
+## 5 Return to Owner    Neutered Male                    5840
+## 6 Return to Owner    Spayed Female                    5475
+##   age_upon_outcome_.years. age_upon_outcome_age_group    outcome_datetime
+## 1                       10                (7.5, 10.0] 2017-12-07 14:07:00
+## 2                        7                 (5.0, 7.5] 2014-12-20 16:35:00
+## 3                        6                 (5.0, 7.5] 2014-03-08 17:10:00
+## 4                       10                (7.5, 10.0] 2014-04-07 15:12:00
+## 5                       16               (15.0, 17.5] 2013-11-16 11:54:00
+## 6                       15               (12.5, 15.0] 2013-11-17 11:40:00
+##   outcome_month outcome_year outcome_monthyear outcome_weekday
+## 1            12         2017           2017-12        Thursday
+## 2            12         2014           2014-12        Saturday
+## 3             3         2014           2014-03        Saturday
+## 4             4         2014           2014-04          Monday
+## 5            11         2013           2013-11        Saturday
+## 6            11         2013           2013-11          Sunday
+##   outcome_hour outcome_number dob_year dob_month dob_monthyear
+## 1            0              1     2007         7       2017-12
+## 2           16              2     2007         7       2014-12
+## 3           17              3     2007         7       2014-03
+## 4           15              1     2004         4       2014-04
+## 5           11              1     1997        10       2013-11
+## 6           11              1     1998         6       2013-11
+##   age_upon_intake animal_id_intake animal_type                       breed
+## 1        10 years          A006100         Dog        Spinone Italiano Mix
+## 2         7 years          A006100         Dog        Spinone Italiano Mix
+## 3         6 years          A006100         Dog        Spinone Italiano Mix
+## 4        10 years          A047759         Dog                   Dachshund
+## 5        16 years          A134067         Dog           Shetland Sheepdog
+## 6        15 years          A141142         Dog Labrador Retriever/Pit Bull
+##          color                                found_location
+## 1 Yellow/White Colony Creek And Hunters Trace in Austin (TX)
+## 2 Yellow/White             8700 Research Blvd in Austin (TX)
+## 3 Yellow/White                  8700 Research in Austin (TX)
+## 4     Tricolor                                   Austin (TX)
+## 5  Brown/White            12034 Research Blvd in Austin (TX)
+## 6  Black/White                                   Austin (TX)
+##   intake_condition     intake_type sex_upon_intake count
+## 1           Normal           Stray   Neutered Male     1
+## 2           Normal   Public Assist   Neutered Male     1
+## 3           Normal   Public Assist   Neutered Male     1
+## 4           Normal Owner Surrender   Neutered Male     1
+## 5          Injured   Public Assist   Neutered Male     1
+## 6             Aged           Stray   Spayed Female     1
+##   age_upon_intake_.days. age_upon_intake_.years. age_upon_intake_age_group
+## 1                   3650                      10               (7.5, 10.0]
+## 2                   2555                       7                (5.0, 7.5]
+## 3                   2190                       6                (5.0, 7.5]
+## 4                   3650                      10               (7.5, 10.0]
+## 5                   5840                      16              (15.0, 17.5]
+## 6                   5475                      15              (12.5, 15.0]
+##       intake_datetime intake_month intake_year intake_monthyear
+## 1 2017-12-07 00:00:00           12        2017          2017-12
+## 2 2014-12-19 10:21:00           12        2014          2014-12
+## 3 2014-03-07 14:26:00            3        2014          2014-03
+## 4 2014-04-02 15:55:00            4        2014          2014-04
+## 5 2013-11-16 09:02:00           11        2013          2013-11
+## 6 2013-11-16 14:46:00           11        2013          2013-11
+##   intake_weekday intake_hour intake_number           time_in_shelter
+## 1       Thursday          14             1 0 days 14:07:00.000000000
+## 2         Friday          10             2 1 days 06:14:00.000000000
+## 3         Friday          14             3 1 days 02:44:00.000000000
+## 4      Wednesday          15             1 4 days 23:17:00.000000000
+## 5       Saturday           9             1 0 days 02:52:00.000000000
+## 6       Saturday          14             1 0 days 20:54:00.000000000
+##   time_in_shelter_days
+## 1            0.5881944
+## 2            1.2597222
+## 3            1.1138889
+## 4            4.9701389
+## 5            0.1194444
+## 6            0.8708333</code></pre>
 <pre class="r"><code>summary(aac_intakes_outcomes)</code></pre>
 <pre><code>##  age_upon_outcome animal_id_outcome             date_of_birth  
 ##  1 year  :14750   A721033:   13     2014-05-05 00:00:00:  112  
@@ -441,26 +526,156 @@ aac_intakes_outcomes$intake_month &lt;- as.factor(aac_intakes_outcomes$intake_mo
 aac_intakes_outcomes$intake_year &lt;- as.factor(aac_intakes_outcomes$intake_year)
 aac_intakes_outcomes$intake_hour &lt;- as.factor(hour(aac_intakes_outcomes$intake_datetime))</code></pre>
 <p>Anmerkungen zu dem Datenset:</p>
-<ul>
-<li>Variablen mit Uhrzeit erscheinen nicht richtig</li>
-<li>age_group muss überprüft werden, machen diese Stufen sinn, warum ist ein negativer Wert enthalten?</li>
-<li>sollten Datensätze gelöscht werden, bei denen das Intake-Datum vor dem Geburtsdatum liegt?</li>
-</ul>
-<pre class="r"><code>aac_intakes_outcomes2 &lt;- aac_intakes_outcomes[c(5, 4, 22:27, 43, 45, 42, 44, 3, 33:35, 37, 39, 10:12, 14, 16, 20, 30, 31, 32, 1, 7, 8, 9, 40, 41)]</code></pre>
+<p>Folgende Animal-Types sind vorhanden:</p>
+<pre class="r"><code>table(aac_intakes_outcomes$animal_type)</code></pre>
+<pre><code>## 
+##  Bird   Cat   Dog Other 
+##   339 29539 45366  4428</code></pre>
+<p>Folgende Kombinationen sind beim Geschlecht möglich:</p>
+<pre class="r"><code>table(aac_intakes_outcomes$sex_upon_intake_first, aac_intakes_outcomes$sex_upon_outcome_first) </code></pre>
+<pre><code>##           
+##            Intact Neutered  NULL Spayed Unknown
+##   Intact    19037    15586     0  14398       0
+##   Neutered      1    12707     0      0       0
+##   Spayed        2        0     0  11151       0
+##   Unknown       0        0     0      0    6789</code></pre>
+<p>neues Dataset:</p>
+<pre class="r"><code>aac_intakes_outcomes2 &lt;- aac_intakes_outcomes[c(5, 22:24, 26, 27, 43, 42, 44, 3, 17, 18, 33:35, 39, 10:12, 30, 7, 40, 41)]</code></pre>
 <p>Folgende Variablen wurden für das neue Dataset nicht verwendet:</p>
 <ul>
+<li>found_location - Diese Variable bietet keine gute Datenqualität, es sind nicht immer gleiche Daten erfasst (z.B. manchmal Ortsname, manchmal komplette Adresse).</li>
+<li>sex_open_intake - Diese Variable enthält die selben Daten wie <code>sex_open_outcome</code>.</li>
+</ul>
+<pre class="r"><code>table(aac_intakes_outcomes$sex_upon_intake_second, aac_intakes_outcomes$sex_upon_outcome_second)</code></pre>
+<pre><code>##          
+##           Female  Male Unknown
+##   Female   34857     0       0
+##   Male         0 38025       0
+##   Unknown      0     0    6790</code></pre>
+<ul>
+<li>outcome_subtype - Diese Variable enthält nur sehr wenige Informationen, diese sind nicht durchgängig je <code>Outcome_type</code> befüllt.</li>
+</ul>
+<pre class="r"><code>table(aac_intakes_outcomes$outcome_type, aac_intakes_outcomes$outcome_subtype)</code></pre>
+<pre><code>##                  
+##                         Aggressive At Vet  Barn Behavior
+##                      10          0      0     0        0
+##   Adoption        27753          0      0     1        0
+##   Died               88          0     34     0        0
+##   Disposal          304          0      0     0        0
+##   Euthanasia        174        497     36     0      133
+##   Missing            11          0      0     0        0
+##   Relocate           15          0      0     0        0
+##   Return to Owner 14790          0      1     0        0
+##   Rto-Adopt         179          0      0     0        0
+##   Transfer            0          0      0     2        0
+##                  
+##                   Court/Investigation Enroute Foster In Foster In Kennel
+##                                     0       0      0         0         0
+##   Adoption                          0       0   5490         0         0
+##   Died                              0      49      0       159       343
+##   Disposal                          0       0      0         0         0
+##   Euthanasia                       23       0      0         0         0
+##   Missing                           0       0      0        18         8
+##   Relocate                          0       0      0         0         0
+##   Return to Owner                   0       0      0         0         0
+##   Rto-Adopt                         0       0      0         0         0
+##   Transfer                          0       0      0         0         0
+##                  
+##                   In Surgery Medical Offsite Partner Possible Theft
+##                            0       0       0       0              0
+##   Adoption                 0       0     350       0              0
+##   Died                    17       0       0       0              0
+##   Disposal                 0       0       0       0              0
+##   Euthanasia               0     265       0       0              0
+##   Missing                  0       0       0       0              9
+##   Relocate                 0       0       0       0              0
+##   Return to Owner          0       0       0       0              0
+##   Rto-Adopt                0       0       0       0              0
+##   Transfer                 0       0       0   19840              0
+##                  
+##                   Rabies Risk  SCRP   Snr Suffering Underage
+##                             0     0     0         0        0
+##   Adoption                  0     0     0         0        0
+##   Died                      0     0     0         0        0
+##   Disposal                  0     0     0         0        0
+##   Euthanasia             2539     0     0      2549       28
+##   Missing                   0     0     0         0        0
+##   Relocate                  0     0     0         0        0
+##   Return to Owner           0     0     0         0        0
+##   Rto-Adopt                 0     0     0         0        0
+##   Transfer                  0  3205   752         0        0</code></pre>
+<ul>
 <li>animal_id_outcome - ID kann nicht für Klassifikation verwendet werden</li>
-<li>sex_upon_outcome - wurde gesplittet, neue Variablen werden verwendet</li>
-<li>outcome_monthyear - der Monat und das Jahr als einzelne Variablen werden verwendet</li>
-<li>outcome_hour - Stunde erscheint wenig sinnvoll, da auch zu ungewöhnichen Uhrzeiten Geschäftsfälle registriert werden</li>
-<li>dob_year - Geburtsdatum wird verwendet</li>
-<li>dob_month - Geburtsdatum wird verwendet</li>
+<li>sex_upon_outcome - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet</li>
+<li>outcome_monthyear - der Monat und das Jahr werden als einzelne Variablen verwendet</li>
+<li>outcome_hour - Es werden auch zu ungewöhnichen Uhrzeiten Geschäftsfälle registriert werden</li>
+</ul>
+<pre class="r"><code>table(aac_intakes_outcomes$outcome_hour)</code></pre>
+<pre><code>## 
+##     0     1     2     3     4     5     6     7     8     9    10    11 
+##  1831    14     5     4     6    15    60   416  1446  3697  1590  5800 
+##    12    13    14    15    16    17    18    19    20    21    22    23 
+##  7006  6939  7549  7513  8129 12198 10999  3819   206   192   189    49</code></pre>
+<ul>
 <li>dob_monthyear - Geburstdatum wird verwendet</li>
 <li>animal_id_intake - ID kann nicht für Klassifikation verwendet werden</li>
-<li>sex_upon_intake - wurde gesplittet, neue Variablen werden verwendet</li>
+<li>sex_upon_intake - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet</li>
 <li>count - alle Werte sind 1, Aushilfsspalte</li>
-<li>intake_monthyear - der Monat und das Jahr als einzelne Variablen werden verwendet</li>
-<li>intake_hour - Stunde erscheint wenig sinnvoll, da auch zu ungewöhnichen Uhrzeiten Geschäftsfälle registriert werden</li>
+</ul>
+<pre class="r"><code>table(aac_intakes_outcomes$count)</code></pre>
+<pre><code>## 
+##     1 
+## 79672</code></pre>
+<ul>
+<li>intake_monthyear - der Monat und das Jahr werden als einzelne Variablen verwendet</li>
+<li>intake_hour - Es werden auch zu ungewöhnichen Uhrzeiten Geschäftsfälle registriert werden</li>
+</ul>
+<pre class="r"><code>table(aac_intakes_outcomes$intake_hour)</code></pre>
+<pre><code>## 
+##     0     1     2     3     4     5     6     7     8     9    10    11 
+##   512   129    83    67    37    24   152  1257  1443  1798  3420 12866 
+##    12    13    14    15    16    17    18    19    20    21    22    23 
+## 10823  9534  8421  8058  8074  5237  4989   924   332   445   531   516</code></pre>
+<ul>
+<li>outcome_weekday, intake_weekday - es soll keine Klassifikation auf Basis eines Wochentages gemacht werden.</li>
+<li>outcome_number - Diese Variable enthält dieselben Informationen wie <code>intake_number</code>.</li>
+</ul>
+<pre class="r"><code>table(aac_intakes_outcomes$outcome_number, aac_intakes_outcomes$intake_number)</code></pre>
+<pre><code>##     
+##          1     2     3     4     5     6     7     8     9    10    11
+##   1  71993     0     0     0     0     0     0     0     0     0     0
+##   2      0  6052     0     0     0     0     0     0     0     0     0
+##   3      0     0  1152     0     0     0     0     0     0     0     0
+##   4      0     0     0   302     0     0     0     0     0     0     0
+##   5      0     0     0     0   101     0     0     0     0     0     0
+##   6      0     0     0     0     0    39     0     0     0     0     0
+##   7      0     0     0     0     0     0    15     0     0     0     0
+##   8      0     0     0     0     0     0     0     7     0     0     0
+##   9      0     0     0     0     0     0     0     0     3     0     0
+##   10     0     0     0     0     0     0     0     0     0     3     0
+##   11     0     0     0     0     0     0     0     0     0     0     3
+##   12     0     0     0     0     0     0     0     0     0     0     0
+##   13     0     0     0     0     0     0     0     0     0     0     0
+##     
+##         12    13
+##   1      0     0
+##   2      0     0
+##   3      0     0
+##   4      0     0
+##   5      0     0
+##   6      0     0
+##   7      0     0
+##   8      0     0
+##   9      0     0
+##   10     0     0
+##   11     0     0
+##   12     1     0
+##   13     0     1</code></pre>
+<ul>
+<li>age_upon_intake, age_upon_intake_year - Diese Variablen enthalten dieselben Informationen wie age_upon_intake_days.</li>
+<li>age_upon_intake_group - Die Gruppierung ist anhand falscher Cluster, je nach Tierarten bedeutet Alter etwas anderes.</li>
+<li>age_upon_outcome, age_upon_outcome_year - Diese Variablen enthalten dieselben Informationen wie <code>age_upon_outcome_days</code>.</li>
+<li>age_upon_outcome_group - Die Gruppierung ist anhand falscher Cluster, je nach Tierarten bedeutet Alter etwas anderes.</li>
 </ul>
 </div>
 <div id="old" class="section level2">
