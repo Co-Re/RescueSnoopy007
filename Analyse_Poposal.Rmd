@@ -198,10 +198,11 @@ table(aac_intakes_outcomes$intake_hour)
 table(aac_intakes_outcomes$outcome_number, aac_intakes_outcomes$intake_number)
 ```
 
-* age_upon_intake, age_upon_intake_year - Diese Variablen enthalten dieselben Informationen wie age_upon_intake_days.
-* age_upon_intake_group - Die Gruppierung ist anhand falscher Cluster, je nach Tierarten bedeutet Alter etwas anderes. 
-* age_upon_outcome, age_upon_outcome_year - Diese Variablen enthalten dieselben Informationen wie `age_upon_outcome_days`.
-* age_upon_outcome_group - Die Gruppierung ist anhand falscher Cluster, je nach Tierarten bedeutet Alter etwas anderes.
+* **age_upon_intake, age_upon_intake_year** - Diese Variablen enthalten dieselben Informationen wie age_upon_intake_days.
+* **age_upon_intake_group** - Die Gruppierung liefert keinen Mehrwert, da darin nicht die extrem variierende Lebenserwartung in Abhängigkeit der Tierart berücksichtigt wird.
+* **age_upon_outcome, age_upon_outcome_year** - Diese Variablen enthalten dieselben Informationen wie `age_upon_outcome_days`.
+* **age_upon_outcome_group** - Die Gruppierung liefert keinen Mehrwert, da darin nicht die extrem variierende Lebenserwartung in Abhängigkeit der Tierart berücksichtigt wird.
+
 
 ## Prüfung auf fehlende Werte
 
