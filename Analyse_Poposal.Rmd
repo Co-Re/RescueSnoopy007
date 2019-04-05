@@ -211,11 +211,8 @@ table(aac_intakes_outcomes2$outcome_type)
 
 v = as.vector(which(aac_intakes_outcomes2$outcome_type == ""))
 aac_intakes_outcomes2 <- aac_intakes_outcomes2[-v,]
-
+aac_intakes_outcomes2$outcome_type <- factor(aac_intakes_outcomes2$outcome_type)
 ```
-
-
-
 ### old
 
 Datetime_Intake -  Geburtsdatum in Tagen - Achtung: negative und Null-Werte vorhanden
