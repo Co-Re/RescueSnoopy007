@@ -255,7 +255,13 @@ Wir haben uns für diesen Datensatz mit dieser Fragestellung entschieden, da ein
 <div id="vorbereitung-in-r" class="section level2">
 <h2>Vorbereitung in R</h2>
 <p>Nachweis, dass die Daten in R geladen werden können. Laden Sie die Daten und drucken Sie die ersten Werte der Antwortvariablen als Nachweis. Warum diese Daten? Nachweis, dass die Daten in R modelliert werden können. Passen Sie entweder lm() (Regression) oder glm() (Klassifizierung) an, rufen Sie dann predict() auf und geben Sie die ersten Werte zurück. Möglicherweise müssen Sie vor diesem Schritt eine Datenbereinigung durchführen.</p>
+<p>Load libraries</p>
+<div id="load-data" class="section level3">
+<h3>Load Data</h3>
 <pre class="r"><code>aac_intakes_outcomes = read.csv(&quot;aac_intakes_outcomes.csv&quot;)</code></pre>
+</div>
+<div id="check-data-structure" class="section level3">
+<h3>Check Data Structure</h3>
 <pre class="r"><code>str(aac_intakes_outcomes)</code></pre>
 <pre><code>## 'data.frame':    79672 obs. of  41 variables:
 ##  $ age_upon_outcome          : Factor w/ 46 levels &quot;0 years&quot;,&quot;1 day&quot;,..: 8 42 40 8 15 14 14 14 14 17 ...
@@ -497,9 +503,14 @@ Wir haben uns für diesen Datensatz mit dieser Fragestellung entschieden, da ein
 ##  0 days 00:17:00.000000000:   77   3rd Qu.:  13.611    
 ##  0 days 00:13:00.000000000:   76   Max.   :1606.194    
 ##  (Other)                  :79211</code></pre>
+</div>
+<div id="initial-data-cleaning-convert-data-types" class="section level3">
+<h3>Initial Data Cleaning: Convert Data types</h3>
 <pre class="r"><code>aac_intakes_outcomes$animal_id_outcome &lt;- as.character(aac_intakes_outcomes$animal_id_outcome)
 aac_intakes_outcomes$date_of_birth &lt;- anytime(aac_intakes_outcomes$date_of_birth)
 
+aac_intakes_outcomes$sex_upon_outcome[is.na(aac_intakes_outcomes$sex_upon_outcome)] &lt;- &quot;Unknown&quot;
+aac_intakes_outcomes$sex_upon_outcome[is.element(aac_intakes_outcomes$sex_upon_outcome, &quot;NULL&quot;)] &lt;- &quot;Unknown&quot;
 aac_intakes_outcomes$sex_upon_outcome_first &lt;- as.factor(sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_outcome), &quot; &quot;), &quot;[&quot;, 1))
 aac_intakes_outcomes$sex_upon_outcome_second &lt;- sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_outcome), &quot; &quot;), &quot;[&quot;, 2)
 aac_intakes_outcomes$sex_upon_outcome_second[is.na(aac_intakes_outcomes$sex_upon_outcome_second)] &lt;- &quot;Unknown&quot;
@@ -514,9 +525,11 @@ aac_intakes_outcomes$dob_month &lt;- as.factor(aac_intakes_outcomes$dob_month)
 aac_intakes_outcomes$dob_year &lt;- as.factor(aac_intakes_outcomes$dob_year)
 aac_intakes_outcomes$animal_id_intake &lt;- as.character(aac_intakes_outcomes$animal_id_intake)
 
+aac_intakes_outcomes$sex_upon_intake[is.na(aac_intakes_outcomes$sex_upon_intake)] &lt;- &quot;Unknown&quot;
 aac_intakes_outcomes$sex_upon_intake_first &lt;- as.factor(sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_intake), &quot; &quot;), &quot;[&quot;, 1))
 aac_intakes_outcomes$sex_upon_intake_second &lt;- sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_intake), &quot; &quot;), &quot;[&quot;, 2)
 aac_intakes_outcomes$sex_upon_intake_second[is.na(aac_intakes_outcomes$sex_upon_intake_second)] &lt;- &quot;Unknown&quot;
+aac_intakes_outcomes$sex_upon_intake_first[is.na(aac_intakes_outcomes$sex_upon_intake_first)] &lt;- &quot;Unknown&quot;
 aac_intakes_outcomes$sex_upon_intake_second &lt;- as.factor(aac_intakes_outcomes$sex_upon_intake_second)
 
 aac_intakes_outcomes$count &lt;- as.numeric(aac_intakes_outcomes$count)
@@ -525,7 +538,9 @@ aac_intakes_outcomes$intake_datetime &lt;- anytime(aac_intakes_outcomes$intake_d
 aac_intakes_outcomes$intake_month &lt;- as.factor(aac_intakes_outcomes$intake_month)
 aac_intakes_outcomes$intake_year &lt;- as.factor(aac_intakes_outcomes$intake_year)
 aac_intakes_outcomes$intake_hour &lt;- as.factor(hour(aac_intakes_outcomes$intake_datetime))</code></pre>
-<p>Anmerkungen zu dem Datenset:</p>
+</div>
+<div id="anmerkungen-zu-dem-datenset" class="section level3">
+<h3>Anmerkungen zu dem Datenset:</h3>
 <p>Folgende Animal-Types sind vorhanden:</p>
 <pre class="r"><code>table(aac_intakes_outcomes$animal_type)</code></pre>
 <pre><code>## 
@@ -534,12 +549,14 @@ aac_intakes_outcomes$intake_hour &lt;- as.factor(hour(aac_intakes_outcomes$intak
 <p>Folgende Kombinationen sind beim Geschlecht möglich:</p>
 <pre class="r"><code>table(aac_intakes_outcomes$sex_upon_intake_first, aac_intakes_outcomes$sex_upon_outcome_first) </code></pre>
 <pre><code>##           
-##            Intact Neutered  NULL Spayed Unknown
-##   Intact    19037    15586     0  14398       0
-##   Neutered      1    12707     0      0       0
-##   Spayed        2        0     0  11151       0
-##   Unknown       0        0     0      0    6789</code></pre>
-<p>neues Dataset:</p>
+##            Intact Neutered Spayed Unknown
+##   Intact    19037    15586  14398       0
+##   Neutered      1    12707      0       0
+##   Spayed        2        0  11151       0
+##   Unknown       0        0      0    6790</code></pre>
+</div>
+<div id="neues-datenset-subsetting" class="section level3">
+<h3>Neues Datenset: Subsetting</h3>
 <pre class="r"><code>aac_intakes_outcomes2 &lt;- aac_intakes_outcomes[c(5, 22:24, 26, 27, 43, 42, 44, 3, 17, 18, 33:35, 39, 10:12, 30, 7, 40, 41)]</code></pre>
 <p>Folgende Variablen wurden für das neue Dataset nicht verwendet:</p>
 <ul>
@@ -555,55 +572,51 @@ aac_intakes_outcomes$intake_hour &lt;- as.factor(hour(aac_intakes_outcomes$intak
 <ul>
 <li>outcome_subtype - Diese Variable enthält nur sehr wenige Informationen, diese sind nicht durchgängig je <code>Outcome_type</code> befüllt.</li>
 </ul>
-<pre class="r"><code>table(aac_intakes_outcomes$outcome_type, aac_intakes_outcomes$outcome_subtype)</code></pre>
-<pre><code>##                  
-##                         Aggressive At Vet  Barn Behavior
-##                      10          0      0     0        0
-##   Adoption        27753          0      0     1        0
-##   Died               88          0     34     0        0
-##   Disposal          304          0      0     0        0
-##   Euthanasia        174        497     36     0      133
-##   Missing            11          0      0     0        0
-##   Relocate           15          0      0     0        0
-##   Return to Owner 14790          0      1     0        0
-##   Rto-Adopt         179          0      0     0        0
-##   Transfer            0          0      0     2        0
-##                  
-##                   Court/Investigation Enroute Foster In Foster In Kennel
-##                                     0       0      0         0         0
-##   Adoption                          0       0   5490         0         0
-##   Died                              0      49      0       159       343
-##   Disposal                          0       0      0         0         0
-##   Euthanasia                       23       0      0         0         0
-##   Missing                           0       0      0        18         8
-##   Relocate                          0       0      0         0         0
-##   Return to Owner                   0       0      0         0         0
-##   Rto-Adopt                         0       0      0         0         0
-##   Transfer                          0       0      0         0         0
-##                  
-##                   In Surgery Medical Offsite Partner Possible Theft
-##                            0       0       0       0              0
-##   Adoption                 0       0     350       0              0
-##   Died                    17       0       0       0              0
-##   Disposal                 0       0       0       0              0
-##   Euthanasia               0     265       0       0              0
-##   Missing                  0       0       0       0              9
-##   Relocate                 0       0       0       0              0
-##   Return to Owner          0       0       0       0              0
-##   Rto-Adopt                0       0       0       0              0
-##   Transfer                 0       0       0   19840              0
-##                  
-##                   Rabies Risk  SCRP   Snr Suffering Underage
-##                             0     0     0         0        0
-##   Adoption                  0     0     0         0        0
-##   Died                      0     0     0         0        0
-##   Disposal                  0     0     0         0        0
-##   Euthanasia             2539     0     0      2549       28
-##   Missing                   0     0     0         0        0
-##   Relocate                  0     0     0         0        0
-##   Return to Owner           0     0     0         0        0
-##   Rto-Adopt                 0     0     0         0        0
-##   Transfer                  0  3205   752         0        0</code></pre>
+<pre class="r"><code>table(aac_intakes_outcomes$outcome_subtype, aac_intakes_outcomes$outcome_type)</code></pre>
+<pre><code>##                      
+##                             Adoption  Died Disposal Euthanasia Missing
+##                          10    27753    88      304        174      11
+##   Aggressive              0        0     0        0        497       0
+##   At Vet                  0        0    34        0         36       0
+##   Barn                    0        1     0        0          0       0
+##   Behavior                0        0     0        0        133       0
+##   Court/Investigation     0        0     0        0         23       0
+##   Enroute                 0        0    49        0          0       0
+##   Foster                  0     5490     0        0          0       0
+##   In Foster               0        0   159        0          0      18
+##   In Kennel               0        0   343        0          0       8
+##   In Surgery              0        0    17        0          0       0
+##   Medical                 0        0     0        0        265       0
+##   Offsite                 0      350     0        0          0       0
+##   Partner                 0        0     0        0          0       0
+##   Possible Theft          0        0     0        0          0       9
+##   Rabies Risk             0        0     0        0       2539       0
+##   SCRP                    0        0     0        0          0       0
+##   Snr                     0        0     0        0          0       0
+##   Suffering               0        0     0        0       2549       0
+##   Underage                0        0     0        0         28       0
+##                      
+##                       Relocate Return to Owner Rto-Adopt Transfer
+##                             15           14790       179        0
+##   Aggressive                 0               0         0        0
+##   At Vet                     0               1         0        0
+##   Barn                       0               0         0        2
+##   Behavior                   0               0         0        0
+##   Court/Investigation        0               0         0        0
+##   Enroute                    0               0         0        0
+##   Foster                     0               0         0        0
+##   In Foster                  0               0         0        0
+##   In Kennel                  0               0         0        0
+##   In Surgery                 0               0         0        0
+##   Medical                    0               0         0        0
+##   Offsite                    0               0         0        0
+##   Partner                    0               0         0    19840
+##   Possible Theft             0               0         0        0
+##   Rabies Risk                0               0         0        0
+##   SCRP                       0               0         0     3205
+##   Snr                        0               0         0      752
+##   Suffering                  0               0         0        0
+##   Underage                   0               0         0        0</code></pre>
 <ul>
 <li>animal_id_outcome - ID kann nicht für Klassifikation verwendet werden</li>
 <li>sex_upon_outcome - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet</li>
@@ -678,10 +691,95 @@ aac_intakes_outcomes$intake_hour &lt;- as.factor(hour(aac_intakes_outcomes$intak
 <li>age_upon_outcome_group - Die Gruppierung ist anhand falscher Cluster, je nach Tierarten bedeutet Alter etwas anderes.</li>
 </ul>
 </div>
-<div id="old" class="section level2">
-<h2>old</h2>
+</div>
+<div id="prufung-auf-fehlende-werte" class="section level2">
+<h2>Prüfung auf fehlende Werte</h2>
+<pre class="r"><code>summary(aac_intakes_outcomes2)</code></pre>
+<pre><code>##           outcome_type   animal_type                        breed      
+##  Adoption       :33594   Bird :  339   Domestic Shorthair Mix  :23423  
+##  Transfer       :23799   Cat  :29539   Pit Bull Mix            : 6256  
+##  Return to Owner:14791   Dog  :45366   Chihuahua Shorthair Mix : 4831  
+##  Euthanasia     : 6244   Other: 4428   Labrador Retriever Mix  : 4789  
+##  Died           :  690                 Domestic Medium Hair Mix: 2326  
+##  Disposal       :  304                 German Shepherd Mix     : 1950  
+##  (Other)        :  250                 (Other)                 :36097  
+##          color       intake_condition             intake_type   
+##  Black/White: 8270   Normal :70056    Euthanasia Request:  251  
+##  Black      : 6673   Injured: 3997    Owner Surrender   :15028  
+##  Brown Tabby: 4471   Sick   : 3099    Public Assist     : 4994  
+##  Brown      : 3598   Nursing: 1915    Stray             :55935  
+##  White      : 2835   Aged   :  319    Wildlife          : 3464  
+##  Brown/White: 2516   Other  :  147                              
+##  (Other)    :51309   (Other):  139                              
+##  sex_upon_outcome_second sex_upon_outcome_first sex_upon_intake_first
+##  Female :34857           Intact  :19040         Intact  :49021       
+##  Male   :38025           Neutered:28293         Neutered:12708       
+##  Unknown: 6790           Spayed  :25549         Spayed  :11153       
+##                          Unknown : 6790         Unknown : 6790       
+##                                                                      
+##                                                                      
+##                                                                      
+##  date_of_birth                    dob_year       dob_month    
+##  Min.   :1991-12-11 00:00:00   2015   :14358   4      : 9138  
+##  1st Qu.:2012-09-29 00:00:00   2014   :14334   5      : 8138  
+##  Median :2014-06-04 00:00:00   2013   :11001   3      : 7850  
+##  Mean   :2013-09-26 02:23:02   2016   :10968   6      : 6760  
+##  3rd Qu.:2015-10-27 00:00:00   2017   : 6989   8      : 6569  
+##  Max.   :2018-03-25 00:00:00   2012   : 6209   7      : 6459  
+##                                (Other):15813   (Other):34758  
+##  intake_datetime                intake_month   intake_year 
+##  Min.   :2013-10-01 07:51:00   5      : 7966   2013: 4178  
+##  1st Qu.:2014-10-27 07:06:00   10     : 7652   2014:18645  
+##  Median :2015-11-17 15:53:30   6      : 7459   2015:18699  
+##  Mean   :2015-12-10 08:24:35   3      : 6613   2016:17632  
+##  3rd Qu.:2017-01-15 16:13:45   11     : 6597   2017:17440  
+##  Max.   :2018-03-29 18:20:00   7      : 6528   2018: 3078  
+##                                (Other):36857               
+##  intake_number    outcome_datetime              outcome_month  
+##  Min.   : 1.000   Min.   :2013-10-01 10:39:00   7      : 7424  
+##  1st Qu.: 1.000   1st Qu.:2014-11-12 17:56:30   10     : 7219  
+##  Median : 1.000   Median :2015-12-11 12:25:00   6      : 7009  
+##  Mean   : 1.127   Mean   :2015-12-27 02:35:45   12     : 6845  
+##  3rd Qu.: 1.000   3rd Qu.:2017-01-31 14:53:15   8      : 6840  
+##  Max.   :13.000   Max.   :2018-04-03 18:43:00   11     : 6837  
+##                                                 (Other):37498  
+##  outcome_year age_upon_intake_.days. age_upon_outcome_.days.
+##  2013: 3704   Min.   :   0.0         Min.   :   0           
+##  2014:18584   1st Qu.:  60.0         1st Qu.:  90           
+##  2015:18505   Median : 365.0         Median : 365           
+##  2016:17667   Mean   : 769.3         Mean   : 782           
+##  2017:17661   3rd Qu.:1095.0         3rd Qu.:1095           
+##  2018: 3551   Max.   :9125.0         Max.   :9125           
+##                                                             
+##                   time_in_shelter  time_in_shelter_days
+##  0 days 00:06:00.000000000:   77   Min.   :   0.000    
+##  0 days 00:11:00.000000000:   77   1st Qu.:   1.102    
+##  0 days 00:12:00.000000000:   77   Median :   4.987    
+##  0 days 00:14:00.000000000:   77   Mean   :  16.757    
+##  0 days 00:17:00.000000000:   77   3rd Qu.:  13.611    
+##  0 days 00:13:00.000000000:   76   Max.   :1606.194    
+##  (Other)                  :79211</code></pre>
+<pre class="r"><code>unique(aac_intakes_outcomes2$outcome_type)</code></pre>
+<pre><code>##  [1] Return to Owner Transfer        Adoption        Euthanasia     
+##  [5] Died            Rto-Adopt       Missing         Disposal       
+##  [9]                 Relocate       
+## 10 Levels:  Adoption Died Disposal Euthanasia Missing ... Transfer</code></pre>
+<pre class="r"><code>table(aac_intakes_outcomes2$outcome_type)</code></pre>
+<pre><code>## 
+##                        Adoption            Died        Disposal 
+##              10           33594             690             304 
+##      Euthanasia         Missing        Relocate Return to Owner 
+##            6244              46              15           14791 
+##       Rto-Adopt        Transfer 
+##             179           23799</code></pre>
+<pre class="r"><code>v = as.vector(which(aac_intakes_outcomes2$outcome_type == &quot;&quot;))
+aac_intakes_outcomes2 &lt;- aac_intakes_outcomes2[-v,]
+aac_intakes_outcomes2$outcome_type &lt;- factor(aac_intakes_outcomes2$outcome_type)</code></pre>
+<div id="old" class="section level3">
+<h3>old</h3>
 <p>Datetime_Intake - Geburtsdatum in Tagen - Achtung: negative und Null-Werte vorhanden</p>
 <p>Folgendes können wir für die Datensätze verwenden, bei denen das Geburtsdatum und datetime_outcome nicht vorhanden ist: Hier wird die Age-Spalte getrennt und das Alter in Tagen berechnet.</p>
+</div>
 </div>
 
 

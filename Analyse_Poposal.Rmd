@@ -68,7 +68,7 @@ Wir haben uns für diesen Datensatz mit dieser Fragestellung entschieden, da ein
 Nachweis, dass die Daten in R geladen werden können. Laden Sie die Daten und drucken Sie die ersten Werte der Antwortvariablen als Nachweis. Warum diese Daten?
 Nachweis, dass die Daten in R modelliert werden können. Passen Sie entweder lm() (Regression) oder glm() (Klassifizierung) an, rufen Sie dann predict() auf und geben Sie die ersten Werte zurück. Möglicherweise müssen Sie vor diesem Schritt eine Datenbereinigung durchführen.
 
-###Load libraries
+Load libraries
 ```{r, include=F}
 library("plyr")
 library("anytime")
@@ -96,6 +96,7 @@ aac_intakes_outcomes$animal_id_outcome <- as.character(aac_intakes_outcomes$anim
 aac_intakes_outcomes$date_of_birth <- anytime(aac_intakes_outcomes$date_of_birth)
 
 aac_intakes_outcomes$sex_upon_outcome[is.na(aac_intakes_outcomes$sex_upon_outcome)] <- "Unknown"
+aac_intakes_outcomes$sex_upon_outcome[is.element(aac_intakes_outcomes$sex_upon_outcome, "NULL")] <- "Unknown"
 aac_intakes_outcomes$sex_upon_outcome_first <- as.factor(sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_outcome), " "), "[", 1))
 aac_intakes_outcomes$sex_upon_outcome_second <- sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_outcome), " "), "[", 2)
 aac_intakes_outcomes$sex_upon_outcome_second[is.na(aac_intakes_outcomes$sex_upon_outcome_second)] <- "Unknown"
@@ -161,7 +162,7 @@ table(aac_intakes_outcomes$sex_upon_intake_second, aac_intakes_outcomes$sex_upon
 * outcome_subtype - Diese Variable enthält nur sehr wenige Informationen, diese sind nicht durchgängig je `Outcome_type` befüllt.
 
 ```{r}
-table(aac_intakes_outcomes$outcome_type, aac_intakes_outcomes$outcome_subtype)
+table(aac_intakes_outcomes$outcome_subtype, aac_intakes_outcomes$outcome_type)
 ```
 
 * animal_id_outcome - ID kann nicht für Klassifikation verwendet werden
