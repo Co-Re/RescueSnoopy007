@@ -68,16 +68,19 @@ Wir haben uns für diesen Datensatz mit dieser Fragestellung entschieden, da ein
 Nachweis, dass die Daten in R geladen werden können. Laden Sie die Daten und drucken Sie die ersten Werte der Antwortvariablen als Nachweis. Warum diese Daten?
 Nachweis, dass die Daten in R modelliert werden können. Passen Sie entweder lm() (Regression) oder glm() (Klassifizierung) an, rufen Sie dann predict() auf und geben Sie die ersten Werte zurück. Möglicherweise müssen Sie vor diesem Schritt eine Datenbereinigung durchführen.
 
+###Load libraries
 ```{r, include=F}
 library("plyr")
 library("anytime")
 library("lubridate")
 ```
 
+###Load Data
 ```{r}
 aac_intakes_outcomes = read.csv("aac_intakes_outcomes.csv")
 ```
 
+###Check Data Structure
 ```{r}
 str(aac_intakes_outcomes)
 head(aac_intakes_outcomes)
@@ -87,6 +90,7 @@ head(aac_intakes_outcomes)
 summary(aac_intakes_outcomes)
 ```
 
+###Initial Data Cleaning: Convert Data types
 ```{r}
 aac_intakes_outcomes$animal_id_outcome <- as.character(aac_intakes_outcomes$animal_id_outcome)
 aac_intakes_outcomes$date_of_birth <- anytime(aac_intakes_outcomes$date_of_birth)
@@ -118,7 +122,7 @@ aac_intakes_outcomes$intake_year <- as.factor(aac_intakes_outcomes$intake_year)
 aac_intakes_outcomes$intake_hour <- as.factor(hour(aac_intakes_outcomes$intake_datetime))
 ```
 
-Anmerkungen zu dem Datenset:
+###Anmerkungen zu dem Datenset:
 
 
 Folgende Animal-Types sind vorhanden:
@@ -136,7 +140,7 @@ table(aac_intakes_outcomes$sex_upon_intake_first, aac_intakes_outcomes$sex_upon_
 ```
 
 
-neues Dataset:
+###Neues Datenset: Subsetting 
 
 ```{r}
 aac_intakes_outcomes2 <- aac_intakes_outcomes[c(5, 22:24, 26, 27, 43, 42, 44, 3, 17, 18, 33:35, 39, 10:12, 30, 7, 40, 41)]
@@ -196,7 +200,7 @@ table(aac_intakes_outcomes$outcome_number, aac_intakes_outcomes$intake_number)
 * age_upon_outcome_group - Die Gruppierung ist anhand falscher Cluster, je nach Tierarten bedeutet Alter etwas anderes.
 
 
-## old
+### old
 
 Datetime_Intake -  Geburtsdatum in Tagen - Achtung: negative und Null-Werte vorhanden
 ```{r, eval=F, echo = F}
