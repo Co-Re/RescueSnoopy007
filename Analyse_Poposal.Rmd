@@ -68,18 +68,20 @@ Wir haben uns für diesen Datensatz mit dieser Fragestellung entschieden, da ein
 Nachweis, dass die Daten in R geladen werden können. Laden Sie die Daten und drucken Sie die ersten Werte der Antwortvariablen als Nachweis. Warum diese Daten?
 Nachweis, dass die Daten in R modelliert werden können. Passen Sie entweder lm() (Regression) oder glm() (Klassifizierung) an, rufen Sie dann predict() auf und geben Sie die ersten Werte zurück. Möglicherweise müssen Sie vor diesem Schritt eine Datenbereinigung durchführen.
 
+Load libraries
 ```{r, include=F}
 library("plyr")
 library("anytime")
 library("lubridate")
 library("kableExtra")
-library("tibble")
 ```
 
+###Load Data
 ```{r}
 aac_intakes_outcomes = read.csv("aac_intakes_outcomes.csv")
 ```
 
+###Check Data Structure
 ```{r}
 str(aac_intakes_outcomes)
 head(aac_intakes_outcomes)
@@ -89,10 +91,13 @@ head(aac_intakes_outcomes)
 summary(aac_intakes_outcomes)
 ```
 
+###Initial Data Cleaning: Convert Data types
 ```{r}
 aac_intakes_outcomes$animal_id_outcome <- as.character(aac_intakes_outcomes$animal_id_outcome)
 aac_intakes_outcomes$date_of_birth <- anytime(aac_intakes_outcomes$date_of_birth)
 
+aac_intakes_outcomes$sex_upon_outcome[is.na(aac_intakes_outcomes$sex_upon_outcome)] <- "Unknown"
+aac_intakes_outcomes$sex_upon_outcome[is.element(aac_intakes_outcomes$sex_upon_outcome, "NULL")] <- "Unknown"
 aac_intakes_outcomes$sex_upon_outcome_first <- as.factor(sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_outcome), " "), "[", 1))
 aac_intakes_outcomes$sex_upon_outcome_second <- sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_outcome), " "), "[", 2)
 aac_intakes_outcomes$sex_upon_outcome_second[is.na(aac_intakes_outcomes$sex_upon_outcome_second)] <- "Unknown"
@@ -107,9 +112,11 @@ aac_intakes_outcomes$dob_month <- as.factor(aac_intakes_outcomes$dob_month)
 aac_intakes_outcomes$dob_year <- as.factor(aac_intakes_outcomes$dob_year)
 aac_intakes_outcomes$animal_id_intake <- as.character(aac_intakes_outcomes$animal_id_intake)
 
+aac_intakes_outcomes$sex_upon_intake[is.na(aac_intakes_outcomes$sex_upon_intake)] <- "Unknown"
 aac_intakes_outcomes$sex_upon_intake_first <- as.factor(sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_intake), " "), "[", 1))
 aac_intakes_outcomes$sex_upon_intake_second <- sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_intake), " "), "[", 2)
 aac_intakes_outcomes$sex_upon_intake_second[is.na(aac_intakes_outcomes$sex_upon_intake_second)] <- "Unknown"
+aac_intakes_outcomes$sex_upon_intake_first[is.na(aac_intakes_outcomes$sex_upon_intake_first)] <- "Unknown"
 aac_intakes_outcomes$sex_upon_intake_second <- as.factor(aac_intakes_outcomes$sex_upon_intake_second)
 
 aac_intakes_outcomes$count <- as.numeric(aac_intakes_outcomes$count)
@@ -120,7 +127,7 @@ aac_intakes_outcomes$intake_year <- as.factor(aac_intakes_outcomes$intake_year)
 aac_intakes_outcomes$intake_hour <- as.factor(hour(aac_intakes_outcomes$intake_datetime))
 ```
 
-Anmerkungen zu dem Datenset:
+###Anmerkungen zu dem Datenset:
 
 
 Folgende Animal-Types sind vorhanden:
@@ -138,7 +145,7 @@ table(aac_intakes_outcomes$sex_upon_intake_first, aac_intakes_outcomes$sex_upon_
 ```
 
 
-neues Dataset:
+###Neues Datenset: Subsetting 
 
 ```{r}
 aac_intakes_outcomes2 <- aac_intakes_outcomes[c(5, 22:24, 26, 27, 43, 42, 44, 3, 17, 18, 33:35, 39, 10:12, 30, 7, 40, 41)]
@@ -156,7 +163,7 @@ table(aac_intakes_outcomes$sex_upon_intake_second, aac_intakes_outcomes$sex_upon
 * outcome_subtype - Diese Variable enthält nur sehr wenige Informationen, diese sind nicht durchgängig je `Outcome_type` befüllt.
 
 ```{r}
-table(aac_intakes_outcomes$outcome_type, aac_intakes_outcomes$outcome_subtype)
+table(aac_intakes_outcomes$outcome_subtype, aac_intakes_outcomes$outcome_type)
 ```
 
 * animal_id_outcome - ID kann nicht für Klassifikation verwendet werden
@@ -192,19 +199,28 @@ table(aac_intakes_outcomes$intake_hour)
 table(aac_intakes_outcomes$outcome_number, aac_intakes_outcomes$intake_number)
 ```
 
-* age_upon_intake, age_upon_intake_year - Diese Variablen enthalten dieselben Informationen wie age_upon_intake_days.
-* age_upon_intake_group - Die Gruppierung ist anhand falscher Cluster, je nach Tierarten bedeutet Alter etwas anderes. 
-* age_upon_outcome, age_upon_outcome_year - Diese Variablen enthalten dieselben Informationen wie `age_upon_outcome_days`.
-* age_upon_outcome_group - Die Gruppierung ist anhand falscher Cluster, je nach Tierarten bedeutet Alter etwas anderes.
+* **age_upon_intake, age_upon_intake_year** - Diese Variablen enthalten dieselben Informationen wie age_upon_intake_days.
+* **age_upon_intake_group** - Die Gruppierung liefert keinen Mehrwert, da darin nicht die extrem variierende Lebenserwartung in Abhängigkeit der Tierart berücksichtigt wird.
+* **age_upon_outcome, age_upon_outcome_year** - Diese Variablen enthalten dieselben Informationen wie `age_upon_outcome_days`.
+* **age_upon_outcome_group** - Die Gruppierung liefert keinen Mehrwert, da darin nicht die extrem variierende Lebenserwartung in Abhängigkeit der Tierart berücksichtigt wird.
 
 
-Anpassen des Animal Types Other.
+## Prüfung auf fehlende Werte
+
 ```{r}
-others = NULL
+summary(aac_intakes_outcomes2)
+unique(aac_intakes_outcomes2$outcome_type)
+table(aac_intakes_outcomes2$outcome_type)
+
+v = as.vector(which(aac_intakes_outcomes2$outcome_type == ""))
+aac_intakes_outcomes2 <- aac_intakes_outcomes2[-v,]
+aac_intakes_outcomes2$outcome_type <- factor(aac_intakes_outcomes2$outcome_type)
+```
+
+## Anpassen des Animal Types Other
+```{r}
 others = aac_intakes_outcomes2[aac_intakes_outcomes2$animal_type  == "Other", ] 
 
-kable(count(others$breed), align = "l") %>%
-  kable_styling(bootstrap_options = "striped")
 
 # Erstellen eines csv files um die verschiedenen Rassen Tieren zuordnen zu können 
 # write.csv(count(others$breed), file = "breed.csv", append = FALSE, quote = TRUE, sep = " ",
@@ -262,8 +278,8 @@ kable(count(aac_intakes_outcomes2$animal_type), align = "l") %>%
 
 
 
-## old
 
+### old
 Datetime_Intake -  Geburtsdatum in Tagen - Achtung: negative und Null-Werte vorhanden
 ```{r, eval=F, echo = F}
 aac_in_out$calc_age_in <- round(((aac_in_out$datetime_intake - aac_in_out$date_of_birth)/24/60),0)
