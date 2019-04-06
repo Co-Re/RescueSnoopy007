@@ -72,6 +72,8 @@ Nachweis, dass die Daten in R modelliert werden können. Passen Sie entweder lm(
 library("plyr")
 library("anytime")
 library("lubridate")
+library("kableExtra")
+library("tibble")
 ```
 
 ```{r}
@@ -196,6 +198,70 @@ table(aac_intakes_outcomes$outcome_number, aac_intakes_outcomes$intake_number)
 * age_upon_outcome_group - Die Gruppierung ist anhand falscher Cluster, je nach Tierarten bedeutet Alter etwas anderes.
 
 
+Anpassen des Animal Types Other.
+```{r}
+others = NULL
+others = aac_intakes_outcomes2[aac_intakes_outcomes2$animal_type  == "Other", ] 
+
+kable(count(others$breed), align = "l") %>%
+  kable_styling(bootstrap_options = "striped")
+
+# Erstellen eines csv files um die verschiedenen Rassen Tieren zuordnen zu können 
+# write.csv(count(others$breed), file = "breed.csv", append = FALSE, quote = TRUE, sep = " ",
+#             eol = "\n", na = "NA", dec = ".", row.names = TRUE,
+#             col.names = TRUE, qmethod = c("escape", "double"),
+#             fileEncoding = "")
+
+# Entfernen von "Mix"
+new_animal_type <- gsub(" Mix","",others$breed)
+
+#Ersetzen aller Rassen die Rabbit enthalten
+new_animal_type <-
+gsub("(.*)?Rabbit(.*)?", "Rabbit", new_animal_type)
+
+# Ersetzen aller Rassen die Rabbit Rassen sind
+rabbit_pattern <-
+"(American Sable|Angora|Belgian Hare|Britannia Petit|Californian|Checkered Giant|Cinnamon|Cottontail|Dutch|English Spot|Flemish Giant|Harlequin|Havana|Himalayan|Hotot|Jersey Wooly|Lionhead|Lop|Netherlnd Dwarf|New Zealand Wht|Rex|Ringtail|Silver|Polish)"
+rabbit_pattern <- paste("(.*)?", rabbit_pattern, "(.*)?", sep = "")
+new_animal_type <- gsub(rabbit_pattern, "Rabbit", new_animal_type)
+
+# Gerbil mit Mouse ersetzen
+new_animal_type <- gsub("(.*)?Gerbil(.*)?", "Mouse", new_animal_type)
+
+# Chinchilla
+new_animal_type <- gsub("(.*)?Chinchilla(.*)?", "Chinchilla", new_animal_type)
+
+# Snake
+new_animal_type <- gsub("(.*)?Snake(.*)?", "Snake", new_animal_type)
+
+# Pig
+new_animal_type <- gsub("(.*)?Pig(.*)?", "Pig", new_animal_type)
+
+# Ersetzen von Rassen, die nicht bekannt sind, mit "Other""
+new_animal_type <- gsub("(.*)?(Cold Water|American|Tropical)(.*)?", "Other", new_animal_type)
+
+others$animal_type = new_animal_type
+
+# Ersetzen der Animaltypen für Other in der Original Tabelle
+
+tmp_aac<- aac_intakes_outcomes2
+
+tmp_aac$animal_type = as.character(tmp_aac$animal_type)
+
+typeof(others$animal_type)
+typeof(tmp_aac$animal_type)
+tmp_aac[tmp_aac$animal_type  == "Other", ] = others
+
+aac_intakes_outcomes2 = tmp_aac
+
+kable(count(aac_intakes_outcomes2$animal_type), align = "l") %>%
+  kable_styling(bootstrap_options = "striped")
+
+
+```
+
+
+
 ## old
 
 Datetime_Intake -  Geburtsdatum in Tagen - Achtung: negative und Null-Werte vorhanden
@@ -249,5 +315,7 @@ aac_in_out$age_upon_intake_calc_days <- aac_in_out$age_upon_intake_char * aac_in
 aac_in_out$age_upon_outcome_calc_days <- aac_in_out$age_upon_outcome_char * aac_in_out$age_upon_outcome_num ## geht noch nicht, da NAs
 
 ```
+
+
 
 
