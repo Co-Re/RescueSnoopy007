@@ -253,8 +253,11 @@ new_animal_type <- gsub("(.*)?Snake(.*)?", "Snake", new_animal_type)
 # Pig
 new_animal_type <- gsub("(.*)?Pig(.*)?", "Pig", new_animal_type)
 
+# Fish
+new_animal_type <- gsub("(.*)?Cold Water(.*)?", "Fish", new_animal_type)
+
 # Ersetzen von Rassen, die nicht bekannt sind, mit "Other""
-new_animal_type <- gsub("(.*)?(Cold Water|American|Tropical)(.*)?", "Other", new_animal_type)
+new_animal_type <- gsub("(.*)?(American|Tropical)(.*)?", "Other", new_animal_type)
 
 others$animal_type = new_animal_type
 
@@ -272,7 +275,6 @@ aac_intakes_outcomes2 = tmp_aac
 
 kable(count(aac_intakes_outcomes2$animal_type), align = "l") %>%
   kable_styling(bootstrap_options = "striped")
-
 
 ```
 
