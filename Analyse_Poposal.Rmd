@@ -55,7 +55,8 @@ Vorhersage des Outcome-Types auf Basis der gegebenen Variablen. Es sollen die Pr
 
 * eine Rückgabe an den Besitzer, 
 * ein Transfer oder 
-* eine Adaption 
+* eine Adoption  
+
 möglichst genau vorhergesagt werden kann. 
 
 ## Motivation
@@ -65,10 +66,7 @@ Weiß man, welche Aspekte eine Rolle spielen, könnte man diese gezielt in den T
 Wir haben uns für diesen Datensatz mit dieser Fragestellung entschieden, da einige von uns selbst Haustiere besitzen und wir den Eindruck haben, dass es bereits ausreichend viele Analysen zu ökonomischen Fragestellungen gibt.
 
 ## Vorbereitung in R
-Nachweis, dass die Daten in R geladen werden können. Laden Sie die Daten und drucken Sie die ersten Werte der Antwortvariablen als Nachweis. Warum diese Daten?
-Nachweis, dass die Daten in R modelliert werden können. Passen Sie entweder lm() (Regression) oder glm() (Klassifizierung) an, rufen Sie dann predict() auf und geben Sie die ersten Werte zurück. Möglicherweise müssen Sie vor diesem Schritt eine Datenbereinigung durchführen.
 
-Load libraries
 ```{r, include=F}
 library("plyr")
 library("anytime")
@@ -229,60 +227,4 @@ glm.prob = predict(glm.fit, type = "response")
 glm.prob[1:10]
 ```
 Erläuterung: 
-Eine Prediction wie sie hier dargestellt ist, ist noch nicht sinnvoll, da mehrere Klassen in der Response vorhanden sind. Für mehrere Klassen sollte eine andere Funktion/ein anderes Modell verwendet werden.
-
-### old
-
-Datetime_Intake -  Geburtsdatum in Tagen - Achtung: negative und Null-Werte vorhanden
-```{r, eval=F, echo = F}
-aac_in_out$calc_age_in <- round(((aac_in_out$datetime_intake - aac_in_out$date_of_birth)/24/60),0)
-```
-
-Folgendes können wir für die Datensätze verwenden, bei denen das Geburtsdatum und datetime_outcome nicht vorhanden ist:
-Hier wird die Age-Spalte getrennt und das Alter in Tagen berechnet.
-
-```{r, eval=F, echo = F}
-aac_in_out$age_upon_intake_num <- as.numeric(sapply(strsplit(as.character(aac_in_out$age_upon_intake), " "), "[", 1))
-aac_in_out$age_upon_intake_char <- sapply(strsplit(as.character(aac_in_out$age_upon_intake), " "), "[", 2)
-
-aac_in_out$age_upon_outcome_num <- as.numeric(sapply(strsplit(as.character(aac_in_out$age_upon_outcome), " "), "[", 1))
-aac_in_out$age_upon_outcome_char <- sapply(strsplit(as.character(aac_in_out$age_upon_outcome), " "), "[", 2)
-
-function_age <- function(value){
-  if (is.element(value, "years")){
-    value <- "365"
-  }
-  else if (is.element(value, "year")){
-    value <- "365"
-  }
-  else if (is.element(value, "month")){
-    value <- "30"
-  }
-  else if (is.element(value, "months")){
-    value <- "30"
-  }
-  else if (is.element(value, "week")){
-    value <- "7"
-  }
-  else if (is.element(value, "weeks")){
-    value <- "7"
-  }
-  else if (is.element(value, "days")){
-    value <- "1"
-  }
-  else if (is.element(value, "day")){
-    value <- "1"
-  }
-  else if (is.na(value))
-    value <- "0" ## ggfs nicht richtig
-}
-
-aac_in_out$age_upon_intake_char <- sapply(sapply(aac_in_out$age_upon_intake_char, function_age), as.numeric)
-aac_in_out$age_upon_outcome_char <- sapply(sapply(aac_in_out$age_upon_outcome_char, function_age), as.numeric)
-
-aac_in_out$age_upon_intake_calc_days <- aac_in_out$age_upon_intake_char * aac_in_out$age_upon_intake_num
-aac_in_out$age_upon_outcome_calc_days <- aac_in_out$age_upon_outcome_char * aac_in_out$age_upon_outcome_num ## geht noch nicht, da NAs
-
-```
-
-
+Eine Prediction wie sie hier dargestellt ist, ist noch nicht sinnvoll, da mehrere Klassen in der Response vorhanden sind. Für mehrere Klassen sollte eine andere Funktion/ein anderes Modell verwendet werden.  

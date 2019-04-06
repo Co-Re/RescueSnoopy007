@@ -243,8 +243,9 @@ Knapp die Hälfte der im Datensatz enthaltenen Tiere wurde adoptiert.</p>
 <ul>
 <li>eine Rückgabe an den Besitzer,</li>
 <li>ein Transfer oder</li>
-<li>eine Adaption möglichst genau vorhergesagt werden kann.</li>
+<li>eine Adoption</li>
 </ul>
+<p>möglichst genau vorhergesagt werden kann.</p>
 </div>
 <div id="motivation" class="section level2">
 <h2>Motivation</h2>
@@ -254,8 +255,6 @@ Wir haben uns für diesen Datensatz mit dieser Fragestellung entschieden, da ein
 </div>
 <div id="vorbereitung-in-r" class="section level2">
 <h2>Vorbereitung in R</h2>
-<p>Nachweis, dass die Daten in R geladen werden können. Laden Sie die Daten und drucken Sie die ersten Werte der Antwortvariablen als Nachweis. Warum diese Daten? Nachweis, dass die Daten in R modelliert werden können. Passen Sie entweder lm() (Regression) oder glm() (Klassifizierung) an, rufen Sie dann predict() auf und geben Sie die ersten Werte zurück. Möglicherweise müssen Sie vor diesem Schritt eine Datenbereinigung durchführen.</p>
-<p>Load libraries</p>
 <div id="load-data" class="section level3">
 <h3>Load Data</h3>
 <pre class="r"><code>aac_intakes_outcomes = read.csv(&quot;aac_intakes_outcomes.csv&quot;)</code></pre>
@@ -685,10 +684,10 @@ aac_intakes_outcomes$intake_hour &lt;- as.factor(hour(aac_intakes_outcomes$intak
 ##   12     1     0
 ##   13     0     1</code></pre>
 <ul>
-<li>age_upon_intake, age_upon_intake_year - Diese Variablen enthalten dieselben Informationen wie age_upon_intake_days.</li>
-<li>age_upon_intake_group - Die Gruppierung ist anhand falscher Cluster, je nach Tierarten bedeutet Alter etwas anderes.</li>
-<li>age_upon_outcome, age_upon_outcome_year - Diese Variablen enthalten dieselben Informationen wie <code>age_upon_outcome_days</code>.</li>
-<li>age_upon_outcome_group - Die Gruppierung ist anhand falscher Cluster, je nach Tierarten bedeutet Alter etwas anderes.</li>
+<li><strong>age_upon_intake, age_upon_intake_year</strong> - Diese Variablen enthalten dieselben Informationen wie age_upon_intake_days.</li>
+<li><strong>age_upon_intake_group</strong> - Die Gruppierung liefert keinen Mehrwert, da darin nicht die extrem variierende Lebenserwartung in Abhängigkeit der Tierart berücksichtigt wird.</li>
+<li><strong>age_upon_outcome, age_upon_outcome_year</strong> - Diese Variablen enthalten dieselben Informationen wie <code>age_upon_outcome_days</code>.</li>
+<li><strong>age_upon_outcome_group</strong> - Die Gruppierung liefert keinen Mehrwert, da darin nicht die extrem variierende Lebenserwartung in Abhängigkeit der Tierart berücksichtigt wird.</li>
 </ul>
 </div>
 </div>
@@ -775,11 +774,55 @@ aac_intakes_outcomes$intake_hour &lt;- as.factor(hour(aac_intakes_outcomes$intak
 <pre class="r"><code>v = as.vector(which(aac_intakes_outcomes2$outcome_type == &quot;&quot;))
 aac_intakes_outcomes2 &lt;- aac_intakes_outcomes2[-v,]
 aac_intakes_outcomes2$outcome_type &lt;- factor(aac_intakes_outcomes2$outcome_type)</code></pre>
-<div id="old" class="section level3">
-<h3>old</h3>
-<p>Datetime_Intake - Geburtsdatum in Tagen - Achtung: negative und Null-Werte vorhanden</p>
-<p>Folgendes können wir für die Datensätze verwenden, bei denen das Geburtsdatum und datetime_outcome nicht vorhanden ist: Hier wird die Age-Spalte getrennt und das Alter in Tagen berechnet.</p>
 </div>
+<div id="glm-modell" class="section level2">
+<h2>glm Modell</h2>
+<pre class="r"><code>glm.fit = glm(outcome_type~animal_type+intake_condition+intake_type, data = aac_intakes_outcomes2, family = binomial)
+summary(glm.fit)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = outcome_type ~ animal_type + intake_condition + 
+##     intake_type, family = binomial, data = aac_intakes_outcomes2)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.6836  -1.2296   0.5377   1.1261   1.5124  
+## 
+## Coefficients:
+##                            Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)                 3.16227    0.33309   9.494  &lt; 2e-16 ***
+## animal_typeCat              0.37799    0.13221   2.859  0.00425 ** 
+## animal_typeDog              0.22308    0.13196   1.690  0.09093 .  
+## animal_typeOther            1.40137    0.15325   9.144  &lt; 2e-16 ***
+## intake_conditionFeral       0.08855    0.30646   0.289  0.77263    
+## intake_conditionInjured    -0.44685    0.14871  -3.005  0.00266 ** 
+## intake_conditionNormal     -1.17623    0.14381  -8.179 2.86e-16 ***
+## intake_conditionNursing    -0.32266    0.15335  -2.104  0.03537 *  
+## intake_conditionOther      -0.60388    0.24413  -2.474  0.01337 *  
+## intake_conditionPregnant   -1.11624    0.33259  -3.356  0.00079 ***
+## intake_conditionSick       -0.07196    0.15275  -0.471  0.63758    
+## intake_typeOwner Surrender -2.74600    0.27872  -9.852  &lt; 2e-16 ***
+## intake_typePublic Assist   -0.34835    0.28155  -1.237  0.21598    
+## intake_typeStray           -2.08725    0.27838  -7.498 6.49e-14 ***
+## intake_typeWildlife         3.39590    0.64525   5.263 1.42e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 108474  on 79661  degrees of freedom
+## Residual deviance:  99032  on 79647  degrees of freedom
+## AIC: 99062
+## 
+## Number of Fisher Scoring iterations: 9</code></pre>
+<p>Prediction:</p>
+<pre class="r"><code>glm.prob = predict(glm.fit, type = &quot;response&quot;)
+glm.prob[1:10]</code></pre>
+<pre><code>##         1         2         3         4         5         6         7 
+## 0.5304299 0.8653862 0.8653862 0.3689129 0.9302247 0.7855158 0.5304299 
+##         8         9        10 
+## 0.5304299 0.8653862 0.5304299</code></pre>
+<p>Erläuterung: Eine Prediction wie sie hier dargestellt ist, ist noch nicht sinnvoll, da mehrere Klassen in der Response vorhanden sind. Für mehrere Klassen sollte eine andere Funktion/ein anderes Modell verwendet werden.</p>
 </div>
 
 
