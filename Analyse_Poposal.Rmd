@@ -277,7 +277,33 @@ aac_intakes_outcomes2$animal_type <- as.factor(aac_intakes_outcomes2$animal_type
 
 ## Anpassen der Animal Color
 ```{r}
-table(aac_intakes_outcomes2$color)
+sort(table(aac_intakes_outcomes2$color_new),decreasing=T)
+
+#Agreggate colors 
+aac_intakes_outcomes2$color_new <-
+gsub("Brown/Brown|Sable|Chocolate|Agouti|Liver", "Brown", aac_intakes_outcomes2$color)
+aac_intakes_outcomes2$color_new <- gsub("(Black/Black)", "Black",aac_intakes_outcomes2$color_new)
+aac_intakes_outcomes2$color_new <- gsub("(White/White)", "White",aac_intakes_outcomes2$color_new)
+aac_intakes_outcomes2$color_new <- gsub("(Gold/Gold)", "Gold",aac_intakes_outcomes2$color_new)
+aac_intakes_outcomes2$color_new <- gsub("(Yellow/Yellow)", "Yellow",aac_intakes_outcomes2$color_new)
+aac_intakes_outcomes2$color_new <- gsub("(Cream|Tan|Gold|Lynx|Buff|Fawn)", "Beige",aac_intakes_outcomes2$color_new)
+  
+#Multicolor
+aac_intakes_outcomes2$color_new <-
+gsub("(.*)?/(.*)?", "Multicolor", aac_intakes_outcomes2$color_new)
+aac_intakes_outcomes2$color_new <- gsub("(Tricolor|Tortie|Calico|Torbie|Seal)", "Multicolor",aac_intakes_outcomes2$color_new)
+
+#remove non-color info
+aac_intakes_outcomes2$color_new <- gsub(" Tabby| Point| Merle| Smoke| Tick| Brindle| Tiger", "", aac_intakes_outcomes2$color_new)
+aac_intakes_outcomes2$color_new <-
+gsub("(.*)? (.*)", "Multicolor", aac_intakes_outcomes2$color_new)
+
+aac_intakes_outcomes2$color_new <-
+gsub("Flame", "Orange", aac_intakes_outcomes2$color_new)
+
+as.factor(aac_intakes_outcomes2$color_new)
+sort(table(aac_intakes_outcomes2$color_new),decreasing=T)
+
 ```
 
 
