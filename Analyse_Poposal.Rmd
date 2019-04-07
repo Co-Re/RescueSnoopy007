@@ -301,7 +301,7 @@ gsub("(.*)? (.*)", "Multicolor", aac_intakes_outcomes2$color_new)
 aac_intakes_outcomes2$color_new <-
 gsub("Flame", "Orange", aac_intakes_outcomes2$color_new)
 
-as.factor(aac_intakes_outcomes2$color_new)
+aac_intakes_outcomes2$color_new <- as.factor(aac_intakes_outcomes2$color_new)
 sort(table(aac_intakes_outcomes2$color_new),decreasing=T)
 
 ```
