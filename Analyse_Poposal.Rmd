@@ -277,7 +277,7 @@ aac_intakes_outcomes2$animal_type <- as.factor(aac_intakes_outcomes2$animal_type
 
 ## Anpassen der Animal Color
 ```{r}
-sort(table(aac_intakes_outcomes2$color_new),decreasing=T)
+sort(table(aac_intakes_outcomes2$color),decreasing=T)
 
 #Agreggate colors 
 aac_intakes_outcomes2$color_new <-
