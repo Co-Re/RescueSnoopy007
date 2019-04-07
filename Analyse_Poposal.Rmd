@@ -281,14 +281,38 @@ table(aac_intakes_outcomes2$color)
 ```
 
 ## Anpassen der Zeugungsfähigkeit
-Bei Analyse der Daten wurde bemerkt, dass 3 Beobachtungen bei den Geschlechtsmerkmalen fehlerhaft sein müssen, da Intake und Outcome-Wert nicht zusammengepasst haben (NEutered . Es wurde daher entschieden, dass diese Datensätze behalten werden und die Werte durch "Unknown" ersetzt werden. 
-Da Neutered und Spayed unterschiedliche Worte für die Sterilisation der weiblichen bzw. männlichen Tiere, wurden diese vereinheitlicht in der Ausprägung "Sterilized" zusammengefasst
+Bei Analyse der Daten wurde bemerkt, dass 3 Beobachtungen bei den Geschlechtsmerkmalen fehlerhaft sein müssen, da Intake und Outcome-Wert nicht zusammengepasst haben (siehe oben bei Anmerkungen zu Datenset). Bei diesen Beobachtungen war das Merkmal bei Intake Neutered/Spayed und bei Outcome Intact. Es wurde daher entschieden, dass diese Datensätze behalten werden und die Werte durch "Unknown" ersetzt werden.   
+Da Neutered und Spayed unterschiedliche Worte für die Sterilisation der weiblichen bzw. männlichen Tiere, wurden diese vereinheitlicht in der Ausprägung "Sterilized" zusammengefasst.
 ```{r}
 detectwrong <- function(v1,c1,v2,c2,x) {ifelse((v1==c1)&(v2==c2),"Unknown",x)}
 
-aac_intakes_outcomes2$sex_upon_intake_first_new <- detectwrong(aac_intakes_outcomes2$sex_upon_intake_first,"Neutered", aac_intakes_outcomes2$sex_upon_outcome_first,"Intact",detectwrong(aac_intakes_outcomes2$sex_upon_intake_first,"Spayed", aac_intakes_outcomes2$sex_upon_outcome_first, "Intact", as.character(aac_intakes_outcomes2$sex_upon_intake_first)))
+aac_intakes_outcomes2$sex_upon_intake_first_new <- detectwrong(
+  aac_intakes_outcomes2$sex_upon_intake_first,
+  "Neutered",
+  aac_intakes_outcomes2$sex_upon_outcome_first,
+  "Intact",
+  detectwrong(
+    aac_intakes_outcomes2$sex_upon_intake_first,
+    "Spayed", 
+    aac_intakes_outcomes2$sex_upon_outcome_first, 
+    "Intact", 
+    as.character(aac_intakes_outcomes2$sex_upon_intake_first)
+    )
+  )
 
-aac_intakes_outcomes2$sex_upon_outcome_first_new <- detectwrong(aac_intakes_outcomes2$sex_upon_intake_first,"Neutered", aac_intakes_outcomes2$sex_upon_outcome_first,"Intact", detectwrong(aac_intakes_outcomes2$sex_upon_intake_first,"Spayed", aac_intakes_outcomes2$sex_upon_outcome_first, "Intact", as.character(aac_intakes_outcomes2$sex_upon_outcome_first)))
+aac_intakes_outcomes2$sex_upon_outcome_first_new <- detectwrong(
+  aac_intakes_outcomes2$sex_upon_intake_first,
+  "Neutered", 
+  aac_intakes_outcomes2$sex_upon_outcome_first,
+  "Intact", 
+  detectwrong(
+    aac_intakes_outcomes2$sex_upon_intake_first,
+    "Spayed", 
+    aac_intakes_outcomes2$sex_upon_outcome_first, 
+    "Intact", 
+    as.character(aac_intakes_outcomes2$sex_upon_outcome_first)
+    )
+  )
 
 # aac_intakes_outcomes2$sex_upon_intake_first_new[is.na(aac_intakes_outcomes2$sex_upon_intake_first)] <- "Unknown"
 # aac_intakes_outcomes2$sex_upon_outcome_first_new[aac_intakes_outcomes2$sex_upon_outcome_first_new == "NULL"] <- "Unknown"
