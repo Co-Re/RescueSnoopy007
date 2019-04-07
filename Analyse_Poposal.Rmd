@@ -280,6 +280,39 @@ aac_intakes_outcomes2$animal_type <- as.factor(aac_intakes_outcomes2$animal_type
 table(aac_intakes_outcomes2$color)
 ```
 
+## Anpassen der Zeugungsfähigkeit
+Bei Analyse der Daten wurde bemerkt, dass 3 Beobachtungen bei den Geschlechtsmerkmalen fehlerhaft sein müssen, da Intake und Outcome-Wert nicht zusammengepasst haben (NEutered . Es wurde daher entschieden, dass diese Datensätze behalten werden und die Werte durch "Unknown" ersetzt werden. 
+Da Neutered und Spayed unterschiedliche Worte für die Sterilisation der weiblichen bzw. männlichen Tiere, wurden diese vereinheitlicht in der Ausprägung "Sterilized" zusammengefasst
+```{r}
+detectwrong <- function(v1,c1,v2,c2,x) {ifelse((v1==c1)&(v2==c2),"Unknown",x)}
+
+aac_intakes_outcomes2$sex_upon_intake_first_new <- detectwrong(aac_intakes_outcomes2$sex_upon_intake_first,"Neutered", aac_intakes_outcomes2$sex_upon_outcome_first,"Intact",detectwrong(aac_intakes_outcomes2$sex_upon_intake_first,"Spayed", aac_intakes_outcomes2$sex_upon_outcome_first, "Intact", as.character(aac_intakes_outcomes2$sex_upon_intake_first)))
+
+aac_intakes_outcomes2$sex_upon_outcome_first_new <- detectwrong(aac_intakes_outcomes2$sex_upon_intake_first,"Neutered", aac_intakes_outcomes2$sex_upon_outcome_first,"Intact", detectwrong(aac_intakes_outcomes2$sex_upon_intake_first,"Spayed", aac_intakes_outcomes2$sex_upon_outcome_first, "Intact", as.character(aac_intakes_outcomes2$sex_upon_outcome_first)))
+
+# aac_intakes_outcomes2$sex_upon_intake_first_new[is.na(aac_intakes_outcomes2$sex_upon_intake_first)] <- "Unknown"
+# aac_intakes_outcomes2$sex_upon_outcome_first_new[aac_intakes_outcomes2$sex_upon_outcome_first_new == "NULL"] <- "Unknown"
+
+# Zusammenfassung in "Sterilized"
+aac_intakes_outcomes2$sex_upon_intake_first_new[aac_intakes_outcomes2$sex_upon_intake_first_new == "Neutered"] <- "Sterilized"
+aac_intakes_outcomes2$sex_upon_intake_first_new[aac_intakes_outcomes2$sex_upon_intake_first_new == "Spayed"] <- "Sterilized"
+aac_intakes_outcomes2$sex_upon_outcome_first_new[aac_intakes_outcomes2$sex_upon_outcome_first_new == "Neutered"] <- "Sterilized"
+aac_intakes_outcomes2$sex_upon_outcome_first_new[aac_intakes_outcomes2$sex_upon_outcome_first_new == "Spayed"] <- "Sterilized"
+
+# Kontrolle der Änderungen
+table(aac_intakes_outcomes2$sex_upon_intake_first_new,aac_intakes_outcomes2$sex_upon_outcome_first_new)
+
+# Als Faktor formatieren, Entfernen der alten Spalten und Umbenennen
+aac_intakes_outcomes2$sex_upon_intake_first_new <- as.factor(aac_intakes_outcomes2$sex_upon_intake_first_new)
+aac_intakes_outcomes2$sex_upon_outcome_first_new <- as.factor(aac_intakes_outcomes2$sex_upon_outcome_first_new)
+
+aac_intakes_outcomes2$sex_upon_intake_first <- NULL
+aac_intakes_outcomes2$sex_upon_outcome_first <- NULL
+
+names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_intake_first_new"] <- "sex_upon_intake_first"
+names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_outcome_first_new"] <- "sex_upon_outcome_first"
+```
+
 
 ## glm Modell
 ```{r}
