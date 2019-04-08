@@ -1,13 +1,16 @@
 ---
-title: "Algorithmik & Statistik Lab 2: Analyse Proposal"
+title: "Algorithmik & Statistik Lab 2: Analyse Proposal - 'Rescue Snoopy'"
 author: "Lara Knapwost - 1810837601, Cornelia Reithmeier - 1810837362, Isabelle Veitl - 1810837521, Anna Weber - 1810837818"
-date: '30.März 2019'
-output: html_document
+date: '9. April 2019'
+output: 
+  html_document:
+    toc: TRUE
 urlcolor: cyan
 ---
 ***
+Unter dem Arbeitstitel "Rescue Snoopy" wurden in einem ersten Schritt folgende Daten ausgewählt, analysiert und das statistische Analyse-Interesse dargelegt.
 
-## Datensatz
+# Ausgewählter Datensatz
 Für die Gruppenarbeit werden Daten von Kaggle verwendet:  
 https://www.kaggle.com/aaronschlegel/austin-animal-center-shelter-intakes-and-outcomes#aac_intakes.csv
 
@@ -15,31 +18,31 @@ Von den dort gesammelten Daten wird folgende Datei verwendet: `aac_intakes_outco
 
 Der Datensatz enthält unter anderem folgende Variablen:
 
-* animal_id - eindeutige ID des Tieres
-* age_upon_outcome - Alter des Tieres bei Outcome
-* date_of_birth - Geburtsdatum des Tieres (geschätzt, wenn dieses nicht bekannt war)
-* outcome_subtype - spezifische Beschreibung des Outcomes
-* outcome_type - Art des Outcomes
-* datetime - Datum und Uhrzeit des Outcomes
-* outcome_number - Anzahl, wie oft ein Tier das Tierheim schon verlassen hat
-* sex_upon_outcome - Geschlecht des Tieres und ob das Tier kastriert wurde
-* age_upon_intake - Alter des Tieres bei Aufnahme in String-Format 
-* animal_type - Tierart
-* breed - Tierrasse
-* color - Tierfarbe
-* datetime - Datum und Uhrzeit der Aufnahme
-* found_location - Adresse oder Bereich, wo das Tier gefunden wurde 
-* intake_condition - Zustand des Tieres bei der Aufnahme
-* intake_type - kategorisierter Aufnahmetyp
-* name - Name des Tieres
-* sex_upon_intake - Geschlecht des Tieres und ob das Tier kastriert wurde
-* intake_number - Anzahl, wie oft ein Tier schon zum Tierheim gebracht wurde
-* time_in_shelter - Zeit im Tierheim
+* `animal_id` - eindeutige ID des Tieres
+* `age_upon_outcome` - Alter des Tieres bei Outcome
+* `date_of_birth` - Geburtsdatum des Tieres (geschätzt, wenn dieses nicht bekannt war)
+* `outcome_subtype` - spezifische Beschreibung des Outcomes
+* `outcome_type` - Art des Outcomes
+* `datetime` - Datum und Uhrzeit des Outcomes
+* `outcome_number` - Anzahl, wie oft ein Tier das Tierheim schon verlassen hat
+* `sex_upon_outcome` - Geschlecht des Tieres und ob das Tier kastriert wurde
+* `age_upon_intake` - Alter des Tieres bei Aufnahme in String-Format 
+* `animal_type` - Tierart
+* `breed` - Tierrasse
+* `color` - Tierfarbe
+* `datetime` - Datum und Uhrzeit der Aufnahme
+* `found_location` - Adresse oder Bereich, wo das Tier gefunden wurde 
+* `intake_condition` - Zustand des Tieres bei der Aufnahme
+* `intake_type` - kategorisierter Aufnahmetyp
+* `name` - Name des Tieres
+* `sex_upon_intake` - Geschlecht des Tieres und ob das Tier kastriert wurde
+* `intake_number` - Anzahl, wie oft ein Tier schon zum Tierheim gebracht wurde
+* `time_in_shelter` - Zeit im Tierheim
 
-Neben diesen Variablen existierten weitere Variablen, die beispielsweise Zeiträume in einem anderen Format darstellen.
+Neben diesen Variablen existierten weitere, die beispielsweise Zeiträume in einem anderen Format darstellen.
 
-## Hintergrundinformationen zum Datensatsz
-Die Daten wurden vom Austin Animal Center erhoben. Dieses Animal Center ist das größte Tierheim in den USA, in dem keine Tiere getötet werden und kann bis zu 18.000 Tiere pro Jahr aufnehmen. Es werden alle Arten von Tieren aufgenommen. Das Tierheim befindet sich im Travis County im US-Bundesstaat Texas.
+## Hintergrundinformationen zum Datensatz
+Die Daten wurden vom [Austin Animal Center](http://www.austintexas.gov/department/aac) erhoben. Dieses Animal Center ist das größte Tierheim in den USA, in dem keine Tiere getötet werden und kann bis zu 18.000 Tiere pro Jahr aufnehmen. Es werden alle Arten von Tieren aufgenommen. Das Tierheim befindet sich im Travis County im US-Bundesstaat Texas.
 Die Daten werden im Rahmen der Austin's Open Data Intitiative online bereitgestellt.  
 
 Der Datensatz enthält n = 79.672 Observationen und 41 Variablen.   
@@ -48,18 +51,18 @@ Die Tiere sind zwischen 0-25 Jahre alt, der Median liegt bei 1 Jahr, die Geschle
 Mehr als die Hälfte der Tiere sind Hunde, gefolgt von Katzen und einigen Vögeln (<500). Etwa 4.500 Tiere sind keiner Spezies zugeordnet.   
 Knapp die Hälfte der im Datensatz enthaltenen Tiere wurde adoptiert.   
 
-## Statistische Lernaufgabe
+# Statistische Lernaufgabe
 Im Rahmen der Gruppenarbeit soll folgendes Klassifikationsproblem betrachtet werden:
 
 Vorhersage des Outcome-Types auf Basis der gegebenen Variablen. Es sollen die Prädiktoren gefunden werden, anhand derer eine Rückgabe an den Besitzer, ein Transfer / eine Adoption, Euthanasie, Tod etc. möglichst genau (durch Vorhersage der Klasse) vorhergesagt werden kann. 
 
-## Motivation
+# Motivation
 Es gibt viele Tierheime, durch Hörensagen ist bekannt, dass in vielen davon eine Großzahl der Tiere einen beträchtlichen Teil ihres Lebens verbringen. 
 Es ist interessant für uns, herauszufinden, welche Aspekte ausschlaggebend dafür sind, ob das Tier (vor dem Tod) wieder aus dem Tierheim "entlassen" wird, d.h. einen neuen Besitzer findet. Wir haben einige Hypothesen, welche wir prüfen möchten. Wir gehen davon aus, dass vor allem jüngere, gesunde Tiere eine bessere Chance haben, als ältere, kranke, ggf. auch nicht kastrierte (Streuner-)Tiere, die bereits sehr lange im Tierheim sind.   
 Weiß man, welche Aspekte eine Rolle spielen, könnte man diese gezielt in den Tierheimen in der Kommunikation verwenden, um mehr Tieren (z.B. vor allem jenen, die grundsätzlich eine schlechtere Chance für eine Adoption haben) ein neues zu Hause zu geben.   
 Wir haben uns für diesen Datensatz mit dieser Fragestellung entschieden, da einige von uns selbst Haustiere besitzen und wir den Eindruck haben, dass es bereits ausreichend viele Analysen zu ökonomischen Fragestellungen gibt.
 
-## Vorbereitung in R
+# Vorbereitung in R
 
 ```{r, include=F}
 library("plyr")
@@ -68,14 +71,15 @@ library("lubridate")
 library("kableExtra")
 ```
 
-###Load Data
+## Load Data
 ```{r}
 aac_intakes_outcomes = read.csv("aac_intakes_outcomes.csv")
 ```
 
-###Check Data Structure
+## Check Data Structure
 ```{r}
 str(aac_intakes_outcomes)
+# Andrucken der ersten Datensätze
 head(aac_intakes_outcomes)
 ```
 
@@ -83,7 +87,7 @@ head(aac_intakes_outcomes)
 summary(aac_intakes_outcomes)
 ```
 
-###Initial Data Cleaning: Convert Data types
+## Initial Data Cleaning - Konvertieren der Datatypen
 ```{r}
 aac_intakes_outcomes$animal_id_outcome <- as.character(aac_intakes_outcomes$animal_id_outcome)
 aac_intakes_outcomes$date_of_birth <- anytime(aac_intakes_outcomes$date_of_birth)
@@ -119,7 +123,7 @@ aac_intakes_outcomes$intake_year <- as.factor(aac_intakes_outcomes$intake_year)
 aac_intakes_outcomes$intake_hour <- as.factor(hour(aac_intakes_outcomes$intake_datetime))
 ```
 
-###Anmerkungen zu dem Datenset:
+## Anmerkungen zum Datensatz
 
 Folgende Animal-Types sind vorhanden:
 Unter Other verbergen sich großteils unterschiedliche Nage- und Säugetiere bzw. Kleintiere, die in einem folgenden Datenaufbereitungsschritt feingliedriger aufgedrosselt werden.
@@ -137,7 +141,7 @@ table(aac_intakes_outcomes$sex_upon_intake_first, aac_intakes_outcomes$sex_upon_
 Unplausible Fälle (Kastrierter Income, Nichtkastrierter Outcome) werden im Zuge der Datenaufbereitung zu Unknown rekategorisiert.
 
 
-###Erstellung eines neues Datensatzes
+## Erstellung einen neuen Datensatzes
 Dieser enthält nicht alle Variablen des Originaldatensatzes. Im Folgenden findet sich eine Auflistung der entfernten Variablen, sowie Begründung, weshalb einige Daten nicht für die Analyse miteinbezogen werden. 
 
 ```{r}
@@ -161,14 +165,14 @@ table(aac_intakes_outcomes$outcome_subtype, aac_intakes_outcomes$outcome_type)
 
 * **animal_id_outcome** - ID kann nicht für Klassifikation verwendet werden. 
 * **sex_upon_outcome** - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet
-* **outcome_monthyear** - der Monat und das Jahr werden als einzelne Variablen verwendet. Diese Ursprungsvariable wird damit nicht mehr benötigt.
+* **outcome_monthyear** - Der Monat und das Jahr werden als einzelne Variablen verwendet. Diese Ursprungsvariable wird damit nicht mehr benötigt.
 * **outcome_hour** - Es werden auch zu ungewöhnlichen Uhrzeiten (z.B. Mitternacht) Geschäftsfälle registriert welche nicht plausibel erscheinen. 
 
 ```{r}
 table(aac_intakes_outcomes$outcome_hour)
 ```
 
-* **dob_monthyear** - Geburstdatum der Monat und das Jahr werden als einzelne Variablen verwendet. Diese Ursprungsvariable wird damit nicht mehr benötigt.
+* **dob_monthyear** - Geburstdatum. Der Monat und das Jahr werden als einzelne Variablen verwendet. Diese Ursprungsvariable wird damit nicht mehr benötigt.
 * **animal_id_intake** - ID kann nicht für Klassifikation verwendet werden
 * **sex_upon_intake** - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet
 * **count** - alle Werte sind 1 (Aushilfsspalte) d.h. kein Informationsgewinn durch diese Variable
@@ -199,10 +203,12 @@ table(aac_intakes_outcomes$outcome_number, aac_intakes_outcomes$intake_number)
 
 # Weitere Datenbereinigungsschritte
 
-##Prüfung auf fehlende Werte
+## Prüfung auf fehlende Werte
 
-```{r}
+```{r results='hide'}
 summary(aac_intakes_outcomes2)
+```
+```{r}
 unique(aac_intakes_outcomes2$outcome_type)
 table(aac_intakes_outcomes2$outcome_type)
 
@@ -210,7 +216,6 @@ v = as.vector(which(aac_intakes_outcomes2$outcome_type == ""))
 aac_intakes_outcomes2 <- aac_intakes_outcomes2[-v,]
 aac_intakes_outcomes2$outcome_type <- factor(aac_intakes_outcomes2$outcome_type)
 ```
-
 
 ## Anpassen des Animal Types Other
 ```{r}
@@ -251,7 +256,7 @@ new_animal_type <- gsub("(.*)?Pig(.*)?", "Pig", new_animal_type)
 # Fish
 new_animal_type <- gsub("(.*)?Cold Water(.*)?", "Fish", new_animal_type)
 
-# Ersetzen von Rassen, die nicht bekannt sind, mit "Other""
+# Ersetzen von Rassen, die nicht bekannt sind, mit "Other"
 new_animal_type <- gsub("(.*)?(American|Tropical)(.*)?", "Other", new_animal_type)
 
 others$animal_type = new_animal_type
@@ -276,10 +281,11 @@ aac_intakes_outcomes2$animal_type <- as.factor(aac_intakes_outcomes2$animal_type
 ```
 
 ## Anpassen der Animal Color
-```{r}
+```{r results='hide'}
 sort(table(aac_intakes_outcomes2$color),decreasing=T)
-
-#Agreggate colors 
+```
+```{r}
+#Zusammenfassen der Farben 
 aac_intakes_outcomes2$color_new <-
 gsub("Brown/Brown|Sable|Chocolate|Agouti|Liver", "Brown", aac_intakes_outcomes2$color)
 aac_intakes_outcomes2$color_new <- gsub("(Black/Black)", "Black",aac_intakes_outcomes2$color_new)
@@ -288,12 +294,12 @@ aac_intakes_outcomes2$color_new <- gsub("(Gold/Gold)", "Gold",aac_intakes_outcom
 aac_intakes_outcomes2$color_new <- gsub("(Yellow/Yellow)", "Yellow",aac_intakes_outcomes2$color_new)
 aac_intakes_outcomes2$color_new <- gsub("(Cream|Tan|Gold|Lynx|Buff|Fawn)", "Beige",aac_intakes_outcomes2$color_new)
   
-#Multicolor
+#Zusammenfassen von Multicolor-Farben
 aac_intakes_outcomes2$color_new <-
 gsub("(.*)?/(.*)?", "Multicolor", aac_intakes_outcomes2$color_new)
 aac_intakes_outcomes2$color_new <- gsub("(Tricolor|Tortie|Calico|Torbie|Seal)", "Multicolor",aac_intakes_outcomes2$color_new)
 
-#remove non-color info
+#Entfernen von  non-color Information
 aac_intakes_outcomes2$color_new <- gsub(" Tabby| Point| Merle| Smoke| Tick| Brindle| Tiger", "", aac_intakes_outcomes2$color_new)
 aac_intakes_outcomes2$color_new <-
 gsub("(.*)? (.*)", "Multicolor", aac_intakes_outcomes2$color_new)
@@ -307,6 +313,8 @@ sort(table(aac_intakes_outcomes2$color_new),decreasing=T)
 aac_intakes_outcomes2 <- aac_intakes_outcomes2[,-4]
 
 ```
+
+
 
 ## Anpassen der Zeugungsfähigkeit
 Bei Analyse der Daten wurde bemerkt, dass 3 Beobachtungen bei den Geschlechtsmerkmalen fehlerhaft sein müssen, da Intake und Outcome-Wert nicht zusammengepasst haben (siehe oben bei Anmerkungen zu Datenset). Bei diesen Beobachtungen war das Merkmal bei Intake Neutered/Spayed und bei Outcome Intact. Es wurde daher entschieden, dass diese Datensätze behalten werden und die Werte durch "Unknown" ersetzt werden.   
@@ -342,9 +350,6 @@ aac_intakes_outcomes2$sex_upon_outcome_first_new <- detectwrong(
     )
   )
 
-# aac_intakes_outcomes2$sex_upon_intake_first_new[is.na(aac_intakes_outcomes2$sex_upon_intake_first)] <- "Unknown"
-# aac_intakes_outcomes2$sex_upon_outcome_first_new[aac_intakes_outcomes2$sex_upon_outcome_first_new == "NULL"] <- "Unknown"
-
 # Zusammenfassung in "Sterilized"
 aac_intakes_outcomes2$sex_upon_intake_first_new[aac_intakes_outcomes2$sex_upon_intake_first_new == "Neutered"] <- "Sterilized"
 aac_intakes_outcomes2$sex_upon_intake_first_new[aac_intakes_outcomes2$sex_upon_intake_first_new == "Spayed"] <- "Sterilized"
@@ -366,16 +371,22 @@ names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_outcome_f
 ```
 
 
-## glm Modell
+# Exemplarisches glm Modell
+Es wird ein GLM Modell am Beispiel von 3 Prädiktoren aufgestellt, um die grundsätzliche Modellierbarkeit darzustellen.
 ```{r}
 glm.fit = glm(outcome_type~animal_type+intake_condition+intake_type, data = aac_intakes_outcomes2, family = binomial)
 summary(glm.fit)
 ```
+
 Prediction:
 ```{r}
 glm.prob = predict(glm.fit, type = "response")
 glm.prob[1:10]
 ```
-Erläuterung: 
-Eine Prediction wie sie hier dargestellt ist, ist noch nicht sinnvoll, da mehrere Klassen in der Response vorhanden sind. Für mehrere Klassen sollte eine andere Funktion/ein anderes Modell verwendet werden.  
 
+## Erläuterung 
+Eine Prediction wie sie hier dargestellt ist, ist noch nicht sinnvoll, da mehrere Klassen in der Response vorhanden sind. Für mehrere Klassen sollte eine andere Funktion bzw. ein anderes Modell verwendet werden. Auf Basis der obenstehenden Analysen und Erkenntnisse halten wir Tree Modelle für die Vorhersage des `outcome_type` für geeignet.
+
+
+
+![](snoopy.png)
