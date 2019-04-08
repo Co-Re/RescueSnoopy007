@@ -76,7 +76,7 @@ library("kableExtra")
 aac_intakes_outcomes = read.csv("aac_intakes_outcomes.csv")
 ```
 
-## Check Data Structure
+## Überprüfung der Datenstruktur
 ```{r}
 str(aac_intakes_outcomes)
 # Andrucken der ersten Datensätze
