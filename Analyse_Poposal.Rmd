@@ -71,7 +71,7 @@ library("lubridate")
 library("kableExtra")
 ```
 
-## Load Data
+## Laden der Daten
 ```{r}
 aac_intakes_outcomes = read.csv("aac_intakes_outcomes.csv")
 ```
