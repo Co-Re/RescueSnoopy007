@@ -41,7 +41,7 @@ Der Datensatz enthält unter anderem folgende Variablen:
 
 Neben diesen Variablen existierten weitere, die beispielsweise Zeiträume in einem anderen Format darstellen.
 
-## Hintergrundinformationen zum Datensatz
+# Hintergrundinformationen zum Datensatz
 Die Daten wurden vom [Austin Animal Center](http://www.austintexas.gov/department/aac) erhoben. Dieses Animal Center ist das größte Tierheim in den USA, in dem keine Tiere getötet werden und kann bis zu 18.000 Tiere pro Jahr aufnehmen. Es werden alle Arten von Tieren aufgenommen. Das Tierheim befindet sich im Travis County im US-Bundesstaat Texas.
 Die Daten werden im Rahmen der Austin's Open Data Intitiative online bereitgestellt.  
 
@@ -54,7 +54,7 @@ Knapp die Hälfte der im Datensatz enthaltenen Tiere wurde adoptiert.
 # Statistische Lernaufgabe
 Im Rahmen der Gruppenarbeit soll folgendes Klassifikationsproblem betrachtet werden:
 
-Vorhersage des Outcome-Types auf Basis der gegebenen Variablen. Es sollen die Prädiktoren gefunden werden, anhand derer eine Rückgabe an den Besitzer, ein Transfer / eine Adoption, Euthanasie, Tod etc. möglichst genau (durch Vorhersage der Klasse) vorhergesagt werden kann. 
+Vorhersage des Outcome-Types auf Basis der gegebenen Variablen. Es sollen die Prädiktoren gefunden werden, anhand derer eine Rückgabe an den Besitzer, ein Transfer / eine Adoption, Euthanasie, Tod etc. möglichst genau (durch Vorhersage der Klasse) vorhergesagt werden können. 
 
 # Motivation
 Es gibt viele Tierheime, durch Hörensagen ist bekannt, dass in vielen davon eine Großzahl der Tiere einen beträchtlichen Teil ihres Lebens verbringen. 
@@ -87,7 +87,7 @@ head(aac_intakes_outcomes)
 summary(aac_intakes_outcomes)
 ```
 
-## Initial Data Cleaning - Konvertieren der Datatypen
+## Initial Data Cleaning - Konvertieren der Datentypen
 ```{r}
 aac_intakes_outcomes$animal_id_outcome <- as.character(aac_intakes_outcomes$animal_id_outcome)
 aac_intakes_outcomes$date_of_birth <- anytime(aac_intakes_outcomes$date_of_birth)
@@ -123,26 +123,26 @@ aac_intakes_outcomes$intake_year <- as.factor(aac_intakes_outcomes$intake_year)
 aac_intakes_outcomes$intake_hour <- as.factor(hour(aac_intakes_outcomes$intake_datetime))
 ```
 
-## Anmerkungen zum Datensatz
+## Anmerkungen zum Dataset
 
 Folgende Animal-Types sind vorhanden:
 Unter Other verbergen sich großteils unterschiedliche Nage- und Säugetiere bzw. Kleintiere, die in einem folgenden Datenaufbereitungsschritt feingliedriger aufgedrosselt werden.
 
-```{r}
+```{r, echo=FALSE}
 table(aac_intakes_outcomes$animal_type)
 ```
 
 Folgende Kombinationen sind bei der Zeugungsfähigkeit des Geschlechts möglich, wobei in den Zeilen der Zustand bei Aufnahme im Tierheim dargestellt wird, in den Spalten bei Verlassen:
 
-```{r}
+```{r, echo=FALSE}
 table(aac_intakes_outcomes$sex_upon_intake_first, aac_intakes_outcomes$sex_upon_outcome_first) 
 
 ```
 Unplausible Fälle (Kastrierter Income, Nichtkastrierter Outcome) werden im Zuge der Datenaufbereitung zu Unknown rekategorisiert.
 
 
-## Erstellung einen neuen Datensatzes
-Dieser enthält nicht alle Variablen des Originaldatensatzes. Im Folgenden findet sich eine Auflistung der entfernten Variablen, sowie Begründung, weshalb einige Daten nicht für die Analyse miteinbezogen werden. 
+## Erstellung einen neuen Datasets
+Dieses enthält nicht alle Variablen. Im Folgenden findet sich eine Auflistung der entfernten Variablen, sowie eine Begründung, weshalb einige Daten nicht für die Analyse miteinbezogen werden. 
 
 ```{r}
 aac_intakes_outcomes2 <- aac_intakes_outcomes[c(5, 22:24, 26, 27, 43, 42, 44, 3, 17, 18, 33:35, 39, 10:12, 30, 7, 40, 41)]
@@ -150,72 +150,76 @@ aac_intakes_outcomes2 <- aac_intakes_outcomes[c(5, 22:24, 26, 27, 43, 42, 44, 3,
 
 Folgende Variablen wurden für das neue Dataset nicht verwendet:
 
-* **found_location** - Diese Variable bietet keine gute Datenqualität, es sind nicht immer gleiche Daten erfasst (z.B. manchmal Ortsname, manchmal komplette Adresse). Eine Bereinigung bzw. Kürzung auf den Ortsnamen bringt keinen Erkenntnisgewinn für das Modell, da alle Aufnahmen in derselben Region stattfanden und einzig über die Adressangabe Subregionen miteinander vergleichbar würden. 
-* **sex_open_intake** - Diese Variable enthält die selben Daten wie `sex_open_outcome`, ist daher redundant.
+* `found_location` - Diese Variable bietet keine gute Datenqualität, es sind nicht immer gleiche Daten erfasst (z.B. manchmal Ortsname, manchmal komplette Adresse). Eine Bereinigung bzw. Kürzung auf den Ortsnamen bringt keinen Erkenntnisgewinn für das Modell, da alle Aufnahmen in derselben Region stattfanden und einzig über die Adressangabe Subregionen miteinander vergleichbar würden. 
+* `sex_open_intake` - Diese Variable enthält die selben Daten wie `sex_open_outcome`, ist daher redundant.
 
-```{r}
+```{r, echo=FALSE}
 table(aac_intakes_outcomes$sex_upon_intake_second, aac_intakes_outcomes$sex_upon_outcome_second)
 ```
 
-* **outcome_subtype** - Diese Variable enthält nur für sehr wenige Datensätze zusätzliche Informationen, diese sind nicht durchgängig je `Outcome_type` befüllt. Außerdem ist die Kategorisierung nicht gänzlich diskriminant, da z.B. Aggressive eine Teilkategorie von Behavior wäre, wobei nicht klar ist, welches Verhaltensmuster dann in Behavior erfasst wurde bzw. ob dieses mit aggressivem Verhalten gleichzusetzen ist. 
+* `outcome_subtype` - Diese Variable enthält nur für sehr wenige Datensätze zusätzliche Informationen, diese sind nicht durchgängig je `Outcome_type` befüllt. Außerdem ist die Kategorisierung nicht gänzlich diskriminant, da z.B. Aggressive eine Teilkategorie von Behavior wäre, wobei nicht klar ist, welches Verhaltensmuster dann in Behavior erfasst wurde bzw. ob dieses mit aggressivem Verhalten gleichzusetzen ist. 
 
-```{r}
+```{r, echo=FALSE}
 table(aac_intakes_outcomes$outcome_subtype, aac_intakes_outcomes$outcome_type)
 ```
 
-* **animal_id_outcome** - ID kann nicht für Klassifikation verwendet werden. 
-* **sex_upon_outcome** - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet
-* **outcome_monthyear** - Der Monat und das Jahr werden als einzelne Variablen verwendet. Diese Ursprungsvariable wird damit nicht mehr benötigt.
-* **outcome_hour** - Es werden auch zu ungewöhnlichen Uhrzeiten (z.B. Mitternacht) Geschäftsfälle registriert welche nicht plausibel erscheinen. 
+* `animal_id_outcome` - ID kann nicht für Klassifikation verwendet werden.
+* `sex_upon_outcome` - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet
+* `outcome_monthyear` - Der Monat und das Jahr werden als einzelne Variablen verwendet. Diese Ursprungsvariable wird damit nicht mehr benötigt.
+* `outcome_hour` - Es werden auch zu ungewöhnlichen Uhrzeiten (z.B. Mitternacht) Geschäftsfälle registriert, welche nicht plausibel erscheinen. 
 
-```{r}
+```{r, echo=FALSE}
 table(aac_intakes_outcomes$outcome_hour)
 ```
 
-* **dob_monthyear** - Geburstdatum. Der Monat und das Jahr werden als einzelne Variablen verwendet. Diese Ursprungsvariable wird damit nicht mehr benötigt.
-* **animal_id_intake** - ID kann nicht für Klassifikation verwendet werden
-* **sex_upon_intake** - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet
-* **count** - alle Werte sind 1 (Aushilfsspalte) d.h. kein Informationsgewinn durch diese Variable
+* `dob_monthyear` - Geburtsdatum. Der Monat und das Jahr werden als einzelne Variablen verwendet. Diese Ursprungsvariable wird damit nicht mehr benötigt.
+* `animal_id_intake` - ID kann nicht für Klassifikation verwendet werden
+* `sex_upon_intake` - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet
+* `count` - alle Werte sind 1 (Aushilfsspalte) d.h. kein Informationsgewinn durch diese Variable
 
-```{r}
+```{r, echo=FALSE}
 table(aac_intakes_outcomes$count)
 ```
 
-* **intake_monthyear** - der Monat und das Jahr werden als einzelne Variablen verwendet
-* **intake_hour** - Es werden auch zu ungewöhnlichen Uhrzeiten Geschäftsfälle registriert, welche unplausible erscheinen.
+* `intake_monthyear` - der Monat und das Jahr werden als einzelne Variablen verwendet
+* `intake_hour` - Es werden auch zu ungewöhnlichen Uhrzeiten Geschäftsfälle registriert, welche unplausibel erscheinen.
 
-```{r}
+```{r, echo=FALSE}
 table(aac_intakes_outcomes$intake_hour)
 ```
 
-* **outcome_weekday, intake_weekday** - es soll keine Klassifikation auf Basis eines Wochentages gemacht werden.
-* **outcome_number** - Diese Variable enthält dieselben Informationen wie `intake_number`, ist daher redundant.
+* `outcome_weekday`, `intake_weekday` - es soll keine Klassifikation auf Basis eines Wochentages gemacht werden.
+* `outcome_number` - Diese Variable enthält dieselben Informationen wie `intake_number`, ist daher redundant.
 
-```{r}
+```{r, echo=FALSE}
 table(aac_intakes_outcomes$outcome_number, aac_intakes_outcomes$intake_number)
 ```
 
-* **age_upon_intake, age_upon_intake_year** - Diese Variablen enthalten dieselben Informationen wie age_upon_intake_days.
-* **age_upon_intake_group** - Die Gruppierung liefert keinen Mehrwert, da darin nicht die extrem variierende Lebenserwartung in Abhängigkeit der Tierart berücksichtigt wird.
-* **age_upon_outcome, age_upon_outcome_year** - Diese Variablen enthalten dieselben Informationen wie `age_upon_outcome_days`.
-* **age_upon_outcome_group** - Die Gruppierung liefert keinen Mehrwert, da darin nicht die extrem variierende Lebenserwartung in Abhängigkeit der Tierart berücksichtigt wird.
+* `age_upon_intake`, `age_upon_intake_year` - Diese Variablen enthalten dieselben Informationen wie age_upon_intake_days.
+* `age_upon_intake_group` - Die Gruppierung liefert keinen Mehrwert, da darin nicht die extrem variierende Lebenserwartung in Abhängigkeit der Tierart berücksichtigt wird.
+* `age_upon_outcome`, `age_upon_outcome_year` - Diese Variablen enthalten dieselben Informationen wie `age_upon_outcome_days`.
+* `age_upon_outcome_group` - Die Gruppierung liefert keinen Mehrwert, da darin nicht die extrem variierende Lebenserwartung in Abhängigkeit der Tierart berücksichtigt wird.
 
 
 # Weitere Datenbereinigungsschritte
 
 ## Prüfung auf fehlende Werte
-
+Über die Summary wird geprüft, wo fehlende Werte vorkommen.
 ```{r results='hide'}
 summary(aac_intakes_outcomes2)
 ```
+Für die Prüfung werden zuerst alle Ausprägungen der Response `outcome_type` ausgegeben:
 ```{r}
 unique(aac_intakes_outcomes2$outcome_type)
 table(aac_intakes_outcomes2$outcome_type)
-
+```
+Umwandlung:
+```{r}
 v = as.vector(which(aac_intakes_outcomes2$outcome_type == ""))
 aac_intakes_outcomes2 <- aac_intakes_outcomes2[-v,]
 aac_intakes_outcomes2$outcome_type <- factor(aac_intakes_outcomes2$outcome_type)
 ```
+
 
 ## Anpassen des Animal Types Other
 ```{r}
@@ -378,13 +382,13 @@ glm.fit = glm(outcome_type~animal_type+intake_condition+intake_type, data = aac_
 summary(glm.fit)
 ```
 
-Prediction:
+**Prediction**  
 ```{r}
 glm.prob = predict(glm.fit, type = "response")
 glm.prob[1:10]
 ```
 
-## Erläuterung 
+**Erläuterung**   
 Eine Prediction wie sie hier dargestellt ist, ist noch nicht sinnvoll, da mehrere Klassen in der Response vorhanden sind. Für mehrere Klassen sollte eine andere Funktion bzw. ein anderes Modell verwendet werden. Auf Basis der obenstehenden Analysen und Erkenntnisse halten wir Tree Modelle für die Vorhersage des `outcome_type` für geeignet.
 
 
