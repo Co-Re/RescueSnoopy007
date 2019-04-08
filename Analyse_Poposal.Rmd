@@ -141,7 +141,7 @@ table(aac_intakes_outcomes$sex_upon_intake_first, aac_intakes_outcomes$sex_upon_
 Unplausible Fälle (Kastrierter Income, Nichtkastrierter Outcome) werden im Zuge der Datenaufbereitung zu Unknown rekategorisiert.
 
 
-## Erstellung einen neuen Datasets
+## Erstellung eines neuen Datasets
 Dieses enthält nicht alle Variablen. Im Folgenden findet sich eine Auflistung der entfernten Variablen, sowie eine Begründung, weshalb einige Daten nicht für die Analyse miteinbezogen werden. 
 
 ```{r}
