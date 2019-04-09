@@ -16,7 +16,7 @@ https://www.kaggle.com/aaronschlegel/austin-animal-center-shelter-intakes-and-ou
 
 Von den dort gesammelten Daten wird folgende Datei verwendet: `aac_intakes_outcomes`
 
-Der Datensatz enthält unter anderem folgende Variablen:
+Das Datenset enthält unter anderem folgende Variablen:
 
 * `animal_id` - eindeutige ID des Tieres
 * `age_upon_outcome` - Alter des Tieres bei Outcome
@@ -49,7 +49,7 @@ Das Datenset enthält n = 79.672 Observationen und 41 Variablen.
 Die Daten stammen aus der Zeit zwischen Oktober 2013 bis April 2018 (Outcomes).  
 Die Tiere sind zwischen 0-25 Jahre alt, der Median liegt bei 1 Jahr, die Geschlechtsverteilung männlicher und weiblicher Tiere liegt fast bei 50/50.  
 Mehr als die Hälfte der Tiere sind Hunde, gefolgt von Katzen und einigen Vögeln (<500). Etwa 4.500 Tiere sind keiner Spezies zugeordnet.   
-Knapp die Hälfte der im Datensatz enthaltenen Tiere wurde adoptiert.   
+Knapp die Hälfte der im Datenset enthaltenen Tiere wurde adoptiert.   
 
 # Statistische Lernaufgabe
 Im Rahmen der Gruppenarbeit soll folgendes Klassifikationsproblem betrachtet werden:
@@ -60,7 +60,7 @@ Vorhersage des Outcome-Types auf Basis der gegebenen Variablen. Es sollen die Pr
 Es gibt viele Tierheime, durch Hörensagen ist bekannt, dass in vielen davon eine Großzahl der Tiere einen beträchtlichen Teil ihres Lebens verbringen. 
 Es ist interessant für uns, herauszufinden, welche Aspekte ausschlaggebend dafür sind, ob das Tier (vor dem Tod) wieder aus dem Tierheim "entlassen" wird, d.h. einen neuen Besitzer findet. Wir haben einige Hypothesen, welche wir prüfen möchten. Wir gehen davon aus, dass vor allem jüngere, gesunde Tiere eine bessere Chance haben, als ältere, kranke, ggf. auch nicht kastrierte (Streuner-)Tiere, die bereits sehr lange im Tierheim sind.   
 Weiß man, welche Aspekte eine Rolle spielen, könnte man diese gezielt in den Tierheimen in der Kommunikation verwenden, um mehr Tieren (z.B. vor allem jenen, die grundsätzlich eine schlechtere Chance für eine Adoption haben) ein neues zu Hause zu geben.   
-Wir haben uns für diesen Datensatz mit dieser Fragestellung entschieden, da einige von uns selbst Haustiere besitzen und wir den Eindruck haben, dass es bereits ausreichend viele Analysen zu ökonomischen Fragestellungen gibt.
+Wir haben uns für dieses Datenset mit dieser Fragestellung entschieden, da einige von uns selbst Haustiere besitzen und wir den Eindruck haben, dass es bereits ausreichend viele Analysen zu ökonomischen Fragestellungen gibt.
 
 # Vorbereitung in R
 
