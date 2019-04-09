@@ -10,7 +10,7 @@ urlcolor: cyan
 ***
 Unter dem Arbeitstitel "Rescue Snoopy" wurden in einem ersten Schritt folgende Daten ausgewählt, analysiert und das statistische Analyse-Interesse dargelegt.
 
-# Ausgewählter Datensatz
+# Ausgewähltes Datenset
 Für die Gruppenarbeit werden Daten von Kaggle verwendet:  
 https://www.kaggle.com/aaronschlegel/austin-animal-center-shelter-intakes-and-outcomes#aac_intakes.csv
 
@@ -41,11 +41,11 @@ Der Datensatz enthält unter anderem folgende Variablen:
 
 Neben diesen Variablen existierten weitere, die beispielsweise Zeiträume in einem anderen Format darstellen.
 
-# Hintergrundinformationen zum Datensatz
+# Hintergrundinformationen zum Datenset
 Die Daten wurden vom [Austin Animal Center](http://www.austintexas.gov/department/aac) erhoben. Dieses Animal Center ist das größte Tierheim in den USA, in dem keine Tiere getötet werden und kann bis zu 18.000 Tiere pro Jahr aufnehmen. Es werden alle Arten von Tieren aufgenommen. Das Tierheim befindet sich im Travis County im US-Bundesstaat Texas.
 Die Daten werden im Rahmen der Austin's Open Data Intitiative online bereitgestellt.  
 
-Der Datensatz enthält n = 79.672 Observationen und 41 Variablen.   
+Das Datenset enthält n = 79.672 Observationen und 41 Variablen.   
 Die Daten stammen aus der Zeit zwischen Oktober 2013 bis April 2018 (Outcomes).  
 Die Tiere sind zwischen 0-25 Jahre alt, der Median liegt bei 1 Jahr, die Geschlechtsverteilung männlicher und weiblicher Tiere liegt fast bei 50/50.  
 Mehr als die Hälfte der Tiere sind Hunde, gefolgt von Katzen und einigen Vögeln (<500). Etwa 4.500 Tiere sind keiner Spezies zugeordnet.   
@@ -87,7 +87,7 @@ head(aac_intakes_outcomes)
 summary(aac_intakes_outcomes)
 ```
 
-## Initial Data Cleaning - Konvertieren der Datentypen
+## Erste Datenbereinigung - Konvertieren der Datentypen
 ```{r}
 aac_intakes_outcomes$animal_id_outcome <- as.character(aac_intakes_outcomes$animal_id_outcome)
 aac_intakes_outcomes$date_of_birth <- anytime(aac_intakes_outcomes$date_of_birth)
@@ -123,7 +123,7 @@ aac_intakes_outcomes$intake_year <- as.factor(aac_intakes_outcomes$intake_year)
 aac_intakes_outcomes$intake_hour <- as.factor(hour(aac_intakes_outcomes$intake_datetime))
 ```
 
-## Anmerkungen zum Dataset
+## Anmerkungen zum Datenset
 
 Folgende Animal-Types sind vorhanden:
 Unter Other verbergen sich großteils unterschiedliche Nage- und Säugetiere bzw. Kleintiere, die in einem folgenden Datenaufbereitungsschritt feingliedriger aufgedrosselt werden.
