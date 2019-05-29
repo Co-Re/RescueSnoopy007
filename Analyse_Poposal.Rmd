@@ -69,6 +69,7 @@ library("plyr")
 library("anytime")
 library("lubridate")
 library("kableExtra")
+library(caret)
 ```
 
 ## Laden der Daten
@@ -390,6 +391,21 @@ glm.prob[1:10]
 
 **Erläuterung**   
 Eine Prediction wie sie hier dargestellt ist, ist noch nicht sinnvoll, da mehrere Klassen in der Response vorhanden sind. Für mehrere Klassen sollte eine andere Funktion bzw. ein anderes Modell verwendet werden. Auf Basis der obenstehenden Analysen und Erkenntnisse halten wir Tree Modelle für die Vorhersage des `outcome_type` für geeignet.
+
+# Train Test Split
+```{r}
+
+train_function <- createDataPartition(
+  y = aac_intakes_outcomes2$outcome_type,
+  p = .70,
+  list = FALSE
+)
+
+training <- aac_intakes_outcomes2[ train_function,]
+testing  <- aac_intakes_outcomes2[-train_function,]
+
+```
+
 
 
 
