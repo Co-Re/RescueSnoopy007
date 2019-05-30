@@ -417,33 +417,70 @@ aac_intakes_outcomes_bird <- aac_intakes_outcomes_bird[,c(1,3:23)]
 table(aac_intakes_outcomes_bird$outcome_type)
 
 ```
+Filterung auf Katzen
+
+```{r}
+aac_intakes_outcomes_cat <- aac_intakes_outcomes2 %>% filter(animal_type == "Cat")
+aac_intakes_outcomes_cat <- droplevels(aac_intakes_outcomes_cat)
+aac_intakes_outcomes_cat <- aac_intakes_outcomes_cat[,c(1,3:23)]
+table(aac_intakes_outcomes_cat$outcome_type)
+
+```
+
 
 # Train Test Split (nur für Vögel)
 ```{r}
-train_function <- createDataPartition(
+train_function_bird <- createDataPartition(
   y = aac_intakes_outcomes_bird$outcome_type,
   p = .70,
   list = FALSE
 )
-training_bird <- aac_intakes_outcomes_bird[ train_function,]
-testing_bird  <- aac_intakes_outcomes_bird[-train_function,]
+training_bird <- aac_intakes_outcomes_bird[ train_function_bird,]
+testing_bird  <- aac_intakes_outcomes_bird[-train_function_bird,]
 ```
 
-# Decision Tree
+# Decision Tree (für Vögel)
 
 ```{r}
 cv_5 = trainControl(method = "cv", number = 5)
 
-tree_cv5 = train(
+tree_cv5_bird = train(
   outcome_type ~ .,
   data = training_bird,
   trControl = cv_5,
   method = "rpart")
 
 
-predictions_tree <- predict(tree_cv5, testing_bird)
-confus.res_tree <- confusionMatrix(predictions_tree, testing_bird$outcome_type)
-confus.res_tree
+predictions_tree_bird <- predict(tree_cv5_bird, testing_bird)
+confus.res_tree_bird <- confusionMatrix(predictions_tree_bird, testing_bird$outcome_type)
+confus.res_tree_bird
+```
+
+# Train Test Split (nur für Katzen)
+```{r}
+train_function_cat <- createDataPartition(
+  y = aac_intakes_outcomes_cat$outcome_type,
+  p = .70,
+  list = FALSE
+)
+training_cat <- aac_intakes_outcomes_cat[ train_function_cat,]
+testing_cat  <- aac_intakes_outcomes_cat[-train_function_cat,]
+```
+
+# Decision Tree (für Katzen)
+
+```{r}
+
+tree_cv5_cat = train(
+  outcome_type ~ .,
+  data = training_cat,
+  trControl = cv_5,
+  method = "rpart")
+
+
+predictions_tree_cat <- predict(tree_cv5_cat, testing_cat)
+confus.res_tree_cat <- confusionMatrix(predictions_tree_cat, testing_cat$outcome_type)
+confus.res_tree_cat
 ```
 
 ![](snoopy.png)
