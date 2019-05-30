@@ -69,6 +69,9 @@ library("plyr")
 library("anytime")
 library("lubridate")
 library("kableExtra")
+library(caret)
+library(tidyverse)
+library(e1071)
 ```
 
 ## Laden der Daten
@@ -402,6 +405,30 @@ training <- aac_intakes_outcomes2[ train_function,]
 testing  <- aac_intakes_outcomes2[-train_function,]
 ```
 
+# Erzeugung eines Sub-Datasets
+Filterung auf Vögel
+Mit der droplevels()-Funktion werden nichtbenutzte Factor-Level entfernt.
+Außerdem wird die Variable animal_type entfernt, da wird hier nur noch ein Factor-Level haben.
+
+```{r}
+aac_intakes_outcomes_bird <- aac_intakes_outcomes2 %>% filter(animal_type == "Bird")
+aac_intakes_outcomes_bird <- droplevels(aac_intakes_outcomes_bird)
+aac_intakes_outcomes_bird <- aac_intakes_outcomes_bird[,c(1,3:23)]
+table(aac_intakes_outcomes_bird$outcome_type)
+
+```
+
+# Train Test Split (nur für Vögel)
+```{r}
+train_function <- createDataPartition(
+  y = aac_intakes_outcomes_bird$outcome_type,
+  p = .70,
+  list = FALSE
+)
+training_bird <- aac_intakes_outcomes_bird[ train_function,]
+testing_bird  <- aac_intakes_outcomes_bird[-train_function,]
+```
+
 # Decision Tree
 
 ```{r}
@@ -409,13 +436,13 @@ cv_5 = trainControl(method = "cv", number = 5)
 
 tree_cv5 = train(
   outcome_type ~ .,
-  data = training,
+  data = training_bird,
   trControl = cv_5,
   method = "rpart")
 
 
-predictions_tree <- predict(tree_cv5, testing)
-confus.res_tree <- confusionMatrix(predictions_tree, testing$outcome_type)
+predictions_tree <- predict(tree_cv5, testing_bird)
+confus.res_tree <- confusionMatrix(predictions_tree, testing_bird$outcome_type)
 confus.res_tree
 ```
 
