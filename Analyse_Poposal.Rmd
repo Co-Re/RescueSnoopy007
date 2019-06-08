@@ -9,6 +9,8 @@ urlcolor: cyan
 ---
 ***
 Unter dem Arbeitstitel "Rescue Snoopy" wurden in einem ersten Schritt folgende Daten ausgewählt, analysiert und das statistische Analyse-Interesse dargelegt.
+Die gemeinsame Arbeit an diesem Projekt wird über Github abgewickelt und dokumentiert: https://github.com/Co-Re/RescueSnoopy007
+ 
 
 # Ausgewähltes Datenset
 Für die Gruppenarbeit werden Daten von Kaggle verwendet:  
@@ -319,6 +321,55 @@ aac_intakes_outcomes2 <- aac_intakes_outcomes2[,-4]
 
 ```
 
+## Altersangaben und Tage im Tierheim neu berechnen
+Da die bestehenden Alters-/Zeitangaben zum Teil nicht mit den Datumsangaben übereingestimmt haben, werden diese neu berechnen bzw. überprüft.
+Beim Alter bei Intake bzw. Outcome kommen dabei auch negative Werte heraus. Zum Teil kann darauf geschlossen werden, dass das trächtige Muttertier vor der Geburt eingeliefert wurde und somit das Alter des Nachwuchs beim Intake im Minusbereich lag. In diesen Fällen wird es auf 0 gesetzt. Andere unschlüssige Fälle werden exkludiert.
+
+```{r}
+# Age upon intake
+dtime <- round(difftime(aac_intakes_outcomes2$intake_datetime, aac_intakes_outcomes2$date_of_birth,
+         units = c("days")))
+aac_intakes_outcomes2$age_upon_intake_days_calc <- dtime
+
+# Age upon outcome
+dtime2 <- round(difftime(aac_intakes_outcomes2$outcome_datetime, aac_intakes_outcomes2$date_of_birth,
+         units = c("days")))
+aac_intakes_outcomes2$age_upon_outcome_days_calc <- dtime2
+
+# Time in shelter
+dtime3 <- round(difftime(aac_intakes_outcomes2$outcome_datetime, aac_intakes_outcomes2$intake_datetime,
+         units = c("days")), digits = 5)
+aac_intakes_outcomes2$time_in_shelter_days_calc <- dtime3
+
+# Alle überflüssigen Features entfernen, die nun nicht mehr benötigt werden
+aac_intakes_outcomes2$age_upon_intake_.days. <- NULL
+aac_intakes_outcomes2$age_upon_outcome_.days. <- NULL
+aac_intakes_outcomes2$time_in_shelter_days <- NULL
+aac_intakes_outcomes2$date_of_birth <- NULL
+aac_intakes_outcomes2$intake_datetime <- NULL
+aac_intakes_outcomes2$outcome_datetime <- NULL
+
+# Spalten umbennen
+names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "age_upon_outcome_days_calc"] <- "age_upon_outcome_.days."
+names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "age_upon_intake_days_calc"] <- "age_upon_intake_.days."
+names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "time_in_shelter_days_calc"] <- "time_in_shelter_days"
+
+
+# Negatives Alter exkludieren bzw. auf Null setzen
+aac_intakes_outcomes_temp1 <- 
+  aac_intakes_outcomes2[aac_intakes_outcomes2$age_upon_intake_.days.  >= -46 &
+                        aac_intakes_outcomes2$age_upon_outcome_.days.  >= 0, ]
+aac_intakes_outcomes2 <- aac_intakes_outcomes_temp1
+
+aac_intakes_outcomes2$age_upon_intake_.days.[aac_intakes_outcomes2$age_upon_intake_.days.< 0] <- 0
+
+```
+```{r results='hide'}
+# Kontrolle, dass Alter bei Outcome immer höher ist als bei Intake
+aac_intakes_outcomes_temp2 <- 
+  aac_intakes_outcomes2[aac_intakes_outcomes2$age_upon_intake_.days. >
+                        aac_intakes_outcomes2$age_upon_outcome_.days., ]
+```
 
 
 ## Anpassen der Zeugungsfähigkeit
@@ -374,7 +425,6 @@ aac_intakes_outcomes2$sex_upon_outcome_first <- NULL
 names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_intake_first_new"] <- "sex_upon_intake_first"
 names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_outcome_first_new"] <- "sex_upon_outcome_first"
 ```
-
 
 # Exemplarisches glm Modell
 Es wird ein GLM Modell am Beispiel von 3 Prädiktoren aufgestellt, um die grundsätzliche Modellierbarkeit darzustellen.
