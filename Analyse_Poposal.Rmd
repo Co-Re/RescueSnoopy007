@@ -438,24 +438,68 @@ types[order(types[,1], decreasing=T),]
 
 #Auswahl von OutcomeTypes
 
-Da das Interesse des Tierheims vorallem darin liegt, dass Hunde, Katzen und Hasen adoptiert werden, und dieser Anteil auch bei den beiden Tierarten relativ hoch ist, soll für diese Tierarten dieser Outcometype vorhergesagt werden. 
+Da das Interesse des Tierheims vorallem darin liegt, dass Hunde, Katzen und Hasen *adoptiert* werden, und dieser Anteil auch bei den beiden Tierarten relativ hoch ist, soll für diese Tierarten dieser *Outcometype* vorhergesagt werden. 
 
 Da der Anteil bei Wildtieren, die eingeschläfert werden, sehr hoch ist, liegen nur wenige Fälle für andere Outcome types vor, weshalb an dieser Stelle davon abgesehen wird, Modelle für Racoons und Bats aufzustellen.  
+
+Im Folgenden wird deshalb der Datensatz weiter reduziert (durch Entfernung der Wildtiere), es sollen ausschließlich Hunde, Katzen und Hasen verbleiben. Es wird eine neue Variable erstellt, die binär codiert angibt, ob das jeweilige Tier adoptiert wurde. 
 
 #weitere Verkleinerung des Datasets
 
 ```{r}
-TODO!!
-  
-#aac_intakes_outcomes_3 <- aac_intakes_outcomes2[aac_intakes_outcomes2$outcome_type  != "Relocate" & aac_intakes_outcomes2$outcome_type != " "]
+library(dummies)
+
+#entferne wildtiere
+
+aac_intakes_outcomes_3 <- subset(aac_intakes_outcomes2, animal_type  == "Dog" | animal_type == "Cat" | aac_intakes_outcomes2$animal_type  == "Rabbit")
+
+#dummycodierung für Adoption
+
+dummies_outcometype <- data.frame(aac_intakes_outcomes_3$outcome_type)
+dummies_outcometype <- dummy.data.frame(dummies_outcometype)
+
+aac_intakes_outcomes_3$outcome_type_adopt <- dummies_outcometype[,1]
+
+```
+
+```{r check recoding, eval = FALSE}
+
+table(aac_intakes_outcomes_3$outcome_type, aac_intakes_outcomes_3$outcome_type_adopt)
+```
+
+```{r}
+aac_intakes_outcomes2 <- aac_intakes_outcomes_3
+```
 
 
-#aac_intakes_outcomes2 <- aac_intakes_outcomes_3
+#Adoptionen nach Tieren
+
+```{r}
+b<- ggplot(aac_intakes_outcomes2, aes(animal_type))+geom_bar(fill = "#0073C2FF") 
+
+b+geom_bar(aes(fill = outcome_type_adopt))
+
+
+```
+
+```{r}
+table( aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adopt)
+```
+
+
+#split Daten nach Tier
+
+```{r}
+rabbits <- subset(aac_intakes_outcomes2, animal_type == "Rabbit")
+dogs <- subset(aac_intakes_outcomes2, animal_type == "Dog")
+cats <- subset(aac_intakes_outcomes2, animal_type == "Cat")
+
+
 ```
 
 
 
-# Train Test Split
+# Allgemeiner Train Test Split
 ```{r}
 
 train_function <- createDataPartition(
@@ -469,7 +513,40 @@ testing  <- aac_intakes_outcomes2[-train_function,]
 
 ```
 
+#Train/Test Split für Hunde
+```{r}
+train_function <- createDataPartition(
+  y = dogs$outcome_type_adopt,
+  p = .30,
+  list = FALSE
+)
 
+training_dog <- dogs[ train_function,]
+testing_dog  <- dogs[-train_function,]
+```
 
+#Train/Test Split für Katzen
+```{r}
+train_function <- createDataPartition(
+  y = cats$outcome_type_adopt,
+  p = .70,
+  list = FALSE
+)
+
+training_cat <- cats[ train_function,]
+testing_cat  <- cats[-train_function,]
+```
+
+#Train/Test Split für Hasen
+```{r}
+train_function <- createDataPartition(
+  y = rabbits$outcome_type_adopt,
+  p = .70,
+  list = FALSE
+)
+
+training_rabbit <- rabbits[ train_function,]
+testing_rabbit  <- rabbits[-train_function,]
+```
 
 ![](snoopy.png)
