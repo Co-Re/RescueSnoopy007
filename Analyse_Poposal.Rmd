@@ -392,6 +392,69 @@ glm.prob[1:10]
 **Erläuterung**   
 Eine Prediction wie sie hier dargestellt ist, ist noch nicht sinnvoll, da mehrere Klassen in der Response vorhanden sind. Für mehrere Klassen sollte eine andere Funktion bzw. ein anderes Modell verwendet werden. Auf Basis der obenstehenden Analysen und Erkenntnisse halten wir Tree Modelle für die Vorhersage des `outcome_type` für geeignet.
 
+# Löschen aller Tierarten mit wenigen Fällen 
+
+```{r}
+summary(aac_intakes_outcomes2$animal_type)
+
+```
+Der primäre Fokus der Vorhersage des Outcometypes liegt bei Hunden und Katzen. 
+Jedoch sollen auch Tiere, von denen mind. n=500 Beobachtungen vorliegen, betrachtet werden, und zwar: 
+
+*- Dog: 45.364
+*- Cat: 29.536
+*- Bat:  2.205
+*- Raccoon: 706
+*- Rabbit: 513
+
+Für jede Tierart soll ein eigenes Modell gefittet werden, gegebenenfalls müssen dann in weiterer Folge aufgrund zu geringer Fallzahlen die Tierarten weiter eingeschränkt werden. 
+
+```{r}
+aac_intakes_outcomes3<- data.frame(subset(aac_intakes_outcomes2, animal_type=="Dog"|animal_type=="Cat"|animal_type=="Bat"|animal_type=="Raccoon"|animal_type=="Rabbit"))
+
+
+aac_intakes_outcomes2 <- aac_intakes_outcomes3
+summary(aac_intakes_outcomes2$animal_type)
+
+```
+
+```{r}
+plot(aac_intakes_outcomes2$outcome_type)
+
+as.numeric(aac_intakes_outcomes2$animal_type)
+
+a<- ggplot(aac_intakes_outcomes2, aes(animal_type))+geom_bar(fill = "#0073C2FF") 
+
+a+geom_bar(aes(fill = outcome_type))
+
+
+```
+
+```{r}
+types <- table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type)
+
+types[order(types[,1], decreasing=T),]
+```
+
+#Auswahl von OutcomeTypes
+
+Da das Interesse des Tierheims vorallem darin liegt, dass Hunde, Katzen und Hasen adoptiert werden, und dieser Anteil auch bei den beiden Tierarten relativ hoch ist, soll für diese Tierarten dieser Outcometype vorhergesagt werden. 
+
+Da der Anteil bei Wildtieren, die eingeschläfert werden, sehr hoch ist, liegen nur wenige Fälle für andere Outcome types vor, weshalb an dieser Stelle davon abgesehen wird, Modelle für Racoons und Bats aufzustellen.  
+
+#weitere Verkleinerung des Datasets
+
+```{r}
+TODO!!
+  
+#aac_intakes_outcomes_3 <- aac_intakes_outcomes2[aac_intakes_outcomes2$outcome_type  != "Relocate" & aac_intakes_outcomes2$outcome_type != " "]
+
+
+#aac_intakes_outcomes2 <- aac_intakes_outcomes_3
+```
+
+
+
 # Train Test Split
 ```{r}
 
