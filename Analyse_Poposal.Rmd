@@ -515,14 +515,26 @@ testing  <- aac_intakes_outcomes2[-train_function,]
 
 #Train/Test Split für Hunde
 ```{r}
+
+#nur 30% aller Datensätze von Hunden
 train_function <- createDataPartition(
   y = dogs$outcome_type_adopt,
   p = .30,
   list = FALSE
 )
 
-training_dog <- dogs[ train_function,]
-testing_dog  <- dogs[-train_function,]
+dogs_reduced <- dogs[ train_function,]
+
+
+#Splitte 30% wiederrum in Test/Training
+train_function <- createDataPartition(
+  y = dogs_reduced$outcome_type_adopt,
+  p = .70,
+  list = FALSE
+)
+
+training_dog <- dogs_reduced[train_function,]
+testing_dog  <- dogs_reduced[-train_function,]
 ```
 
 #Train/Test Split für Katzen
