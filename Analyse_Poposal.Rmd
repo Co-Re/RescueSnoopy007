@@ -70,6 +70,7 @@ library("anytime")
 library("lubridate")
 library("kableExtra")
 library(caret)
+library(rpart.plot)
 ```
 
 ## Laden der Daten
@@ -561,4 +562,44 @@ training_rabbit <- rabbits[ train_function,]
 testing_rabbit  <- rabbits[-train_function,]
 ```
 
+***
+
+#Aufstellen der Modelle
+Zuerst werden Modell mithilfe von Decisoin Trees aufgestellt. Danach wird untersucht, ob andere Methoden wie neuronale Netze ein ähnliche oder sogar besseres Ergebnis liefern.
+
+## Decision Trees
+
+### Decion Tree für Hunde
+```{r}
+training_dog$outcome_type_adopt <- as.factor(training_dog$outcome_type_adopt)
+vars = c("breed", "intake_condition", "dob_year", "time_in_shelter_days", "color_new", "outcome_type_adopt")
+training_dog_subsmample = training_dog[vars]
+
+set.seed(123)
+```
+
+```{r}
+cv_5 = trainControl(method = "cv", number = 5)
+
+tree_dog <- train(
+  outcome_type_adopt ~ .,
+  data = training_dog_subsmample,
+  trControl = cv_5,
+  method = "rpart")
+
+print(tree_dog)
+```
+
+```{r}
+testing_dog$outcome_type_adopt <- as.factor(testing_dog$outcome_type_adopt)
+testing_dog_subsmample = testing_dog[vars]
+
+pred_tree_dog <- predict(tree_dog, testing_dog[vars])
+conf_matrix_tree_dog <- confusionMatrix(pred_tree_dog, testing_dog[vars]$outcome_type)
+conf_matrix_tree_dog
+```
+
+```{r}
+rpart.plot(tree_dog$finalModel)
+```
 ![](snoopy.png)
