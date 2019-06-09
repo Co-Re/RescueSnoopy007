@@ -641,5 +641,37 @@ conf_matrix_tree_cat
 rpart.plot(tree_cat$finalModel)
 ```
 
+### Decion Tree für Hasen
+```{r}
+training_rabbit$outcome_type_adopt <- as.factor(training_rabbit$outcome_type_adopt)
+training_rabbit_sub = training_rabbit[vars]
+
+```
+
+```{r}
+set.seed(seed_val)
+
+tree_rabbit <- train(
+  outcome_type_adopt ~ .,
+  data = training_rabbit_sub,
+  trControl = cv_5,
+  method = "rpart")
+
+print(tree_rabbit)
+```
+
+```{r}
+testing_rabbit$outcome_type_adopt <- as.factor(testing_rabbit$outcome_type_adopt)
+testing_rabbit_sub = testing_rabbit[vars]
+
+pred_tree_rabbit <- predict(tree_rabbit, testing_rabbit_sub)
+conf_matrix_tree_rabbit <- confusionMatrix(pred_tree_rabbit, testing_rabbit_sub$outcome_type)
+conf_matrix_tree_rabbit
+```
+
+```{r}
+rpart.plot(tree_rabbit$finalModel)
+```
+
 
 ![](snoopy.png)
