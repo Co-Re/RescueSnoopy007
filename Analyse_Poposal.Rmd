@@ -64,6 +64,8 @@ Es ist interessant für uns, herauszufinden, welche Aspekte ausschlaggebend daf�
 Weiß man, welche Aspekte eine Rolle spielen, könnte man diese gezielt in den Tierheimen in der Kommunikation verwenden, um mehr Tieren (z.B. vor allem jenen, die grundsätzlich eine schlechtere Chance für eine Adoption haben) ein neues zu Hause zu geben.   
 Wir haben uns für dieses Datenset mit dieser Fragestellung entschieden, da einige von uns selbst Haustiere besitzen und wir den Eindruck haben, dass es bereits ausreichend viele Analysen zu ökonomischen Fragestellungen gibt.
 
+***
+
 # Vorbereitung in R
 
 ```{r, include=F}
@@ -487,7 +489,7 @@ types <- table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_
 types[order(types[,1], decreasing=T),]
 ```
 
-#Auswahl von OutcomeTypes
+# Auswahl von OutcomeTypes
 
 Da das Interesse des Tierheims vorallem darin liegt, dass Hunde, Katzen und Hasen *adoptiert* werden, und dieser Anteil auch bei den beiden Tierarten relativ hoch ist, soll für diese Tierarten dieser *Outcometype* vorhergesagt werden. 
 
@@ -495,7 +497,7 @@ Da der Anteil bei Wildtieren, die eingeschläfert werden, sehr hoch ist, liegen 
 
 Im Folgenden wird deshalb der Datensatz weiter reduziert (durch Entfernung der Wildtiere), es sollen ausschließlich Hunde, Katzen und Hasen verbleiben. Es wird eine neue Variable erstellt, die binär codiert angibt, ob das jeweilige Tier adoptiert wurde. 
 
-#weitere Verkleinerung des Datasets
+# weitere Verkleinerung des Datasets
 
 ```{r}
 library(dummies)
@@ -523,7 +525,7 @@ aac_intakes_outcomes2 <- aac_intakes_outcomes_3
 ```
 
 
-#Adoptionen nach Tieren
+# Adoptionen nach Tieren
 
 ```{r}
 b<- ggplot(aac_intakes_outcomes2, aes(animal_type))+geom_bar(fill = "#0073C2FF") 
@@ -538,7 +540,7 @@ table( aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_ado
 ```
 
 
-#split Daten nach Tier
+# split Daten nach Tier
 
 ```{r}
 rabbits <- subset(aac_intakes_outcomes2, animal_type == "Rabbit")
@@ -564,7 +566,7 @@ testing  <- aac_intakes_outcomes2[-train_function,]
 
 ```
 
-#Train/Test Split für Hunde
+# Train/Test Split für Hunde
 ```{r}
 
 #nur 30% aller Datensätze von Hunden
@@ -588,7 +590,7 @@ training_dog <- dogs_reduced[train_function,]
 testing_dog  <- dogs_reduced[-train_function,]
 ```
 
-#Train/Test Split für Katzen
+# Train/Test Split für Katzen
 ```{r}
 train_function <- createDataPartition(
   y = cats$outcome_type_adopt,
@@ -600,7 +602,7 @@ training_cat <- cats[ train_function,]
 testing_cat  <- cats[-train_function,]
 ```
 
-#Train/Test Split für Hasen
+# Train/Test Split für Hasen
 ```{r}
 train_function <- createDataPartition(
   y = rabbits$outcome_type_adopt,
@@ -614,11 +616,10 @@ testing_rabbit  <- rabbits[-train_function,]
 
 ***
 
-#Aufstellen der Modelle
+# Aufstellen der Modelle
 Zuerst werden Modell mithilfe von Decisoin Trees aufgestellt. Danach wird untersucht, ob andere Methoden wie neuronale Netze ein ähnliche oder sogar besseres Ergebnis liefern.
 
 ## Decision Trees
-
 
 Allgemeine Werte
 ```{r}
