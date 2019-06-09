@@ -625,106 +625,161 @@ Allgemeine Werte
 ```{r}
 cv_5 = trainControl(method = "cv", number = 5)
 seed_val = 123
-vars = c("breed", "intake_condition", "dob_year", "time_in_shelter_days", "color_new", "outcome_type_adopt")
+vars1 = c("breed", "intake_condition", "dob_year", "time_in_shelter_days", "color_new", "outcome_type_adopt")
+
+vars2 = c("breed", "intake_condition", "intake_type", "dob_year", "time_in_shelter_days", "sex_upon_outcome_second", "color_new", "outcome_type_adopt")
 ```
 
 ### Decion Tree für Hunde
 ```{r}
 training_dog$outcome_type_adopt <- as.factor(training_dog$outcome_type_adopt)
-training_dog_sub = training_dog[vars]
+training_dog_sub1 = training_dog[vars1]
+training_dog_sub2 = training_dog[vars2]
 
 ```
 
 ```{r}
 set.seed(seed_val)
 
-tree_dog <- train(
+tree_dog1 <- train(
   outcome_type_adopt ~ .,
-  data = training_dog_sub,
+  data = training_dog_sub1,
   trControl = cv_5,
   method = "rpart")
 
-print(tree_dog)
+tree_dog2 <- train(
+  outcome_type_adopt ~ .,
+  data = training_dog_sub2,
+  trControl = cv_5,
+  method = "rpart")
+
+print(tree_dog1)
+print(tree_dog2)
 ```
 
 ```{r}
 testing_dog$outcome_type_adopt <- as.factor(testing_dog$outcome_type_adopt)
-testing_dog_sub = testing_dog[vars]
+testing_dog_sub1 = testing_dog[vars1]
 
-pred_tree_dog <- predict(tree_dog, testing_dog_sub)
-conf_matrix_tree_dog <- confusionMatrix(pred_tree_dog, testing_dog_sub$outcome_type)
-conf_matrix_tree_dog
+pred_tree_dog1 <- predict(tree_dog1, testing_dog_sub1)
+conf_matrix_tree_dog1 <- confusionMatrix(pred_tree_dog1, testing_dog_sub1$outcome_type)
+conf_matrix_tree_dog1
+
+testing_dog_sub2 = testing_dog[vars2]
+
+pred_tree_dog2 <- predict(tree_dog2, testing_dog_sub2)
+conf_matrix_tree_dog2 <- confusionMatrix(pred_tree_dog2, testing_dog_sub2$outcome_type)
+conf_matrix_tree_dog2
 ```
+
+Der Tree (tree_dog2) schneidet mit 0.744 etwas besser als tree1 mit 0.7205 ab.
 
 ```{r}
-rpart.plot(tree_dog$finalModel)
+rpart.plot(tree_dog2$finalModel)
 ```
-Der Tree zeigt, dass vor allem time_in_shelter bei Hunden eine Rolle spielt. Als einzige weitere Variable ist intake_conditionNormal aufgeführt.
+
+
+Der Tree zeigt, dass zuerst time_in_shelter eine Rolle spielt und somit die erste Abzweigung im Baum ist. Als weitere Variable verwendet der Baum intake_type und zwar ob Pulbic Assist.
 
 ### Decion Tree für Katzen
 ```{r}
 training_cat$outcome_type_adopt <- as.factor(training_cat$outcome_type_adopt)
-training_cat_sub = training_cat[vars]
-
+training_cat_sub1 = training_cat[vars1]
+training_cat_sub2 = training_cat[vars2]
 ```
 
 ```{r}
 set.seed(seed_val)
 
-tree_cat <- train(
+tree_cat1 <- train(
   outcome_type_adopt ~ .,
-  data = training_cat_sub,
+  data = training_cat_sub1,
   trControl = cv_5,
   method = "rpart")
 
-print(tree_cat)
+tree_cat2 <- train(
+  outcome_type_adopt ~ .,
+  data = training_cat_sub2,
+  trControl = cv_5,
+  method = "rpart")
+
+print(tree_cat1)
+print(tree_cat2)
 ```
 
 ```{r}
 testing_cat$outcome_type_adopt <- as.factor(testing_cat$outcome_type_adopt)
-testing_cat_sub = testing_cat[vars]
+testing_cat_sub1 = testing_cat[vars1]
+testing_cat_sub2 = testing_cat[vars2]
 
-pred_tree_cat <- predict(tree_cat, testing_cat_sub)
-conf_matrix_tree_cat <- confusionMatrix(pred_tree_cat, testing_cat_sub$outcome_type)
-conf_matrix_tree_cat
+pred_tree_cat1 <- predict(tree_cat1, testing_cat_sub1)
+conf_matrix_tree_cat1 <- confusionMatrix(pred_tree_cat1, testing_cat_sub1$outcome_type)
+conf_matrix_tree_cat1
+
+pred_tree_cat2 <- predict(tree_cat2, testing_cat_sub2)
+conf_matrix_tree_cat2 <- confusionMatrix(pred_tree_cat2, testing_cat_sub2$outcome_type)
+conf_matrix_tree_cat2
 ```
+
+Der zweite Tree mit einer Accuracy 0,7818 ist etwas besser.
 
 ```{r}
-rpart.plot(tree_cat$finalModel)
+rpart.plot(tree_cat2$finalModel)
 ```
-Bei Katzen ist auch time_in_shelter_days der wichtigste Wert. Hinzu kommt als Variable wie bei den Hunden intake_conditionNormal. Somit sind Hunde und Katzen in der Auswahl der Variablen sehr ähnlich.
+
+
+Bei Katzen ist auch time_in_shelter_days die erste Split Variable des Baumes, dann kommt time_in_shelter. Aber auch das Geschlecht und der Zustand des Tieres sind im Baum als Variablen aufgeführt.
 
 ### Decion Tree für Hasen
 ```{r}
 training_rabbit$outcome_type_adopt <- as.factor(training_rabbit$outcome_type_adopt)
-training_rabbit_sub = training_rabbit[vars]
+training_rabbit_sub1 = training_rabbit[vars1]
+training_rabbit_sub2 = training_rabbit[vars2]
 
 ```
 
 ```{r}
 set.seed(seed_val)
 
-tree_rabbit <- train(
+tree_rabbit1 <- train(
   outcome_type_adopt ~ .,
-  data = training_rabbit_sub,
+  data = training_rabbit_sub1,
   trControl = cv_5,
   method = "rpart")
 
-print(tree_rabbit)
+tree_rabbit2 <- train(
+  outcome_type_adopt ~ .,
+  data = training_rabbit_sub2,
+  trControl = cv_5,
+  method = "rpart")
+
+print(tree_rabbit1)
+print(tree_rabbit2)
 ```
 
 ```{r}
 testing_rabbit$outcome_type_adopt <- as.factor(testing_rabbit$outcome_type_adopt)
-testing_rabbit_sub = testing_rabbit[vars]
+testing_rabbit_sub1 = testing_rabbit[vars1]
+testing_rabbit_sub2 = testing_rabbit[vars2]
 
-pred_tree_rabbit <- predict(tree_rabbit, testing_rabbit_sub)
-conf_matrix_tree_rabbit <- confusionMatrix(pred_tree_rabbit, testing_rabbit_sub$outcome_type)
-conf_matrix_tree_rabbit
+pred_tree_rabbit1 <- predict(tree_rabbit1, testing_rabbit_sub1)
+conf_matrix_tree_rabbit1 <- confusionMatrix(pred_tree_rabbit1, testing_rabbit_sub1$outcome_type)
+conf_matrix_tree_rabbit1
+
+pred_tree_rabbit2 <- predict(tree_rabbit2, testing_rabbit_sub2)
+conf_matrix_tree_rabbit2 <- confusionMatrix(pred_tree_rabbit2, testing_rabbit_sub2$outcome_type)
+conf_matrix_tree_rabbit2
 ```
+Der zweite Tree ist bezüglich Accuracy um 4% (0,81) besser als der erste Tree.
+
 
 ```{r}
-rpart.plot(tree_rabbit$finalModel)
+rpart.plot(tree_rabbit2$finalModel)
 ```
-Bei Hasen ist auch die erste Variable des Baumes time_in_shelter_days, jedoch ist dann die zweite Split Variable das Alter des Tieres.
+
+
+Bei Hasen ist auch die erste Variable des Baumes time_in_shelter_days, jedoch ist dann die zweite Split Variable das Geschlecht des Tieres.
+
+
 
 ![](snoopy.png)
