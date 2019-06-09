@@ -658,6 +658,7 @@ conf_matrix_tree_dog
 ```{r}
 rpart.plot(tree_dog$finalModel)
 ```
+Der Tree zeigt, dass vor allem time_in_shelter bei Hunden eine Rolle spielt. Als einzige weitere Variable ist intake_conditionNormal aufgeführt.
 
 ### Decion Tree für Katzen
 ```{r}
@@ -690,6 +691,7 @@ conf_matrix_tree_cat
 ```{r}
 rpart.plot(tree_cat$finalModel)
 ```
+Bei Katzen ist auch time_in_shelter_days der wichtigste Wert. Hinzu kommt als Variable wie bei den Hunden intake_conditionNormal. Somit sind Hunde und Katzen in der Auswahl der Variablen sehr ähnlich.
 
 ### Decion Tree für Hasen
 ```{r}
@@ -722,6 +724,6 @@ conf_matrix_tree_rabbit
 ```{r}
 rpart.plot(tree_rabbit$finalModel)
 ```
-
+Bei Hasen ist auch die erste Variable des Baumes time_in_shelter_days, jedoch ist dann die zweite Split Variable das Alter des Tieres.
 
 ![](snoopy.png)
