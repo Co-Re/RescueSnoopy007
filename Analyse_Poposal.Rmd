@@ -569,21 +569,27 @@ Zuerst werden Modell mithilfe von Decisoin Trees aufgestellt. Danach wird unters
 
 ## Decision Trees
 
+
+Allgemeine Werte
+```{r}
+cv_5 = trainControl(method = "cv", number = 5)
+seed_val = 123
+vars = c("breed", "intake_condition", "dob_year", "time_in_shelter_days", "color_new", "outcome_type_adopt")
+```
+
 ### Decion Tree für Hunde
 ```{r}
 training_dog$outcome_type_adopt <- as.factor(training_dog$outcome_type_adopt)
-vars = c("breed", "intake_condition", "dob_year", "time_in_shelter_days", "color_new", "outcome_type_adopt")
-training_dog_subsmample = training_dog[vars]
+training_dog_sub = training_dog[vars]
 
-set.seed(123)
 ```
 
 ```{r}
-cv_5 = trainControl(method = "cv", number = 5)
+set.seed(seed_val)
 
 tree_dog <- train(
   outcome_type_adopt ~ .,
-  data = training_dog_subsmample,
+  data = training_dog_sub,
   trControl = cv_5,
   method = "rpart")
 
@@ -592,14 +598,48 @@ print(tree_dog)
 
 ```{r}
 testing_dog$outcome_type_adopt <- as.factor(testing_dog$outcome_type_adopt)
-testing_dog_subsmample = testing_dog[vars]
+testing_dog_sub = testing_dog[vars]
 
-pred_tree_dog <- predict(tree_dog, testing_dog[vars])
-conf_matrix_tree_dog <- confusionMatrix(pred_tree_dog, testing_dog[vars]$outcome_type)
+pred_tree_dog <- predict(tree_dog, testing_dog_sub)
+conf_matrix_tree_dog <- confusionMatrix(pred_tree_dog, testing_dog_sub$outcome_type)
 conf_matrix_tree_dog
 ```
 
 ```{r}
 rpart.plot(tree_dog$finalModel)
 ```
+
+### Decion Tree für Katzen
+```{r}
+training_cat$outcome_type_adopt <- as.factor(training_cat$outcome_type_adopt)
+training_cat_sub = training_cat[vars]
+
+```
+
+```{r}
+set.seed(seed_val)
+
+tree_cat <- train(
+  outcome_type_adopt ~ .,
+  data = training_cat_sub,
+  trControl = cv_5,
+  method = "rpart")
+
+print(tree_cat)
+```
+
+```{r}
+testing_cat$outcome_type_adopt <- as.factor(testing_cat$outcome_type_adopt)
+testing_cat_sub = testing_cat[vars]
+
+pred_tree_cat <- predict(tree_cat, testing_cat_sub)
+conf_matrix_tree_cat <- confusionMatrix(pred_tree_cat, testing_cat_sub$outcome_type)
+conf_matrix_tree_cat
+```
+
+```{r}
+rpart.plot(tree_cat$finalModel)
+```
+
+
 ![](snoopy.png)
