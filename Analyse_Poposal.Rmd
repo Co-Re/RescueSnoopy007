@@ -540,18 +540,123 @@ b+geom_bar(aes(fill = outcome_type_adopt))
 table( aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adopt)
 ```
 
+```{r}
+#Löschung unbenötigter Spalten: date_of_birth_month & year, time_in_shelter
+
+aac_intakes_outcomes2 <- aac_intakes_outcomes2[,c(1:6,9:13,15:21)]
+#dummies_breed <- dummy.data.frame(data.frame(aac_intakes_outcomes2$breed))
+
+dummies_intake_condition <- dummy.data.frame(data.frame(aac_intakes_outcomes2$intake_condition))
+aac_intakes_outcomes2$intake_conditionAged <- dummies_intake_condition[,1]
+aac_intakes_outcomes2$intake_conditionFeral <- dummies_intake_condition[,2]
+aac_intakes_outcomes2$intake_conditionInjured <- dummies_intake_condition[,3]
+aac_intakes_outcomes2$intake_conditionNormal <- dummies_intake_condition[,4]
+aac_intakes_outcomes2$intake_conditionNursing <- dummies_intake_condition[,5]
+aac_intakes_outcomes2$intake_conditionOther <- dummies_intake_condition[,6]
+aac_intakes_outcomes2$intake_conditionPregnant <- dummies_intake_condition[,7]
+aac_intakes_outcomes2$intake_conditionSick <- dummies_intake_condition[,8]
+
+dummies_intake_type <- dummy.data.frame(data.frame(aac_intakes_outcomes2$intake_type))
+aac_intakes_outcomes2$intake_typeEuthanasiaRequest <- dummies_intake_type[,1]
+aac_intakes_outcomes2$intake_typeOwnerSurrender <- dummies_intake_type[,2]
+aac_intakes_outcomes2$intake_typePublicAssist <- dummies_intake_type[,3]
+aac_intakes_outcomes2$intake_typeStray <- dummies_intake_type[,4]
+aac_intakes_outcomes2$intake_typeWildlife <- dummies_intake_type[,5]
+
+dummies_suos <- dummy.data.frame(data.frame(aac_intakes_outcomes2$sex_upon_outcome_second))
+aac_intakes_outcomes2$sexuponoutcomesecond_female <- dummies_suos[,1]
+aac_intakes_outcomes2$sexuponoutcomesecond_male <- dummies_suos[,2]
+aac_intakes_outcomes2$sexuponoutcomesecond_unknown <- dummies_suos[,3]
+
+dummies_intake_month <- dummy.data.frame(data.frame(aac_intakes_outcomes2$intake_month))
+aac_intakes_outcomes2$intake_month1 <- dummies_intake_month[,1]
+aac_intakes_outcomes2$intake_month2 <- dummies_intake_month[,2]
+aac_intakes_outcomes2$intake_month3 <- dummies_intake_month[,3]
+aac_intakes_outcomes2$intake_month4 <- dummies_intake_month[,4]
+aac_intakes_outcomes2$intake_month5 <- dummies_intake_month[,5]
+aac_intakes_outcomes2$intake_month6 <- dummies_intake_month[,6]
+aac_intakes_outcomes2$intake_month7 <- dummies_intake_month[,7]
+aac_intakes_outcomes2$intake_month8 <- dummies_intake_month[,8]
+aac_intakes_outcomes2$intake_month9 <- dummies_intake_month[,9]
+aac_intakes_outcomes2$intake_month10 <- dummies_intake_month[,10]
+aac_intakes_outcomes2$intake_month11 <- dummies_intake_month[,11]
+aac_intakes_outcomes2$intake_month12 <- dummies_intake_month[,12]
+
+dummies_intake_year <- dummy.data.frame(data.frame(aac_intakes_outcomes2$intake_year))
+aac_intakes_outcomes2$intake_year2013 <- dummies_intake_year[,1]
+aac_intakes_outcomes2$intake_year2014 <- dummies_intake_year[,2]
+aac_intakes_outcomes2$intake_year2015 <- dummies_intake_year[,3]
+aac_intakes_outcomes2$intake_year2016 <- dummies_intake_year[,4]
+aac_intakes_outcomes2$intake_year2017 <- dummies_intake_year[,5]
+aac_intakes_outcomes2$intake_year2018 <- dummies_intake_year[,6]
+
+dummies_outcome_month <- dummy.data.frame(data.frame(aac_intakes_outcomes2$outcome_month))
+aac_intakes_outcomes2$outcome_month1 <- dummies_outcome_month[,1]
+aac_intakes_outcomes2$outcome_month2 <- dummies_outcome_month[,2]
+aac_intakes_outcomes2$outcome_month3 <- dummies_outcome_month[,3]
+aac_intakes_outcomes2$outcome_month4 <- dummies_outcome_month[,4]
+aac_intakes_outcomes2$outcome_month5 <- dummies_outcome_month[,5]
+aac_intakes_outcomes2$outcome_month6 <- dummies_outcome_month[,6]
+aac_intakes_outcomes2$outcome_month7 <- dummies_outcome_month[,7]
+aac_intakes_outcomes2$outcome_month8 <- dummies_outcome_month[,8]
+aac_intakes_outcomes2$outcome_month9 <- dummies_outcome_month[,9]
+aac_intakes_outcomes2$outcome_month10 <- dummies_outcome_month[,10]
+aac_intakes_outcomes2$outcome_month11 <- dummies_outcome_month[,11]
+aac_intakes_outcomes2$outcome_month12 <- dummies_outcome_month[,12]
+
+dummies_outcome_year <- dummy.data.frame(data.frame(aac_intakes_outcomes2$outcome_year))
+aac_intakes_outcomes2$outcome_year2013 <- dummies_outcome_year[,1]
+aac_intakes_outcomes2$outcome_year2014 <- dummies_outcome_year[,2]
+aac_intakes_outcomes2$outcome_year2015 <- dummies_outcome_year[,3]
+aac_intakes_outcomes2$outcome_year2016 <- dummies_outcome_year[,4]
+aac_intakes_outcomes2$outcome_year2017 <- dummies_outcome_year[,5]
+aac_intakes_outcomes2$outcome_year2018 <- dummies_outcome_year[,6]
+
+dummies_color <- dummy.data.frame(data.frame(aac_intakes_outcomes2$color_new))
+aac_intakes_outcomes2$colorApricot <- dummies_color[,1]
+aac_intakes_outcomes2$colorBeige <- dummies_color[,2]
+aac_intakes_outcomes2$colorBlack <- dummies_color[,3]
+aac_intakes_outcomes2$colorBlue <- dummies_color[,4]
+aac_intakes_outcomes2$colorBrown <- dummies_color[,5]
+aac_intakes_outcomes2$colorGray <- dummies_color[,6]
+aac_intakes_outcomes2$colorLilac <- dummies_color[,7]
+aac_intakes_outcomes2$colorMulticolor <- dummies_color[,8]
+aac_intakes_outcomes2$colorOrange <- dummies_color[,9]
+aac_intakes_outcomes2$colorPink <- dummies_color[,10]
+aac_intakes_outcomes2$colorRed <- dummies_color[,11]
+aac_intakes_outcomes2$colorSilver <- dummies_color[,12]
+aac_intakes_outcomes2$colorWhite <- dummies_color[,13]
+aac_intakes_outcomes2$colorYellow <- dummies_color[,14]
+
+aac_intakes_outcomes2$age_upon_intake_.days. <- as.numeric(aac_intakes_outcomes2$age_upon_intake_.days.)
+aac_intakes_outcomes2$age_upon_outcome_.days. <- as.numeric(aac_intakes_outcomes2$age_upon_outcome_.days.)
+aac_intakes_outcomes2$time_in_shelter_days <- as.numeric(aac_intakes_outcomes2$time_in_shelter_days)
+
+dummies_suif<- dummy.data.frame(data.frame(aac_intakes_outcomes2$sex_upon_intake_first))
+aac_intakes_outcomes2$sex_upon_intake_first_Intact <- dummies_suif[,1]
+aac_intakes_outcomes2$sex_upon_intake_first_Sterilized <- dummies_suif[,2]
+aac_intakes_outcomes2$sex_upon_intake_first_Unknown <- dummies_suif[,3]
+
+dummies_suof<- dummy.data.frame(data.frame(aac_intakes_outcomes2$sex_upon_outcome_first))
+aac_intakes_outcomes2$sex_upon_outcome_first_Intact <- dummies_suof[,1]
+aac_intakes_outcomes2$sex_upon_outcome_first_Sterilized <- dummies_suof[,2]
+aac_intakes_outcomes2$sex_upon_outcome_first_Unknown <- dummies_suof[,3]
+
+aac_intakes_outcomes2$outcome_type_adopt <- as.factor(aac_intakes_outcomes2$outcome_type_adopt)
+```
+
 
 # split Daten nach Tier
 
 ```{r}
 rabbits <- subset(aac_intakes_outcomes2, animal_type == "Rabbit")
-rabbits <- rabbits[,c(3:21)]
+rabbits <- rabbits[,c(3,9,13:15,18:90)]
 
 dogs <- subset(aac_intakes_outcomes2, animal_type == "Dog")
-dogs <- dogs[,c(3:21)]
+dogs <- dogs[,c(3,9,13:15,18:90)]
 
 cats <- subset(aac_intakes_outcomes2, animal_type == "Cat")
-cats <- cats[,c(3:21)]
+cats <- cats[,c(3,9,13:15,18:90)]
 
 ```
 
@@ -630,160 +735,94 @@ Allgemeine Werte
 ```{r}
 cv_5 = trainControl(method = "cv", number = 5)
 seed_val = 123
-vars1 = c("breed", "intake_condition", "dob_year", "time_in_shelter_days", "color_new", "outcome_type_adopt")
-
-vars2 = c("breed", "intake_condition", "intake_type", "dob_year", "time_in_shelter_days", "sex_upon_outcome_second", "color_new", "outcome_type_adopt")
 ```
 
 ### Decion Tree für Hunde
-```{r}
-training_dog$outcome_type_adopt <- as.factor(training_dog$outcome_type_adopt)
-training_dog_sub1 = training_dog[vars1]
-training_dog_sub2 = training_dog[vars2]
-
-```
 
 ```{r}
 set.seed(seed_val)
 
 tree_dog1 <- train(
   outcome_type_adopt ~ .,
-  data = training_dog_sub1,
-  trControl = cv_5,
-  method = "rpart")
-
-tree_dog2 <- train(
-  outcome_type_adopt ~ .,
-  data = training_dog_sub2,
+  data = training_dog,
   trControl = cv_5,
   method = "rpart")
 
 print(tree_dog1)
-print(tree_dog2)
+
 ```
 
 ```{r}
-testing_dog$outcome_type_adopt <- as.factor(testing_dog$outcome_type_adopt)
-testing_dog_sub1 = testing_dog[vars1]
-
-pred_tree_dog1 <- predict(tree_dog1, testing_dog_sub1)
-conf_matrix_tree_dog1 <- confusionMatrix(pred_tree_dog1, testing_dog_sub1$outcome_type)
+pred_tree_dog1 <- predict(tree_dog1, testing_dog)
+conf_matrix_tree_dog1 <- confusionMatrix(pred_tree_dog1, testing_dog$outcome_type)
 conf_matrix_tree_dog1
 
-testing_dog_sub2 = testing_dog[vars2]
-
-pred_tree_dog2 <- predict(tree_dog2, testing_dog_sub2)
-conf_matrix_tree_dog2 <- confusionMatrix(pred_tree_dog2, testing_dog_sub2$outcome_type)
-conf_matrix_tree_dog2
 ```
 
-Der Tree (tree_dog2) schneidet mit 0.744 etwas besser als tree1 mit 0.7205 ab.
 
 ```{r}
-rpart.plot(tree_dog2$finalModel)
+rpart.plot(tree_dog1$finalModel)
 ```
 
 
-Der Tree zeigt, dass zuerst time_in_shelter eine Rolle spielt und somit die erste Abzweigung im Baum ist. Als weitere Variable verwendet der Baum intake_type und zwar ob Pulbic Assist.
+Der Tree zeigt, dass zuerst time_in_shelter eine Rolle spielt und somit die erste Abzweigung im Baum ist. Als weitere Variable verwendet der Baum sex_upon_outcome_first_ Sterilized = 0.
 
 ### Decion Tree für Katzen
-```{r}
-training_cat$outcome_type_adopt <- as.factor(training_cat$outcome_type_adopt)
-training_cat_sub1 = training_cat[vars1]
-training_cat_sub2 = training_cat[vars2]
-```
 
 ```{r}
 set.seed(seed_val)
 
 tree_cat1 <- train(
   outcome_type_adopt ~ .,
-  data = training_cat_sub1,
-  trControl = cv_5,
-  method = "rpart")
-
-tree_cat2 <- train(
-  outcome_type_adopt ~ .,
-  data = training_cat_sub2,
+  data = training_cat,
   trControl = cv_5,
   method = "rpart")
 
 print(tree_cat1)
-print(tree_cat2)
 ```
 
 ```{r}
-testing_cat$outcome_type_adopt <- as.factor(testing_cat$outcome_type_adopt)
-testing_cat_sub1 = testing_cat[vars1]
-testing_cat_sub2 = testing_cat[vars2]
-
-pred_tree_cat1 <- predict(tree_cat1, testing_cat_sub1)
-conf_matrix_tree_cat1 <- confusionMatrix(pred_tree_cat1, testing_cat_sub1$outcome_type)
+pred_tree_cat1 <- predict(tree_cat1, testing_cat)
+conf_matrix_tree_cat1 <- confusionMatrix(pred_tree_cat1, testing_cat$outcome_type)
 conf_matrix_tree_cat1
 
-pred_tree_cat2 <- predict(tree_cat2, testing_cat_sub2)
-conf_matrix_tree_cat2 <- confusionMatrix(pred_tree_cat2, testing_cat_sub2$outcome_type)
-conf_matrix_tree_cat2
 ```
 
-Der zweite Tree mit einer Accuracy 0,7818 ist etwas besser.
 
 ```{r}
-rpart.plot(tree_cat2$finalModel)
+rpart.plot(tree_cat1$finalModel)
 ```
 
 
-Bei Katzen ist auch time_in_shelter_days die erste Split Variable des Baumes, dann kommt time_in_shelter. Aber auch das Geschlecht und der Zustand des Tieres sind im Baum als Variablen aufgeführt.
+Bei Katzen ist sex_upon_outcome_first_Sterilized = 0 die erste Split Variable des Baumes, dann kommt das ALter und die Zeit, die die Katze im Tierheim verbracht hat.
 
 ### Decion Tree für Hasen
-```{r}
-training_rabbit$outcome_type_adopt <- as.factor(training_rabbit$outcome_type_adopt)
-training_rabbit_sub1 = training_rabbit[vars1]
-training_rabbit_sub2 = training_rabbit[vars2]
-
-```
-
 ```{r}
 set.seed(seed_val)
 
 tree_rabbit1 <- train(
   outcome_type_adopt ~ .,
-  data = training_rabbit_sub1,
-  trControl = cv_5,
-  method = "rpart")
-
-tree_rabbit2 <- train(
-  outcome_type_adopt ~ .,
-  data = training_rabbit_sub2,
+  data = training_rabbit,
   trControl = cv_5,
   method = "rpart")
 
 print(tree_rabbit1)
-print(tree_rabbit2)
 ```
 
 ```{r}
-testing_rabbit$outcome_type_adopt <- as.factor(testing_rabbit$outcome_type_adopt)
-testing_rabbit_sub1 = testing_rabbit[vars1]
-testing_rabbit_sub2 = testing_rabbit[vars2]
-
-pred_tree_rabbit1 <- predict(tree_rabbit1, testing_rabbit_sub1)
-conf_matrix_tree_rabbit1 <- confusionMatrix(pred_tree_rabbit1, testing_rabbit_sub1$outcome_type)
+pred_tree_rabbit1 <- predict(tree_rabbit1, testing_rabbit)
+conf_matrix_tree_rabbit1 <- confusionMatrix(pred_tree_rabbit1, testing_rabbit$outcome_type)
 conf_matrix_tree_rabbit1
 
-pred_tree_rabbit2 <- predict(tree_rabbit2, testing_rabbit_sub2)
-conf_matrix_tree_rabbit2 <- confusionMatrix(pred_tree_rabbit2, testing_rabbit_sub2$outcome_type)
-conf_matrix_tree_rabbit2
 ```
-Der zweite Tree ist bezüglich Accuracy um 4% (0,81) besser als der erste Tree.
 
 
 ```{r}
-rpart.plot(tree_rabbit2$finalModel)
+rpart.plot(tree_rabbit1$finalModel)
 ```
 
 
-Bei Hasen ist auch die erste Variable des Baumes time_in_shelter_days, jedoch ist dann die zweite Split Variable das Geschlecht des Tieres.
+Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0.
 
 
 
