@@ -75,6 +75,7 @@ library("lubridate")
 library("kableExtra")
 library(caret)
 library(rpart.plot)
+library(dummies)
 ```
 
 ## Laden der Daten
@@ -501,11 +502,10 @@ Im Folgenden wird deshalb der Datensatz weiter reduziert (durch Entfernung der W
 # weitere Verkleinerung des Datasets
 
 ```{r}
-library(dummies)
-
 #entferne wildtiere
 
 aac_intakes_outcomes_3 <- subset(aac_intakes_outcomes2, animal_type  == "Dog" | animal_type == "Cat" | aac_intakes_outcomes2$animal_type  == "Rabbit")
+aac_intakes_outcomes_3$animal_type <- factor(aac_intakes_outcomes_3$animal_type)
 
 #dummycodierung für Adoption
 
@@ -517,7 +517,7 @@ aac_intakes_outcomes_3$outcome_type_adopt <- dummies_outcometype[,1]
 ```
 
 ```{r check recoding, eval = FALSE}
-
+aac_intakes_outcomes_3$outcome_type <- factor(aac_intakes_outcomes_3$outcome_type)
 table(aac_intakes_outcomes_3$outcome_type, aac_intakes_outcomes_3$outcome_type_adopt)
 ```
 
@@ -545,9 +545,13 @@ table( aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_ado
 
 ```{r}
 rabbits <- subset(aac_intakes_outcomes2, animal_type == "Rabbit")
-dogs <- subset(aac_intakes_outcomes2, animal_type == "Dog")
-cats <- subset(aac_intakes_outcomes2, animal_type == "Cat")
+rabbits <- rabbits[,c(3:21)]
 
+dogs <- subset(aac_intakes_outcomes2, animal_type == "Dog")
+dogs <- dogs[,c(3:21)]
+
+cats <- subset(aac_intakes_outcomes2, animal_type == "Cat")
+cats <- cats[,c(3:21)]
 
 ```
 
@@ -570,7 +574,7 @@ testing  <- aac_intakes_outcomes2[-train_function,]
 # Train/Test Split für Hunde
 ```{r}
 
-#nur 30% aller Datensätze von Hunden
+#nur 30% aller Datensätze von Hunden, um die Datenmenge zu verkleinern
 train_function <- createDataPartition(
   y = dogs$outcome_type_adopt,
   p = .30,
