@@ -545,7 +545,7 @@ table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adop
 ```
 
 ```{r}
-#Löschung unbenötigter Spalten: outcometype (alle types) &date_of_birth_month & year, time_in_shelter
+#Löschung unbenötigter Spalten: outcometype (alle types) &date_of_birth_month & year
 
 aac_intakes_outcomes2 <- aac_intakes_outcomes2[,c(2:6,9:20)]
 #dummies_breed <- dummy.data.frame(data.frame(aac_intakes_outcomes2$breed))
@@ -845,6 +845,47 @@ rpart.plot(tree_rabbit1$finalModel)
 
 Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0.
 
+### Variable Importance des Hundemodells
 
+```{r}
+?varImp
+importance <- varImp(tree_dog1)
+print(importance)
+plot(importance, top=20)
+```
+
+Es ist ersichtlich, dass für den Decision Tree der Hunde lediglich 6 Prädiktoren eine Rolle spielen:
+* sex_upon_outcome_first_Sterilized
+* sex_upon_outcome_first_Intact
+* time_in_shelter_days
+* intake_typePublic Assist
+* age_upon_intake_.days.
+* intake_typeStray
+
+Am wichtigsten sind die Ausprägungen der Variable sex_upon_outcome_first
+
+### Variable Importance des Katzenmodells
+
+```{r}
+importance <- varImp(tree_cat1)
+print(importance)
+plot(importance, top=20)
+```
+
+Im Modell der Katzen finden sich ähnliche Prädiktoren wieder, hinzugekommen ist hier:
+* age_upon_outcome_.days.
+* sex_upon_intake_first_Sterilized
+* sex_upon_intake_first_Intact
+* sexuponoutcomesecond_unknown
+* intake_typeStray
+
+### Variable Importance des Hasenmodells
+
+```{r}
+?varImp
+importance <- varImp(tree_rabbit1)
+print(importance)
+plot(importance, top=20)
+```
 
 ![](snoopy.png)
