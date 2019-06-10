@@ -363,7 +363,14 @@ aac_intakes_outcomes2 <- aac_intakes_outcomes_temp1
 
 aac_intakes_outcomes2$age_upon_intake_.days.[aac_intakes_outcomes2$age_upon_intake_.days.< 0] <- 0
 
+
+#Löschen der alten Variable time_in_shelter
+
+aac_intakes_outcomes2$time_in_shelter <- NULL
+
+
 ```
+
 ```{r results='hide'}
 # Kontrolle, dass Alter bei Outcome immer höher ist als bei Intake
 aac_intakes_outcomes_temp2 <- 
