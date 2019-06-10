@@ -367,7 +367,14 @@ aac_intakes_outcomes2 <- aac_intakes_outcomes_temp1
 
 aac_intakes_outcomes2$age_upon_intake_.days.[aac_intakes_outcomes2$age_upon_intake_.days.< 0] <- 0
 
+
+#Löschen der alten Variable time_in_shelter
+
+aac_intakes_outcomes2$time_in_shelter <- NULL
+
+
 ```
+
 ```{r results='hide'}
 # Kontrolle, dass Alter bei Outcome immer höher ist als bei Intake
 aac_intakes_outcomes_temp2 <- 
@@ -474,9 +481,6 @@ summary(aac_intakes_outcomes2$animal_type)
 ```
 
 ```{r}
-plot(aac_intakes_outcomes2$outcome_type)
-
-as.numeric(aac_intakes_outcomes2$animal_type)
 
 a<- ggplot(aac_intakes_outcomes2, aes(animal_type))+geom_bar(fill = "#0073C2FF") 
 
@@ -689,7 +693,6 @@ cats <- subset(aac_intakes_outcomes2, animal_type == "Cat")
 cats <- cats[,-c(1)]
 
 ```
-
 
 
 # Train Test Split - alle Tierarten
