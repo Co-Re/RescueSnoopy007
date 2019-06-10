@@ -537,14 +537,17 @@ b+geom_bar(aes(fill = outcome_type_adopt))
 ```
 
 ```{r}
-table( aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adopt)
+table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adopt)
 ```
 
 ```{r}
-#Löschung unbenötigter Spalten: date_of_birth_month & year, time_in_shelter
+#Löschung unbenötigter Spalten: outcometype (alle types) &date_of_birth_month & year, time_in_shelter
 
-aac_intakes_outcomes2 <- aac_intakes_outcomes2[,c(1:6,9:13,15:21)]
+aac_intakes_outcomes2 <- aac_intakes_outcomes2[,c(2:6,9:13,15:21)]
 #dummies_breed <- dummy.data.frame(data.frame(aac_intakes_outcomes2$breed))
+
+
+#Dummycodierungen
 
 dummies_intake_condition <- dummy.data.frame(data.frame(aac_intakes_outcomes2$intake_condition))
 aac_intakes_outcomes2$intake_conditionAged <- dummies_intake_condition[,1]
@@ -613,6 +616,10 @@ aac_intakes_outcomes2$outcome_year2017 <- dummies_outcome_year[,5]
 aac_intakes_outcomes2$outcome_year2018 <- dummies_outcome_year[,6]
 
 dummies_color <- dummy.data.frame(data.frame(aac_intakes_outcomes2$color_new))
+
+#prüfe ob plausible Farben für übrige Tierrassen.  table(aac_intakes_outcomes2$color_new, aac_intakes_outcomes2$animal_type)
+#Grün keine Werte mehr. Andere Farben alle plausibel
+
 aac_intakes_outcomes2$colorApricot <- dummies_color[,1]
 aac_intakes_outcomes2$colorBeige <- dummies_color[,2]
 aac_intakes_outcomes2$colorBlack <- dummies_color[,3]
@@ -643,55 +650,66 @@ aac_intakes_outcomes2$sex_upon_outcome_first_Sterilized <- dummies_suof[,2]
 aac_intakes_outcomes2$sex_upon_outcome_first_Unknown <- dummies_suof[,3]
 
 aac_intakes_outcomes2$outcome_type_adopt <- as.factor(aac_intakes_outcomes2$outcome_type_adopt)
+
+
+
+#Entfernen aller 10 Originalspalten, die Dummycodiert wurden
+
+aac_intakes_outcomes2[ ,c('intake_condition', 'intake_type', 'sex_upon_outcome_second', 'intake_month', 'intake_year', 'outcome_month', 'outcome_year', 'color_new', 'sex_upon_intake_first', 'sex_upon_outcome_first')] <- list(NULL)
+
+
 ```
 
-
-# split Daten nach Tier
+# FINALE DATENSÄTZE ZUR MODELLIERUNG
 
 ```{r}
+allanimals <- aac_intakes_outcomes2
+dummies_animals<- dummy.data.frame(data.frame(allanimals$animal_type))
+
+allanimals$cat <- dummies_animals[,1]
+allanimals$dog <- dummies_animals[,2]
+allanimals$rabbit <- dummies_animals[,3]
+
+allanimals<- allanimals[,-c(1)]
+
+```
+
+
+# split Daten nach Tier & entfernen der animal_type variable
+
+```{r}
+
 rabbits <- subset(aac_intakes_outcomes2, animal_type == "Rabbit")
-rabbits <- rabbits[,c(3,9,13:15,18:90)]
+rabbits <- rabbits[,-c(1)]
 
 dogs <- subset(aac_intakes_outcomes2, animal_type == "Dog")
-dogs <- dogs[,c(3,9,13:15,18:90)]
+dogs <- dogs[,-c(1)]
 
 cats <- subset(aac_intakes_outcomes2, animal_type == "Cat")
-cats <- cats[,c(3,9,13:15,18:90)]
+cats <- cats[,-c(1)]
 
 ```
 
 
 
-# Allgemeiner Train Test Split
+# Train Test Split - alle Tierarten
 ```{r}
 
 train_function <- createDataPartition(
-  y = aac_intakes_outcomes2$outcome_type,
+  y = allanimals$outcome_type_adopt,
   p = .70,
   list = FALSE
 )
 
-training <- aac_intakes_outcomes2[ train_function,]
-testing  <- aac_intakes_outcomes2[-train_function,]
+training <- allanimals[ train_function,]
+testing  <- allanimals[-train_function,]
 
 ```
 
 # Train/Test Split für Hunde
 ```{r}
-
-#nur 30% aller Datensätze von Hunden, um die Datenmenge zu verkleinern
 train_function <- createDataPartition(
   y = dogs$outcome_type_adopt,
-  p = .30,
-  list = FALSE
-)
-
-dogs_reduced <- dogs[ train_function,]
-
-
-#Splitte 30% wiederrum in Test/Training
-train_function <- createDataPartition(
-  y = dogs_reduced$outcome_type_adopt,
   p = .70,
   list = FALSE
 )
