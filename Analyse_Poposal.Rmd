@@ -64,6 +64,8 @@ Es ist interessant für uns, herauszufinden, welche Aspekte ausschlaggebend daf�
 Weiß man, welche Aspekte eine Rolle spielen, könnte man diese gezielt in den Tierheimen in der Kommunikation verwenden, um mehr Tieren (z.B. vor allem jenen, die grundsätzlich eine schlechtere Chance für eine Adoption haben) ein neues zu Hause zu geben.   
 Wir haben uns für dieses Datenset mit dieser Fragestellung entschieden, da einige von uns selbst Haustiere besitzen und wir den Eindruck haben, dass es bereits ausreichend viele Analysen zu ökonomischen Fragestellungen gibt.
 
+***
+
 # Vorbereitung in R
 
 ```{r, include=F}
@@ -72,6 +74,8 @@ library("anytime")
 library("lubridate")
 library("kableExtra")
 library(caret)
+library(rpart.plot)
+library(dummies)
 ```
 
 ## Laden der Daten
@@ -471,6 +475,7 @@ aac_intakes_outcomes3<- data.frame(subset(aac_intakes_outcomes2, animal_type=="D
 
 
 aac_intakes_outcomes2 <- aac_intakes_outcomes3
+aac_intakes_outcomes2$animal_type <- factor(aac_intakes_outcomes2$animal_type)
 summary(aac_intakes_outcomes2$animal_type)
 
 ```
@@ -501,11 +506,10 @@ Im Folgenden wird deshalb der Datensatz weiter reduziert (durch Entfernung der W
 # weitere Verkleinerung des Datasets
 
 ```{r}
-library(dummies)
-
 #entferne wildtiere
 
 aac_intakes_outcomes_3 <- subset(aac_intakes_outcomes2, animal_type  == "Dog" | animal_type == "Cat" | aac_intakes_outcomes2$animal_type  == "Rabbit")
+aac_intakes_outcomes_3$animal_type <- factor(aac_intakes_outcomes_3$animal_type)
 
 #dummycodierung für Adoption
 
@@ -517,7 +521,7 @@ aac_intakes_outcomes_3$outcome_type_adopt <- dummies_outcometype[,1]
 ```
 
 ```{r check recoding, eval = FALSE}
-
+aac_intakes_outcomes_3$outcome_type <- factor(aac_intakes_outcomes_3$outcome_type)
 table(aac_intakes_outcomes_3$outcome_type, aac_intakes_outcomes_3$outcome_type_adopt)
 ```
 
@@ -537,58 +541,184 @@ b+geom_bar(aes(fill = outcome_type_adopt))
 ```
 
 ```{r}
-table( aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adopt)
+table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adopt)
 ```
-
-
-# split Daten nach Tier
 
 ```{r}
-rabbits <- subset(aac_intakes_outcomes2, animal_type == "Rabbit")
-dogs <- subset(aac_intakes_outcomes2, animal_type == "Dog")
-cats <- subset(aac_intakes_outcomes2, animal_type == "Cat")
+#Löschung unbenötigter Spalten: outcometype (alle types) &date_of_birth_month & year, time_in_shelter
+
+aac_intakes_outcomes2 <- aac_intakes_outcomes2[,c(2:6,9:20)]
+#dummies_breed <- dummy.data.frame(data.frame(aac_intakes_outcomes2$breed))
+
+
+#Dummycodierungen
+
+dummies_intake_condition <- dummy.data.frame(data.frame(aac_intakes_outcomes2$intake_condition))
+aac_intakes_outcomes2$intake_conditionAged <- dummies_intake_condition[,1]
+aac_intakes_outcomes2$intake_conditionFeral <- dummies_intake_condition[,2]
+aac_intakes_outcomes2$intake_conditionInjured <- dummies_intake_condition[,3]
+aac_intakes_outcomes2$intake_conditionNormal <- dummies_intake_condition[,4]
+aac_intakes_outcomes2$intake_conditionNursing <- dummies_intake_condition[,5]
+aac_intakes_outcomes2$intake_conditionOther <- dummies_intake_condition[,6]
+aac_intakes_outcomes2$intake_conditionPregnant <- dummies_intake_condition[,7]
+aac_intakes_outcomes2$intake_conditionSick <- dummies_intake_condition[,8]
+
+dummies_intake_type <- dummy.data.frame(data.frame(aac_intakes_outcomes2$intake_type))
+aac_intakes_outcomes2$intake_typeEuthanasiaRequest <- dummies_intake_type[,1]
+aac_intakes_outcomes2$intake_typeOwnerSurrender <- dummies_intake_type[,2]
+aac_intakes_outcomes2$intake_typePublicAssist <- dummies_intake_type[,3]
+aac_intakes_outcomes2$intake_typeStray <- dummies_intake_type[,4]
+aac_intakes_outcomes2$intake_typeWildlife <- dummies_intake_type[,5]
+
+dummies_suos <- dummy.data.frame(data.frame(aac_intakes_outcomes2$sex_upon_outcome_second))
+aac_intakes_outcomes2$sexuponoutcomesecond_female <- dummies_suos[,1]
+aac_intakes_outcomes2$sexuponoutcomesecond_male <- dummies_suos[,2]
+aac_intakes_outcomes2$sexuponoutcomesecond_unknown <- dummies_suos[,3]
+
+dummies_intake_month <- dummy.data.frame(data.frame(aac_intakes_outcomes2$intake_month))
+aac_intakes_outcomes2$intake_month1 <- dummies_intake_month[,1]
+aac_intakes_outcomes2$intake_month2 <- dummies_intake_month[,2]
+aac_intakes_outcomes2$intake_month3 <- dummies_intake_month[,3]
+aac_intakes_outcomes2$intake_month4 <- dummies_intake_month[,4]
+aac_intakes_outcomes2$intake_month5 <- dummies_intake_month[,5]
+aac_intakes_outcomes2$intake_month6 <- dummies_intake_month[,6]
+aac_intakes_outcomes2$intake_month7 <- dummies_intake_month[,7]
+aac_intakes_outcomes2$intake_month8 <- dummies_intake_month[,8]
+aac_intakes_outcomes2$intake_month9 <- dummies_intake_month[,9]
+aac_intakes_outcomes2$intake_month10 <- dummies_intake_month[,10]
+aac_intakes_outcomes2$intake_month11 <- dummies_intake_month[,11]
+aac_intakes_outcomes2$intake_month12 <- dummies_intake_month[,12]
+
+dummies_intake_year <- dummy.data.frame(data.frame(aac_intakes_outcomes2$intake_year))
+aac_intakes_outcomes2$intake_year2013 <- dummies_intake_year[,1]
+aac_intakes_outcomes2$intake_year2014 <- dummies_intake_year[,2]
+aac_intakes_outcomes2$intake_year2015 <- dummies_intake_year[,3]
+aac_intakes_outcomes2$intake_year2016 <- dummies_intake_year[,4]
+aac_intakes_outcomes2$intake_year2017 <- dummies_intake_year[,5]
+aac_intakes_outcomes2$intake_year2018 <- dummies_intake_year[,6]
+
+dummies_outcome_month <- dummy.data.frame(data.frame(aac_intakes_outcomes2$outcome_month))
+aac_intakes_outcomes2$outcome_month1 <- dummies_outcome_month[,1]
+aac_intakes_outcomes2$outcome_month2 <- dummies_outcome_month[,2]
+aac_intakes_outcomes2$outcome_month3 <- dummies_outcome_month[,3]
+aac_intakes_outcomes2$outcome_month4 <- dummies_outcome_month[,4]
+aac_intakes_outcomes2$outcome_month5 <- dummies_outcome_month[,5]
+aac_intakes_outcomes2$outcome_month6 <- dummies_outcome_month[,6]
+aac_intakes_outcomes2$outcome_month7 <- dummies_outcome_month[,7]
+aac_intakes_outcomes2$outcome_month8 <- dummies_outcome_month[,8]
+aac_intakes_outcomes2$outcome_month9 <- dummies_outcome_month[,9]
+aac_intakes_outcomes2$outcome_month10 <- dummies_outcome_month[,10]
+aac_intakes_outcomes2$outcome_month11 <- dummies_outcome_month[,11]
+aac_intakes_outcomes2$outcome_month12 <- dummies_outcome_month[,12]
+
+dummies_outcome_year <- dummy.data.frame(data.frame(aac_intakes_outcomes2$outcome_year))
+aac_intakes_outcomes2$outcome_year2013 <- dummies_outcome_year[,1]
+aac_intakes_outcomes2$outcome_year2014 <- dummies_outcome_year[,2]
+aac_intakes_outcomes2$outcome_year2015 <- dummies_outcome_year[,3]
+aac_intakes_outcomes2$outcome_year2016 <- dummies_outcome_year[,4]
+aac_intakes_outcomes2$outcome_year2017 <- dummies_outcome_year[,5]
+aac_intakes_outcomes2$outcome_year2018 <- dummies_outcome_year[,6]
+
+dummies_color <- dummy.data.frame(data.frame(aac_intakes_outcomes2$color_new))
+
+#prüfe ob plausible Farben für übrige Tierrassen.  table(aac_intakes_outcomes2$color_new, aac_intakes_outcomes2$animal_type)
+#Grün keine Werte mehr. Andere Farben alle plausibel
+
+aac_intakes_outcomes2$colorApricot <- dummies_color[,1]
+aac_intakes_outcomes2$colorBeige <- dummies_color[,2]
+aac_intakes_outcomes2$colorBlack <- dummies_color[,3]
+aac_intakes_outcomes2$colorBlue <- dummies_color[,4]
+aac_intakes_outcomes2$colorBrown <- dummies_color[,5]
+aac_intakes_outcomes2$colorGray <- dummies_color[,6]
+aac_intakes_outcomes2$colorLilac <- dummies_color[,7]
+aac_intakes_outcomes2$colorMulticolor <- dummies_color[,8]
+aac_intakes_outcomes2$colorOrange <- dummies_color[,9]
+aac_intakes_outcomes2$colorPink <- dummies_color[,10]
+aac_intakes_outcomes2$colorRed <- dummies_color[,11]
+aac_intakes_outcomes2$colorSilver <- dummies_color[,12]
+aac_intakes_outcomes2$colorWhite <- dummies_color[,13]
+aac_intakes_outcomes2$colorYellow <- dummies_color[,14]
+
+aac_intakes_outcomes2$age_upon_intake_.days. <- as.numeric(aac_intakes_outcomes2$age_upon_intake_.days.)
+aac_intakes_outcomes2$age_upon_outcome_.days. <- as.numeric(aac_intakes_outcomes2$age_upon_outcome_.days.)
+aac_intakes_outcomes2$time_in_shelter_days <- as.numeric(aac_intakes_outcomes2$time_in_shelter_days)
+
+dummies_suif<- dummy.data.frame(data.frame(aac_intakes_outcomes2$sex_upon_intake_first))
+aac_intakes_outcomes2$sex_upon_intake_first_Intact <- dummies_suif[,1]
+aac_intakes_outcomes2$sex_upon_intake_first_Sterilized <- dummies_suif[,2]
+aac_intakes_outcomes2$sex_upon_intake_first_Unknown <- dummies_suif[,3]
+
+dummies_suof<- dummy.data.frame(data.frame(aac_intakes_outcomes2$sex_upon_outcome_first))
+aac_intakes_outcomes2$sex_upon_outcome_first_Intact <- dummies_suof[,1]
+aac_intakes_outcomes2$sex_upon_outcome_first_Sterilized <- dummies_suof[,2]
+aac_intakes_outcomes2$sex_upon_outcome_first_Unknown <- dummies_suof[,3]
+
+aac_intakes_outcomes2$outcome_type_adopt <- as.factor(aac_intakes_outcomes2$outcome_type_adopt)
+
+
+
+#Entfernen aller 10 Originalspalten, die Dummycodiert wurden
+
+aac_intakes_outcomes2[ ,c('intake_condition', 'intake_type', 'sex_upon_outcome_second', 'intake_month', 'intake_year', 'outcome_month', 'outcome_year', 'color_new', 'sex_upon_intake_first', 'sex_upon_outcome_first')] <- list(NULL)
 
 
 ```
 
+# FINALE DATENSÄTZE ZUR MODELLIERUNG
+
+```{r}
+allanimals <- aac_intakes_outcomes2
+dummies_animals<- dummy.data.frame(data.frame(allanimals$animal_type))
+
+allanimals$cat <- dummies_animals[,1]
+allanimals$dog <- dummies_animals[,2]
+allanimals$rabbit <- dummies_animals[,3]
+
+allanimals<- allanimals[,-c(1)]
+
+```
 
 
-# Allgemeiner Train Test Split
+# split Daten nach Tier & entfernen der animal_type variable
+
+```{r}
+
+rabbits <- subset(aac_intakes_outcomes2, animal_type == "Rabbit")
+rabbits <- rabbits[,-c(1)]
+
+dogs <- subset(aac_intakes_outcomes2, animal_type == "Dog")
+dogs <- dogs[,-c(1)]
+
+cats <- subset(aac_intakes_outcomes2, animal_type == "Cat")
+cats <- cats[,-c(1)]
+
+```
+
+
+# Train Test Split - alle Tierarten
 ```{r}
 
 train_function <- createDataPartition(
-  y = aac_intakes_outcomes2$outcome_type,
+  y = allanimals$outcome_type_adopt,
   p = .70,
   list = FALSE
 )
 
-training <- aac_intakes_outcomes2[ train_function,]
-testing  <- aac_intakes_outcomes2[-train_function,]
+training <- allanimals[ train_function,]
+testing  <- allanimals[-train_function,]
 
 ```
 
 # Train/Test Split für Hunde
 ```{r}
-
-#nur 30% aller Datensätze von Hunden
 train_function <- createDataPartition(
   y = dogs$outcome_type_adopt,
-  p = .30,
-  list = FALSE
-)
-
-dogs_reduced <- dogs[ train_function,]
-
-
-#Splitte 30% wiederrum in Test/Training
-train_function <- createDataPartition(
-  y = dogs_reduced$outcome_type_adopt,
   p = .70,
   list = FALSE
 )
 
-training_dog <- dogs_reduced[train_function,]
-testing_dog  <- dogs_reduced[-train_function,]
+training_dog <- dogs[train_function,]
+testing_dog  <- dogs[-train_function,]
 ```
 
 # Train/Test Split für Katzen
@@ -614,5 +744,107 @@ train_function <- createDataPartition(
 training_rabbit <- rabbits[ train_function,]
 testing_rabbit  <- rabbits[-train_function,]
 ```
+
+***
+
+# Aufstellen der Modelle
+Zuerst werden Modell mithilfe von Decisoin Trees aufgestellt. Danach wird untersucht, ob andere Methoden wie neuronale Netze ein ähnliche oder sogar besseres Ergebnis liefern.
+
+## Decision Trees
+
+Allgemeine Werte
+```{r}
+cv_5 = trainControl(method = "cv", number = 5)
+seed_val = 123
+```
+
+### Decion Tree für Hunde
+
+```{r}
+set.seed(seed_val)
+
+tree_dog1 <- train(
+  outcome_type_adopt ~ .,
+  data = training_dog,
+  trControl = cv_5,
+  method = "rpart")
+
+print(tree_dog1)
+
+```
+
+```{r}
+pred_tree_dog1 <- predict(tree_dog1, testing_dog)
+conf_matrix_tree_dog1 <- confusionMatrix(pred_tree_dog1, testing_dog$outcome_type)
+conf_matrix_tree_dog1
+
+```
+
+
+```{r}
+rpart.plot(tree_dog1$finalModel)
+```
+
+
+Der Tree zeigt, dass zuerst time_in_shelter eine Rolle spielt und somit die erste Abzweigung im Baum ist. Als weitere Variable verwendet der Baum sex_upon_outcome_first_ Sterilized = 0.
+
+### Decion Tree für Katzen
+
+```{r}
+set.seed(seed_val)
+
+tree_cat1 <- train(
+  outcome_type_adopt ~ .,
+  data = training_cat,
+  trControl = cv_5,
+  method = "rpart")
+
+print(tree_cat1)
+```
+
+```{r}
+pred_tree_cat1 <- predict(tree_cat1, testing_cat)
+conf_matrix_tree_cat1 <- confusionMatrix(pred_tree_cat1, testing_cat$outcome_type)
+conf_matrix_tree_cat1
+
+```
+
+
+```{r}
+rpart.plot(tree_cat1$finalModel)
+```
+
+
+Bei Katzen ist sex_upon_outcome_first_Sterilized = 0 die erste Split Variable des Baumes, dann kommt das ALter und die Zeit, die die Katze im Tierheim verbracht hat.
+
+### Decion Tree für Hasen
+```{r}
+set.seed(seed_val)
+
+tree_rabbit1 <- train(
+  outcome_type_adopt ~ .,
+  data = training_rabbit,
+  trControl = cv_5,
+  method = "rpart")
+
+print(tree_rabbit1)
+```
+
+```{r}
+pred_tree_rabbit1 <- predict(tree_rabbit1, testing_rabbit)
+conf_matrix_tree_rabbit1 <- confusionMatrix(pred_tree_rabbit1, testing_rabbit$outcome_type)
+conf_matrix_tree_rabbit1
+
+```
+
+
+```{r}
+rpart.plot(tree_rabbit1$finalModel)
+```
+
+
+Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0.
+
+
 
 ![](snoopy.png)
