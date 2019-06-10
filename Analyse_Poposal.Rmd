@@ -547,7 +547,7 @@ table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adop
 ```{r}
 #Löschung unbenötigter Spalten: outcometype (alle types) &date_of_birth_month & year, time_in_shelter
 
-aac_intakes_outcomes2 <- aac_intakes_outcomes2[,c(2:6,9:13,15:21)]
+aac_intakes_outcomes2 <- aac_intakes_outcomes2[,c(2:6,9:20)]
 #dummies_breed <- dummy.data.frame(data.frame(aac_intakes_outcomes2$breed))
 
 
