@@ -714,8 +714,8 @@ train_function <- createDataPartition(
   list = FALSE
 )
 
-training_dog <- dogs_reduced[train_function,]
-testing_dog  <- dogs_reduced[-train_function,]
+training_dog <- dogs[train_function,]
+testing_dog  <- dogs[-train_function,]
 ```
 
 # Train/Test Split für Katzen
