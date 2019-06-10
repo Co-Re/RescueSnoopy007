@@ -851,11 +851,6 @@ Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0.
 ### Variable Importance des Hundemodells
 
 ```{r}
-cor(aac_intakes_outcomes2[,21:23])
-```
-
-
-```{r}
 ?varImp
 importance <- varImp(tree_dog1)
 print(importance)
