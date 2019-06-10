@@ -76,6 +76,7 @@ library("kableExtra")
 library(caret)
 library(rpart.plot)
 library(dummies)
+library(dplyr)
 ```
 
 ## Laden der Daten
@@ -925,7 +926,6 @@ conf_matrix_RF_OOB <- confusionMatrix(RF_OOB_predict, data_test_model$outcome_ty
 # Modellvergleich
 ## Tree1 Modelmetrics muss noch befüllt werden! 
 ```{r}
-
 tree1 = tibble(
   Model = "Einfacher Tree mit CV",
   TrainAccuracy = 0,
