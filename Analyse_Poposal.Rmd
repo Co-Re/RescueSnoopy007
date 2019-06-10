@@ -462,11 +462,11 @@ summary(aac_intakes_outcomes2$animal_type)
 Der primäre Fokus der Vorhersage des Outcometypes liegt bei Hunden und Katzen. 
 Jedoch sollen auch Tiere, von denen mind. n=500 Beobachtungen vorliegen, betrachtet werden, und zwar: 
 
-*- Dog: 45.364
-*- Cat: 29.536
-*- Bat:  2.205
-*- Raccoon: 706
-*- Rabbit: 513
+* Dog: 45.364
+* Cat: 29.536
+* Bat:  2.205
+* Raccoon: 706
+* Rabbit: 513
 
 Für jede Tierart soll ein eigenes Modell gefittet werden, gegebenenfalls müssen dann in weiterer Folge aufgrund zu geringer Fallzahlen die Tierarten weiter eingeschränkt werden. 
 
@@ -685,12 +685,15 @@ allanimals<- allanimals[,-c(1)]
 
 rabbits <- subset(aac_intakes_outcomes2, animal_type == "Rabbit")
 rabbits <- rabbits[,-c(1)]
+rabbits$breed <- factor(rabbits$breed)
 
 dogs <- subset(aac_intakes_outcomes2, animal_type == "Dog")
 dogs <- dogs[,-c(1)]
+dogs$breed <- factor(dogs$breed)
 
 cats <- subset(aac_intakes_outcomes2, animal_type == "Cat")
 cats <- cats[,-c(1)]
+cats$breed <- factor(cats$breed)
 
 ```
 
@@ -848,6 +851,11 @@ Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0.
 ### Variable Importance des Hundemodells
 
 ```{r}
+cor(aac_intakes_outcomes2[,21:23])
+```
+
+
+```{r}
 ?varImp
 importance <- varImp(tree_dog1)
 print(importance)
@@ -855,14 +863,14 @@ plot(importance, top=20)
 ```
 
 Es ist ersichtlich, dass für den Decision Tree der Hunde lediglich 6 Prädiktoren eine Rolle spielen:
-* sex_upon_outcome_first_Sterilized
-* sex_upon_outcome_first_Intact
-* time_in_shelter_days
-* intake_typePublic Assist
-* age_upon_intake_.days.
-* intake_typeStray
+* `sex_upon_outcome_first_Sterilized`
+* `sex_upon_outcome_first_Intact`
+* `time_in_shelter_days`
+* `intake_typePublic Assist`
+* `age_upon_intake_.days.`
+* `intake_typeStray`
 
-Am wichtigsten sind die Ausprägungen der Variable sex_upon_outcome_first
+Am wichtigsten sind die Variablen `sex_upon_outcome_first_Sterilized` und `sex_upon_outcome_first_Intact.`
 
 ### Variable Importance des Katzenmodells
 
@@ -873,19 +881,31 @@ plot(importance, top=20)
 ```
 
 Im Modell der Katzen finden sich ähnliche Prädiktoren wieder, hinzugekommen ist hier:
-* age_upon_outcome_.days.
-* sex_upon_intake_first_Sterilized
-* sex_upon_intake_first_Intact
-* sexuponoutcomesecond_unknown
-* intake_typeStray
+* `age_upon_outcome_.days.`
+* `sex_upon_intake_first_Sterilized`
+* `sex_upon_intake_first_Intact`
+* `sexuponoutcomesecond_unknown`
+* `intake_typeStray`
+
+Hier ist im Gegensatz zu den Hunden die `time_in_shelter` am wichtigsten.
 
 ### Variable Importance des Hasenmodells
 
 ```{r}
-?varImp
 importance <- varImp(tree_rabbit1)
 print(importance)
 plot(importance, top=20)
 ```
+
+
+Hier ist wie im Modell der Hunde die Variable `sex_upon_outcome_first_Sterilized` am wichtigsten.
+Hier sind neben den bekannten Prädiktoren u.a. noch die Prädiktoren
+* `intake_year2016`
+* `outcome_year2016`
+* `intake_year2015`
+* `outcome_month9`
+* `outcome_year2014`
+von Bedeutung.
+
 
 ![](snoopy.png)
