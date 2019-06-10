@@ -467,6 +467,7 @@ aac_intakes_outcomes3<- data.frame(subset(aac_intakes_outcomes2, animal_type=="D
 
 
 aac_intakes_outcomes2 <- aac_intakes_outcomes3
+aac_intakes_outcomes2$animal_type <- factor(aac_intakes_outcomes2$animal_type)
 summary(aac_intakes_outcomes2$animal_type)
 
 ```
