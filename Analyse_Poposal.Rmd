@@ -845,6 +845,114 @@ rpart.plot(tree_rabbit1$finalModel)
 
 Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0.
 
+# Tree Tuning (Bagging, Boosting, Random Forrest)
+
+# Auswahl Daten 
+```{r}
+
+data_train_model <- training_rabbit
+data_test_model <- testing_rabbit
+
+```
+
+# Bagged Tree mit Bootstrapping
+
+```{r}
+trcBootstr <- trainControl(method="boot")
+
+baggedtree <- train(
+  outcome_type_adopt ~ .,
+  data = data_train_model,
+  method = "treebag",
+  trControl = trcBootstr
+)
+
+```
+
+```{r}
+baggedT_predict = predict(baggedtree, data_test_model)
+conf_matrix_tree_bagged <- confusionMatrix(baggedT_predict, data_test_model$outcome_type)
+
+```
+
+# Random Forrest mit CV 
+
+## Max. Zahl für das tuneGrid (für die Metry) wurde mit 9 gewählt, da üblicherweise das Optimum von m= Wurzel aus p, d.h. Wurzel aus 78=9 (gerundet)
+
+```{r}
+trnCntrl <- trainControl(method = "cv", number=5)
+
+randomforest_CV <- train(
+  outcome_type_adopt ~ .,
+  data = data_train_model,
+  method = "rf",
+  tuneGrid = expand.grid(mtry=seq(1,10,1)),
+  trControl = trnCntrl
+)
+
+```
+
+```{r}
+RF_CV_predict = predict(randomforest_CV, data_test_model)
+conf_matrix_RF_CV <- confusionMatrix(RF_CV_predict, data_test_model$outcome_type)
+
+```
+
+
+# Random Forrest mit OOB 
+
+```{r}
+trcOOB <- trainControl(method="oob")
+
+randomforest_OOB <- train(
+  outcome_type_adopt ~ .,
+  data = data_train_model,
+  method = "rf",
+  tuneGrid = expand.grid(mtry=seq(1,10,1)),
+  trControl = trcOOB
+)
+
+```
+
+```{r}
+RF_OOB_predict = predict(randomforest_OOB, data_test_model)
+conf_matrix_RF_OOB <- confusionMatrix(RF_OOB_predict, data_test_model$outcome_type)
+
+```
+
+
+
+# Modellvergleich
+## Tree1 Modelmetrics muss noch befüllt werden! 
+```{r}
+
+tree1 = tibble(
+  Model = "Einfacher Tree mit CV",
+  TrainAccuracy = 0,
+  TestAccuracy = 0)
+
+
+tree2 = tibble(
+  Model = "Bagged Model",
+  TrainAccuracy = baggedtree$results$Accuracy,
+  TestAccuracy = conf_matrix_tree_bagged$overall[1])
+
+tree3 = tibble(
+  Model = "Random Forrest CV",
+  TrainAccuracy = randomforest_CV$results$Accuracy,
+  TestAccuracy = conf_matrix_RF_CV$overall[1])
+
+tree4 = tibble(
+  Model = "Random Forrest OOB",
+  TrainAccuracy = randomforest_OOB$results$Accuracy,
+  TestAccuracy = conf_matrix_RF_OOB$overall[1])
+
+comp_table_trees= bind_rows(tree1, tree2, tree3, tree4)
+
+print(comp_table_trees)
+
+
+```
 
 
 ![](snoopy.png)
