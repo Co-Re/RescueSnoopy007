@@ -76,6 +76,7 @@ library("kableExtra")
 library(caret)
 library(rpart.plot)
 library(dummies)
+library(neuralnet)
 ```
 
 ## Laden der Daten
@@ -844,6 +845,51 @@ rpart.plot(tree_rabbit1$finalModel)
 
 
 Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0.
+
+
+## Neuronales Netzwerk
+```{r}
+
+train_function <- createDataPartition(
+  y = rabbits$outcome_type_adopt,
+  p = .70,
+  list = FALSE
+)
+
+training_rabbit <- rabbits[ train_function,]
+testing_rabbit  <- rabbits[-train_function,]
+
+str(training_rabbit)
+
+
+new_df_train = as.data.frame(training_rabbit[c(-1)])
+
+
+# training_rabbit_nn <- as.data.frame(training_rabbit)
+# testing_rabbit_nn <-  as.data.frame(testing_rabbit)
+# 
+# str(training_rabbit)
+
+testing_rabbit$outcome_type_adopt
+
+str(new_df_train)
+
+net_model_rabbit = neuralnet(outcome_type_adopt~ .,data=new_df_train,hidden=c(10),linear.output=T, act.fct = "logistic")
+net_model_rabbit
+```
+
+```{r}
+pred_net_rabbit <- predict(net_model_rabbit, testing_rabbit[c(-1)])
+conf_matrix_net_rabbit <- confusionMatrix(pred_net_rabbit, testing_rabbit[c(-1)]$outcome_type_adopt)
+conf_matrix_net_rabbit
+# confusionMatrix()
+# pred_net_rabbit
+```
+
+```{r}
+plot(net_model_rabbit, rep="best")
+```
+
 
 
 
