@@ -285,12 +285,18 @@ tmp_aac[tmp_aac$animal_type  == "Other", ] = others
 
 aac_intakes_outcomes2 = tmp_aac
 
-kable(count(aac_intakes_outcomes2$animal_type), align = "l") %>%
-  kable_styling(bootstrap_options = "striped")
+
 
 aac_intakes_outcomes2$animal_type <- as.factor(aac_intakes_outcomes2$animal_type)
 
 ```
+
+```{r eval=FALSE}
+kable(count(aac_intakes_outcomes2$animal_type), align = "l") %>%
+  kable_styling(bootstrap_options = "striped")
+```
+
+
 
 ## Anpassen der Animal Color
 ```{r results='hide'}
@@ -656,6 +662,7 @@ aac_intakes_outcomes2$sex_upon_outcome_first_Unknown <- dummies_suof[,3]
 
 aac_intakes_outcomes2$outcome_type_adopt <- as.factor(aac_intakes_outcomes2$outcome_type_adopt)
 
+aac_intakes_outcomes2$breed <- as.factor(aac_intakes_outcomes2$breed)
 
 
 #Entfernen aller 10 Originalspalten, die Dummycodiert wurden
@@ -851,8 +858,8 @@ Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0.
 # Auswahl Daten 
 ```{r}
 
-data_train_model <- training_rabbit
-data_test_model <- testing_rabbit
+data_train_model <- training_cat
+data_test_model <- testing_cat
 
 ```
 
