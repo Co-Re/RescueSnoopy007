@@ -922,6 +922,13 @@ randomforest_OOB <- train(
 
 ```
 
+# Modell für Katzen (Achtung, nur mit einem Subsample von n=1000!)
+```{r}
+load("randomforestOOB_cats_n=1000.Rdata")
+
+```
+
+
 ```{r}
 RF_OOB_predict = predict(randomforest_OOB, data_test_model)
 conf_matrix_RF_OOB <- confusionMatrix(RF_OOB_predict, data_test_model$outcome_type)
