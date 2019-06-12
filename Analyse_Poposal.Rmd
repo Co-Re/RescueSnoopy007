@@ -848,49 +848,101 @@ Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0.
 
 
 ## Neuronales Netzwerk
+
+Allgemeine Funktion
+```{r}
+maxidx <- function(arr) {
+    return(which(arr == max(arr)))
+}
+```
+
+### Neuronales Netz für Hunde
 ```{r}
 
-train_function <- createDataPartition(
-  y = rabbits$outcome_type_adopt,
-  p = .70,
-  list = FALSE
-)
+set.seed(seed_val)
 
-training_rabbit <- rabbits[ train_function,]
-testing_rabbit  <- rabbits[-train_function,]
-
-str(training_rabbit)
+net_model_dog <- neuralnet(outcome_type_adopt ~ .,
+                data=training_dog[c(5,6)], 
+                hidden=c(3),
+                stepmax = 10000,
+                threshold = 1, 
+                act.fct = "logistic")
 
 
-new_df_train = as.data.frame(training_rabbit[c(-1)])
 
-
-# training_rabbit_nn <- as.data.frame(training_rabbit)
-# testing_rabbit_nn <-  as.data.frame(testing_rabbit)
-# 
-# str(training_rabbit)
-
-testing_rabbit$outcome_type_adopt
-
-str(new_df_train)
-
-net_model_rabbit = neuralnet(outcome_type_adopt~ .,data=new_df_train,hidden=c(10),linear.output=T, act.fct = "logistic")
-net_model_rabbit
 ```
 
 ```{r}
-pred_net_rabbit <- predict(net_model_rabbit, testing_rabbit[c(-1)])
-conf_matrix_net_rabbit <- confusionMatrix(pred_net_rabbit, testing_rabbit[c(-1)]$outcome_type_adopt)
-conf_matrix_net_rabbit
-# confusionMatrix()
-# pred_net_rabbit
+plot(net_model_dog , rep="best")
+```
+
+
+```{r}
+pred_net_dog <- predict(net_model_dog,testing_dog[,-6] )
+idx <- apply(pred_net_dog, c(1), maxidx)
+pred_net_dog <-as.factor(c('0', '1')[idx])
+
+confusionMatrix(pred_net_dog,testing_dog$outcome_type_adopt)
+```
+
+
+### Neuronales Netz für Katzen
+```{r}
+
+set.seed(seed_val)
+
+net_model_cat <- neuralnet(outcome_type_adopt ~ .,
+                data=training_cat[c(6:77)], 
+                hidden=c(3),
+                stepmax = 10000,
+                threshold = 1, 
+                act.fct = "logistic")
+
+
+
 ```
 
 ```{r}
-plot(net_model_rabbit, rep="best")
+plot(net_model_cat , rep="best")
 ```
 
 
+```{r}
+pred_net_cat <- predict(net_model_cat,testing_cat[,-6] )
+idx <- apply(pred_net_cat, c(1), maxidx)
+pred_net_cat <-as.factor(c('0', '1')[idx])
 
+confusionMatrix(pred_net_cat,testing_cat$outcome_type_adopt)
+```
+
+
+### Neuronales Netz für Hasen
+```{r}
+
+set.seed(seed_val)
+
+net_model_rabbit <- neuralnet(outcome_type_adopt ~ .,
+                data=training_rabbit[c(5,6)], 
+                hidden=c(3),
+                stepmax = 10000,
+                threshold = 1, 
+                act.fct = "logistic")
+
+
+
+```
+
+```{r}
+plot(net_model_rabbit , rep="best")
+```
+
+
+```{r}
+pred_net_rabbit <- predict(net_model_rabbit,testing_rabbit[,-6] )
+idx <- apply(pred_net_rabbit, c(1), maxidx)
+pred_net_rabbit <-as.factor(c('0', '1')[idx])
+
+confusionMatrix(pred_net_rabbit,testing_rabbit$outcome_type_adopt)
+```
 
 ![](snoopy.png)
