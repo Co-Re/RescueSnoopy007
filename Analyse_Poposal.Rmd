@@ -758,16 +758,24 @@ cv_5 = trainControl(method = "cv", number = 5)
 seed_val = 123
 ```
 
+
+Laden der gespeicherten Decision Tree Modelle
+```{r}
+load("decision_trees.RData")
+```
+
+
 ### Decion Tree für Hunde
 
 ```{r}
 set.seed(seed_val)
 
-tree_dog1 <- train(
-  outcome_type_adopt ~ .,
-  data = training_dog,
-  trControl = cv_5,
-  method = "rpart")
+if (!exists("tree_dog1"))
+  tree_dog1 <- train(
+    outcome_type_adopt ~ .,
+    data = training_dog,
+    trControl = cv_5,
+    method = "rpart")
 
 print(tree_dog1)
 
@@ -792,12 +800,12 @@ Der Tree zeigt, dass zuerst time_in_shelter eine Rolle spielt und somit die erst
 
 ```{r}
 set.seed(seed_val)
-
-tree_cat1 <- train(
-  outcome_type_adopt ~ .,
-  data = training_cat,
-  trControl = cv_5,
-  method = "rpart")
+if (!exists("tree_cat1"))
+  tree_cat1 <- train(
+    outcome_type_adopt ~ .,
+    data = training_cat,
+    trControl = cv_5,
+    method = "rpart")
 
 print(tree_cat1)
 ```
@@ -821,11 +829,12 @@ Bei Katzen ist sex_upon_outcome_first_Sterilized = 0 die erste Split Variable de
 ```{r}
 set.seed(seed_val)
 
-tree_rabbit1 <- train(
-  outcome_type_adopt ~ .,
-  data = training_rabbit,
-  trControl = cv_5,
-  method = "rpart")
+if (!exists("tree_rabbit1"))
+  tree_rabbit1 <- train(
+    outcome_type_adopt ~ .,
+    data = training_rabbit,
+    trControl = cv_5,
+    method = "rpart")
 
 print(tree_rabbit1)
 ```
@@ -845,6 +854,13 @@ rpart.plot(tree_rabbit1$finalModel)
 
 Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0.
 
+
+### Save Decision Trees
+```{r}
+if (!file.exists("decision_trees.RData"))
+  save(tree_dog1, tree_cat1, tree_rabbit1, file = "decision_trees.RData")
+
+```
 
 
 ![](snoopy.png)
