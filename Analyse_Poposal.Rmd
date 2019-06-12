@@ -854,18 +854,27 @@ Allgemeine Funktion
 maxidx <- function(arr) {
     return(which(arr == max(arr)))
 }
+
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+
 ```
 
 ### Neuronales Netz für Hunde
 ```{r}
+training_dog_norm = training_dog
+
+training_dog_norm[c(2:5)] <- as.data.frame(lapply(training_dog[c(2:5)], normalize))
 
 set.seed(seed_val)
 
 net_model_dog <- neuralnet(outcome_type_adopt ~ .,
-                data=training_dog[c(5,6)], 
+                data=training_dog_norm[c(2:78)], 
                 hidden=c(3),
-                stepmax = 10000,
+                stepmax = 1e6,
                 threshold = 1, 
+                linear.output=T,
                 act.fct = "logistic")
 
 
@@ -919,10 +928,8 @@ confusionMatrix(pred_net_cat,testing_cat$outcome_type_adopt)
 ### Neuronales Netz für Hasen
 ```{r}
 
-set.seed(seed_val)
-
 net_model_rabbit <- neuralnet(outcome_type_adopt ~ .,
-                data=training_rabbit[c(5,6)], 
+                data=training_rabbit[c(6,77)], 
                 hidden=c(3),
                 stepmax = 10000,
                 threshold = 1, 
