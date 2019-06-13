@@ -756,16 +756,25 @@ cv_5 = trainControl(method = "cv", number = 5)
 seed_val = 123
 ```
 
+
+Laden der gespeicherten Decision Tree Modelle
+```{r}
+if (file.exists("decision_trees.RData"))
+  load("decision_trees.RData")
+```
+
+
 ### Decion Tree für Hunde
 
 ```{r}
 set.seed(seed_val)
 
-tree_dog1 <- train(
-  outcome_type_adopt ~ .,
-  data = training_dog,
-  trControl = cv_5,
-  method = "rpart")
+if (!exists("tree_dog1"))
+  tree_dog1 <- train(
+    outcome_type_adopt ~ .,
+    data = training_dog,
+    trControl = cv_5,
+    method = "rpart")
 
 print(tree_dog1)
 
@@ -785,17 +794,20 @@ rpart.plot(tree_dog1$finalModel)
 
 
 Der Tree zeigt, dass zuerst time_in_shelter eine Rolle spielt und somit die erste Abzweigung im Baum ist. Als weitere Variable verwendet der Baum sex_upon_outcome_first_ Sterilized = 0.
+Wenn der Hund weniger als 4 Tage im Tierheim ist, scheint eine Adoption auf Basis des Modells also als unwahrscheinlich, wohingegen bei Hunden, die länger als 4 Tage im Tierheim verbleiben, die Wahrscheinlichkeit einer Adoption dann hoch ist, wenn der Hund sterilisiert ist. 
+
+Die Specitivity ist mit 87% um fast 20% höher als die Sensitivity, d.h. die Vorhersage von Hunden, die *nicht* adoptiert werden, ist genauer, als die für Hunde, die adoptiert werden. Gleichzeitig muss festgehalten werden, dass das Modell nur eine Accuracy von 76% hat, weshalb eine weitere Optimierung besonders sinnvoll erscheint. 
 
 ### Decion Tree für Katzen
 
 ```{r}
 set.seed(seed_val)
-
-tree_cat1 <- train(
-  outcome_type_adopt ~ .,
-  data = training_cat,
-  trControl = cv_5,
-  method = "rpart")
+if (!exists("tree_cat1"))
+  tree_cat1 <- train(
+    outcome_type_adopt ~ .,
+    data = training_cat,
+    trControl = cv_5,
+    method = "rpart")
 
 print(tree_cat1)
 ```
@@ -813,17 +825,22 @@ rpart.plot(tree_cat1$finalModel)
 ```
 
 
-Bei Katzen ist sex_upon_outcome_first_Sterilized = 0 die erste Split Variable des Baumes, dann kommt das ALter und die Zeit, die die Katze im Tierheim verbracht hat.
+Bei Katzen ist sex_upon_outcome_first_Sterilized = 0 die erste Split Variable des Baumes, gefolgt von dem Alter und der Zeit, die die Katze im Tierheim verbracht hat.
+Daher scheinen für die Adoption einer Katze ähnliche Kriterien eine Rolle zu spielen als bei Hunden. Im Gegensatz zur Wahrscheinlichkeit einer Adoption eines Hundes spielt diesem Klassifikationsbaum zufolge auch das Alter der Katze eine Rolle: Wenn die Katze sterilisiert, und älter als ein halbes Jahr alt ist, ist eine Adoption wahrscheinlich. Ist die Katze jünger als ein halbes Jahr, hängt die Adoption davon ab, wie lange die Katze bereits im Tierheim war (Wahrscheinlich ist eine Adoption nämlich nur dann, wenn sie bereits länger als 12 Tage dort war).
+Dies könnte daran liegen, dass Jungtiere erst ab einem bestimmten Alter adoptiert werden können. 
+
+Im Vergleich zum ersten Tree für die Vorhersage einer Adoption eines Hundes, zeigt sich beim Entscheidungsbaum für Katzen ohne Optimierung bereits eine bessere bzw. höhere Accuracy von über 80%. Auffallend ist im direkten Vergleich der Modelle vor allem auch, dass bei Katzen (umgekehrt als bei Hunden), die Adoption besser vorhergesagt werden kann (Sensitivity = 88%), als Fälle, in denen Katzen nicht adoptiert werden (Specitivity = 81,5%). 
 
 ### Decion Tree für Hasen
 ```{r}
 set.seed(seed_val)
 
-tree_rabbit1 <- train(
-  outcome_type_adopt ~ .,
-  data = training_rabbit,
-  trControl = cv_5,
-  method = "rpart")
+if (!exists("tree_rabbit1"))
+  tree_rabbit1 <- train(
+    outcome_type_adopt ~ .,
+    data = training_rabbit,
+    trControl = cv_5,
+    method = "rpart")
 
 print(tree_rabbit1)
 ```
@@ -841,7 +858,16 @@ rpart.plot(tree_rabbit1$finalModel)
 ```
 
 
-Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0.
+Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0. Daher erfolgt die Vorhersage einer Adoption eines Hasens ausschließlich auf Basis der Information, ob das Tier sterilisiert ist. Wie auch bei den anderen Tieren ist die Adoptionswahrscheinlichkeit dann deutlich höher, wenn das Tier bereits sterilisiert ist.
+Die Accuracy ist mit 88% noch besser als jene der anderen beiden Trees (Hunde und Katzen). 
+
+
+### Save Decision Trees
+```{r}
+if (!file.exists("decision_trees.RData"))
+  save(tree_dog1, tree_cat1, tree_rabbit1, file = "decision_trees.RData")
+
+```
 
 ### Variable Importance des Hundemodells
 
@@ -896,6 +922,7 @@ Hier sind neben den bekannten Prädiktoren u.a. noch die Prädiktoren
 * `outcome_month9`
 * `outcome_year2014`
 von Bedeutung.
+
 
 
 ![](snoopy.png)
