@@ -76,6 +76,11 @@ library("kableExtra")
 library(caret)
 library(rpart.plot)
 library(dummies)
+
+
+
+
+
 library(dplyr)
 ```
 
@@ -661,8 +666,10 @@ aac_intakes_outcomes2$sex_upon_outcome_first_Sterilized <- dummies_suof[,2]
 aac_intakes_outcomes2$sex_upon_outcome_first_Unknown <- dummies_suof[,3]
 
 aac_intakes_outcomes2$outcome_type_adopt <- as.factor(aac_intakes_outcomes2$outcome_type_adopt)
-
 aac_intakes_outcomes2$breed <- as.factor(aac_intakes_outcomes2$breed)
+
+
+
 
 
 #Entfernen aller 10 Originalspalten, die Dummycodiert wurden
@@ -852,6 +859,68 @@ rpart.plot(tree_rabbit1$finalModel)
 
 
 Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Tree Tuning (Bagging, Boosting, Random Forrest)
 
