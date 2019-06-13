@@ -548,8 +548,6 @@ table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adop
 #Löschung unbenötigter Spalten: outcometype (alle types) &date_of_birth_month & year
 
 aac_intakes_outcomes2 <- aac_intakes_outcomes2[,c(2:6,9:20)]
-#dummies_breed <- dummy.data.frame(data.frame(aac_intakes_outcomes2$breed))
-
 
 #Dummycodierungen
 
@@ -655,7 +653,7 @@ aac_intakes_outcomes2$sex_upon_outcome_first_Unknown <- dummies_suof[,3]
 
 aac_intakes_outcomes2$outcome_type_adopt <- as.factor(aac_intakes_outcomes2$outcome_type_adopt)
 
-
+aac_intakes_outcomes2$breed <- factor(aac_intakes_outcomes2$breed)
 
 #Entfernen aller 10 Originalspalten, die Dummycodiert wurden
 
@@ -685,15 +683,12 @@ allanimals<- allanimals[,-c(1)]
 
 rabbits <- subset(aac_intakes_outcomes2, animal_type == "Rabbit")
 rabbits <- rabbits[,-c(1)]
-rabbits$breed <- factor(rabbits$breed)
 
 dogs <- subset(aac_intakes_outcomes2, animal_type == "Dog")
 dogs <- dogs[,-c(1)]
-dogs$breed <- factor(dogs$breed)
 
 cats <- subset(aac_intakes_outcomes2, animal_type == "Cat")
 cats <- cats[,-c(1)]
-cats$breed <- factor(cats$breed)
 
 ```
 
