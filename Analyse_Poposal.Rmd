@@ -761,7 +761,8 @@ seed_val = 123
 
 Laden der gespeicherten Decision Tree Modelle
 ```{r}
-load("decision_trees.RData")
+if (file.exists("decision_trees.RData"))
+  load("decision_trees.RData")
 ```
 
 
