@@ -69,24 +69,17 @@ Wir haben uns für dieses Datenset mit dieser Fragestellung entschieden, da eini
 # Vorbereitung in R
 
 ```{r, include=F}
-library("plyr")
-library("anytime")
-library("lubridate")
-library("kableExtra")
+library(plyr)
+library(anytime)
+library(lubridate)
+library(kableExtra)
 library(caret)
 library(rpart.plot)
 library(dummies)
-
-
-
-
-
-
 library(dplyr)
-
 library(neuralnet)
 library(tibble)
-
+library(vip)
 ```
 
 ## Laden der Daten
@@ -889,13 +882,18 @@ if (!file.exists("decision_trees.RData"))
 
 ```
 
+## Variable Importance
+
+Je Modell ist eine Tabelle der Wichtigkeit einer Variable sowie eine Grafik dargestellt. Die Tabelle enthält lediglich Variablen, bei denen die Importance größer 0.
+
 ### Variable Importance des Hundemodells
 
 ```{r}
-?varImp
-importance <- varImp(tree_dog1)
-print(importance)
-plot(importance, top=20)
+imp_dog = vi(tree_dog1)
+imp_dog = imp_dog[imp_dog$Importance>0,]
+imp_dog_tab = tibble(Variable = imp_dog$Variable, Importance = imp_dog$Importance)
+imp_dog_tab
+vip(tree_dog1, width = 0.5, fill = "green3")
 ```
 
 Es ist ersichtlich, dass für den Decision Tree der Hunde lediglich 6 Prädiktoren eine Rolle spielen:
@@ -911,9 +909,11 @@ Am wichtigsten sind die Variablen `sex_upon_outcome_first_Sterilized` und `sex_u
 ### Variable Importance des Katzenmodells
 
 ```{r}
-importance <- varImp(tree_cat1)
-print(importance)
-plot(importance, top=20)
+imp_cat = vi(tree_cat1)
+imp_cat = imp_cat[imp_cat$Importance>0,]
+imp_cat_tab = tibble(Variable = imp_cat$Variable, Importance = imp_cat$Importance)
+imp_cat_tab
+vip(tree_cat1, width = 0.5, fill = "green3")
 ```
 
 Im Modell der Katzen finden sich ähnliche Prädiktoren wieder, hinzugekommen ist hier:
@@ -926,13 +926,13 @@ Im Modell der Katzen finden sich ähnliche Prädiktoren wieder, hinzugekommen is
 Hier ist im Gegensatz zu den Hunden die `time_in_shelter` am wichtigsten.
 
 ### Variable Importance des Hasenmodells
-
 ```{r}
-importance <- varImp(tree_rabbit1)
-print(importance)
-plot(importance, top=20)
+imp_rab= vi(tree_rabbit1)
+imp_rab = imp_rab[imp_rab$Importance>0,]
+imp_rab_tab = tibble(Variable = imp_rab$Variable, Importance = imp_rab$Importance)
+imp_rab_tab
+vip(tree_rabbit1, width = 0.5, fill = "green3")
 ```
-
 
 Hier ist wie im Modell der Hunde die Variable `sex_upon_outcome_first_Sterilized` am wichtigsten.
 Hier sind neben den bekannten Prädiktoren u.a. noch die Prädiktoren
