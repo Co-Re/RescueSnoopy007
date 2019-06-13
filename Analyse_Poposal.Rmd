@@ -876,6 +876,7 @@ normalize <- function(x) {
 Alle Variablen außer Breed
 ```{r}
 set.seed(seed_val)
+
 training_dog_norm = training_dog
 training_dog_norm[c(2:5)] <- as.data.frame(lapply(training_dog_norm[c(2:5)], normalize))
 
@@ -883,7 +884,7 @@ if (!exists("net_model_dog"))
   net_model_dog <- neuralnet(outcome_type_adopt ~ .,
                   data=training_dog_norm[c(2:78)], 
                   hidden=c(3),
-                  stepmax = 1e6,
+                  stepmax = 1000000,
                   threshold = 1, 
                   linear.output=T,
                   act.fct = "logistic")
@@ -891,12 +892,13 @@ if (!exists("net_model_dog"))
 
 Neuronales Netz mit time_in_shelter_days und sex_upon_intake_first_Sterilized
 ```{r}
+set.seed(seed_val)
 
 if (!exists("net_model_dog_selected"))
   net_model_dog_selected <- neuralnet(outcome_type_adopt ~ time_in_shelter_days+sex_upon_intake_first_Sterilized,
                   data=training_dog_norm[c(2:78)], 
                   hidden=c(3),
-                  stepmax = 1e6,
+                  stepmax = 1000000,
                   threshold = 1, 
                   linear.output=T,
                   act.fct = "logistic")
@@ -937,18 +939,20 @@ if (!exists("net_model_cat"))
   net_model_cat <- neuralnet(outcome_type_adopt ~ .,
                   data=training_cat_norm[c(2:78)], 
                   hidden=c(3),
-                  stepmax = 10000,
+                  stepmax = 1000000,
                   threshold = 1, 
                   act.fct = "logistic")
 ```
 
 Neuronales Netz mit sex_upon_outcome_first_Sterilized, Alter und time_in_shelter
 ```{r}
+set.seed(seed_val)
+
 if (!exists("net_model_cat_selected"))
   net_model_cat_selected <- neuralnet(outcome_type_adopt ~ sex_upon_outcome_first_Sterilized+age_upon_outcome_.days.+time_in_shelter_days,
                   data=training_cat_norm[c(2:78)], 
                   hidden=c(3),
-                  stepmax = 10000,
+                  stepmax = 1000000,
                   threshold = 1, 
                   act.fct = "logistic")
 ```
@@ -984,7 +988,6 @@ Alle Variablen außer Breed
 ```{r}
 
 set.seed(seed_val)
-
 training_rabbit_norm = training_rabbit
 training_rabbit_norm[c(2:5)] <- as.data.frame(lapply(training_rabbit_norm[c(2:5)], normalize))
 
@@ -992,18 +995,19 @@ if (!exists("net_model_rabbit"))
   net_model_rabbit <- neuralnet(outcome_type_adopt ~ .,
                   data=training_rabbit[c(2:78)], 
                   hidden=c(3),
-                  stepmax = 10000,
+                  stepmax = 1000000,
                   threshold = 1, 
                   act.fct = "logistic")
 ```
 
 Neuronales Netz mit sex_upon_outcome_first_Sterilized
 ```{r}
+set.seed(seed_val)
 if (!exists("net_model_rabbit_selected"))
   net_model_rabbit_selected <- neuralnet(outcome_type_adopt ~ sex_upon_outcome_first_Sterilized,
-                  data=training_rabbit[c(5:78)], 
+                  data=training_rabbit[c(2:78)], 
                   hidden=c(3),
-                  stepmax = 10000,
+                  stepmax = 1000000,
                   threshold = 1, 
                   act.fct = "logistic")
 ```
@@ -1030,7 +1034,6 @@ cat("Selected Variables: Accuracy", cf_net_rabbit_selected$overall["Accuracy"], 
 ```
 Tabelle der Accuracies aller neuronalen Netze
 ```{r}
-accuracyTable = NULL
 accuracyTable = tibble(Tierart="Hunde", Accuracy_All=cf_net_dog$overall["Accuracy"], Accuracy_Selected_Features=cf_net_dog_selected$overall["Accuracy"])
 accuracyTable = add_row(accuracyTable, Tierart="Katzen", Accuracy_All=cf_net_cat$overall["Accuracy"], Accuracy_Selected_Features=cf_net_cat_selected$overall["Accuracy"])
 accuracyTable = add_row(accuracyTable, Tierart="Hasen", Accuracy_All=cf_net_rabbit$overall["Accuracy"], Accuracy_Selected_Features=cf_net_rabbit_selected$overall["Accuracy"])
