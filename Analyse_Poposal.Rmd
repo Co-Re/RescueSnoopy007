@@ -953,12 +953,12 @@ tree2 = tibble(
 
 tree3 = tibble(
   Model = "Random Forrest CV",
-  TrainAccuracy = randomforest_CV$results$Accuracy,
+  TrainAccuracy = max(randomforest_CV$results$Accuracy),
   TestAccuracy = conf_matrix_RF_CV$overall[1])
 
 tree4 = tibble(
   Model = "Random Forrest OOB",
-  TrainAccuracy = randomforest_OOB$results$Accuracy,
+  TrainAccuracy = max(randomforest_OOB$results$Accuracy),
   TestAccuracy = conf_matrix_RF_OOB$overall[1])
 
 comp_table_trees= bind_rows(tree1, tree2, tree3, tree4)
