@@ -76,8 +76,17 @@ library("kableExtra")
 library(caret)
 library(rpart.plot)
 library(dummies)
+
+
+
+
+
+
+library(dplyr)
+
 library(neuralnet)
 library(tibble)
+
 ```
 
 ## Laden der Daten
@@ -286,12 +295,18 @@ tmp_aac[tmp_aac$animal_type  == "Other", ] = others
 
 aac_intakes_outcomes2 = tmp_aac
 
-kable(count(aac_intakes_outcomes2$animal_type), align = "l") %>%
-  kable_styling(bootstrap_options = "striped")
+
 
 aac_intakes_outcomes2$animal_type <- as.factor(aac_intakes_outcomes2$animal_type)
 
 ```
+
+```{r eval=FALSE}
+kable(count(aac_intakes_outcomes2$animal_type), align = "l") %>%
+  kable_styling(bootstrap_options = "striped")
+```
+
+
 
 ## Anpassen der Animal Color
 ```{r results='hide'}
@@ -654,6 +669,9 @@ aac_intakes_outcomes2$sex_upon_outcome_first_Sterilized <- dummies_suof[,2]
 aac_intakes_outcomes2$sex_upon_outcome_first_Unknown <- dummies_suof[,3]
 
 aac_intakes_outcomes2$outcome_type_adopt <- as.factor(aac_intakes_outcomes2$outcome_type_adopt)
+aac_intakes_outcomes2$breed <- as.factor(aac_intakes_outcomes2$breed)
+
+
 
 aac_intakes_outcomes2$breed <- factor(aac_intakes_outcomes2$breed)
 
@@ -931,6 +949,125 @@ Bei den neuronalen Netzen wird die Breed Variable ausgeschlossen, da sie schon b
 Es werden für jede Tierart jeweil zwei neuronale Netze erstellt, einmal mit allen Variabeln und einmal mit den Variablen die im Decision Tree schon als wichtig festgestellt wurden.
 
 
+
+
+# Tree Tuning (Bagging, Boosting, Random Forrest)
+
+# Auswahl Daten 
+```{r}
+
+data_train_model <- training_cat
+data_test_model <- testing_cat
+
+```
+
+# Bagged Tree mit Bootstrapping
+
+```{r}
+trcBootstr <- trainControl(method="boot")
+
+baggedtree <- train(
+  outcome_type_adopt ~ .,
+  data = data_train_model,
+  method = "treebag",
+  trControl = trcBootstr
+)
+
+```
+
+```{r}
+baggedT_predict = predict(baggedtree, data_test_model)
+conf_matrix_tree_bagged <- confusionMatrix(baggedT_predict, data_test_model$outcome_type)
+
+```
+
+# Random Forrest mit CV 
+
+## Max. Zahl für das tuneGrid (für die Metry) wurde mit 9 gewählt, da üblicherweise das Optimum von m= Wurzel aus p, d.h. Wurzel aus 78=9 (gerundet)
+
+```{r}
+trnCntrl <- trainControl(method = "cv", number=5)
+
+randomforest_CV <- train(
+  outcome_type_adopt ~ .,
+  data = data_train_model,
+  method = "rf",
+  tuneGrid = expand.grid(mtry=seq(1,10,1)),
+  trControl = trnCntrl
+)
+
+```
+
+```{r}
+RF_CV_predict = predict(randomforest_CV, data_test_model)
+conf_matrix_RF_CV <- confusionMatrix(RF_CV_predict, data_test_model$outcome_type)
+
+```
+
+
+# Random Forrest mit OOB 
+
+```{r}
+trcOOB <- trainControl(method="oob")
+
+randomforest_OOB <- train(
+  outcome_type_adopt ~ .,
+  data = data_train_model,
+  method = "rf",
+  tuneGrid = expand.grid(mtry=seq(1,10,1)),
+  trControl = trcOOB
+)
+
+```
+
+# Modell für Katzen (Achtung, nur mit einem Subsample von n=1000!)
+```{r}
+load("randomforestOOB_cats_n=1000.Rdata")
+
+```
+
+
+```{r}
+RF_OOB_predict = predict(randomforest_OOB, data_test_model)
+conf_matrix_RF_OOB <- confusionMatrix(RF_OOB_predict, data_test_model$outcome_type)
+
+```
+
+
+
+# Modellvergleich
+## Tree1 Modelmetrics muss noch befüllt werden! 
+```{r}
+tree1 = tibble(
+  Model = "Einfacher Tree mit CV",
+  TrainAccuracy = 0,
+  TestAccuracy = 0)
+
+
+tree2 = tibble(
+  Model = "Bagged Model",
+  TrainAccuracy = baggedtree$results$Accuracy,
+  TestAccuracy = conf_matrix_tree_bagged$overall[1])
+
+tree3 = tibble(
+  Model = "Random Forrest CV",
+  TrainAccuracy = max(randomforest_CV$results$Accuracy),
+  TestAccuracy = conf_matrix_RF_CV$overall[1])
+
+tree4 = tibble(
+  Model = "Random Forrest OOB",
+  TrainAccuracy = max(randomforest_OOB$results$Accuracy),
+  TestAccuracy = conf_matrix_RF_OOB$overall[1])
+
+comp_table_trees= bind_rows(tree1, tree2, tree3, tree4)
+
+print(comp_table_trees)
+
+
+```
+
+
+
 Laden der gespeicherten Neuronalen Netze Modelle
 ```{r}
 if (file.exists("neuronale_netze.RData"))
@@ -1126,4 +1263,5 @@ kable(accuracyTable, align = "l") %>%
 if (!file.exists("neuronale_netze.RData"))
   save(net_model_dog, net_model_dog_selected, net_model_cat, net_model_cat_selected, net_model_rabbit,net_model_rabbit_selected, file = "neuronale_netze.RData")
 ```
+
 ![](snoopy.png)
