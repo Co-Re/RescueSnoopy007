@@ -43,7 +43,7 @@ Das Datenset enthält unter anderem folgende Variablen:
 
 Neben diesen Variablen existierten weitere, die beispielsweise Zeiträume in einem anderen Format darstellen.
 
-# Hintergrundinformationen zum Datenset
+## Hintergrundinformationen zum Datenset
 Die Daten wurden vom [Austin Animal Center](http://www.austintexas.gov/department/aac) erhoben. Dieses Animal Center ist das größte Tierheim in den USA, in dem keine Tiere getötet werden und kann bis zu 18.000 Tiere pro Jahr aufnehmen. Es werden alle Arten von Tieren aufgenommen. Das Tierheim befindet sich im Travis County im US-Bundesstaat Texas.
 Die Daten werden im Rahmen der Austin's Open Data Intitiative online bereitgestellt.  
 
@@ -53,12 +53,12 @@ Die Tiere sind zwischen 0-25 Jahre alt, der Median liegt bei 1 Jahr, die Geschle
 Mehr als die Hälfte der Tiere sind Hunde, gefolgt von Katzen und einigen Vögeln (<500). Etwa 4.500 Tiere sind keiner Spezies zugeordnet.   
 Knapp die Hälfte der im Datenset enthaltenen Tiere wurde adoptiert.   
 
-# Statistische Lernaufgabe
+## Statistische Lernaufgabe
 Im Rahmen der Gruppenarbeit soll folgendes Klassifikationsproblem betrachtet werden:
 
-Vorhersage des Outcome-Types auf Basis der gegebenen Variablen. Es sollen die Prädiktoren gefunden werden, anhand derer eine Rückgabe an den Besitzer, ein Transfer / eine Adoption, Euthanasie, Tod etc. möglichst genau (durch Vorhersage der Klasse) vorhergesagt werden können. 
+Vorhersage des Outcome-Types auf Basis der gegebenen Variablen. Die initale Idee war es, die Prädiktoren zu finden, anhand derer eine Rückgabe an den Besitzer, ein Transfer / eine Adoption, Euthanasie, Tod etc. möglichst genau (durch Vorhersage der Klasse) vorhergesagt werden können. Eine detaillierte Auseinandersetzung bzw. im Zuge des Preprocessings stellte sich heraus, dass für viele der angeführten Outcome-Types wenige Fälle vorhanden sind, sodass eine Modellierung ohne Overfitting schwierig erscheint. Deshalb wurde während des Projektes bzw. zu Ende des Preprocessings redefiniert bzw. eingeschränkt auf Tierarten mit mindestens n=500 und ausschließlich den Outcometype Adoption. 
 
-# Motivation
+## Motivation
 Es gibt viele Tierheime, durch Hörensagen ist bekannt, dass in vielen davon eine Großzahl der Tiere einen beträchtlichen Teil ihres Lebens verbringen. 
 Es ist interessant für uns, herauszufinden, welche Aspekte ausschlaggebend dafür sind, ob das Tier (vor dem Tod) wieder aus dem Tierheim "entlassen" wird, d.h. einen neuen Besitzer findet. Wir haben einige Hypothesen, welche wir prüfen möchten. Wir gehen davon aus, dass vor allem jüngere, gesunde Tiere eine bessere Chance haben, als ältere, kranke, ggf. auch nicht kastrierte (Streuner-)Tiere, die bereits sehr lange im Tierheim sind.   
 Weiß man, welche Aspekte eine Rolle spielen, könnte man diese gezielt in den Tierheimen in der Kommunikation verwenden, um mehr Tieren (z.B. vor allem jenen, die grundsätzlich eine schlechtere Chance für eine Adoption haben) ein neues zu Hause zu geben.   
@@ -66,9 +66,11 @@ Wir haben uns für dieses Datenset mit dieser Fragestellung entschieden, da eini
 
 ***
 
-# Vorbereitung in R
+# Initiales Preprocessing
 
-```{r, include=F}
+##benötigte Packages
+
+```{r load packages, include=F, message=FALSE, warning = FALSE}
 library("plyr")
 library("anytime")
 library("lubridate")
@@ -76,37 +78,30 @@ library("kableExtra")
 library(caret)
 library(rpart.plot)
 library(dummies)
-
-
-
-
-
-
 library(dplyr)
-
 library(neuralnet)
 library(tibble)
 
 ```
 
 ## Laden der Daten
-```{r}
+```{r load data, results='hide'}
 aac_intakes_outcomes = read.csv("aac_intakes_outcomes.csv")
 ```
 
 ## Überprüfung der Datenstruktur
-```{r}
+```{r check structure, include=FALSE}
 str(aac_intakes_outcomes)
 # Andrucken der ersten Datensätze
 head(aac_intakes_outcomes)
 ```
 
-```{r}
+```{r summary, include=FALSE}
 summary(aac_intakes_outcomes)
 ```
 
-## Erste Datenbereinigung - Konvertieren der Datentypen
-```{r}
+### Datenbereinigung I - Konvertieren der Datentypen
+```{r datatypes}
 aac_intakes_outcomes$animal_id_outcome <- as.character(aac_intakes_outcomes$animal_id_outcome)
 aac_intakes_outcomes$date_of_birth <- anytime(aac_intakes_outcomes$date_of_birth)
 
@@ -141,28 +136,28 @@ aac_intakes_outcomes$intake_year <- as.factor(aac_intakes_outcomes$intake_year)
 aac_intakes_outcomes$intake_hour <- as.factor(hour(aac_intakes_outcomes$intake_datetime))
 ```
 
-## Anmerkungen zum Datenset
+### Anmerkungen für weitere Preprocessing Schritte
 
 Folgende Animal-Types sind vorhanden:
 Unter Other verbergen sich großteils unterschiedliche Nage- und Säugetiere bzw. Kleintiere, die in einem folgenden Datenaufbereitungsschritt feingliedriger aufgedrosselt werden.
 
-```{r, echo=FALSE}
+```{r table animals, echo=FALSE}
 table(aac_intakes_outcomes$animal_type)
 ```
 
 Folgende Kombinationen sind bei der Zeugungsfähigkeit des Geschlechts möglich, wobei in den Zeilen der Zustand bei Aufnahme im Tierheim dargestellt wird, in den Spalten bei Verlassen:
 
-```{r, echo=FALSE}
+```{r crosstable, echo=FALSE}
 table(aac_intakes_outcomes$sex_upon_intake_first, aac_intakes_outcomes$sex_upon_outcome_first) 
 
 ```
 Unplausible Fälle (Kastrierter Income, Nichtkastrierter Outcome) werden im Zuge der Datenaufbereitung zu Unknown rekategorisiert.
 
 
-## Erstellung eines neuen Datasets
+### Erstellung eines neuen Datasets und Entfernung von Variablen
 Dieses enthält nicht alle Variablen. Im Folgenden findet sich eine Auflistung der entfernten Variablen, sowie eine Begründung, weshalb einige Daten nicht für die Analyse miteinbezogen werden. 
 
-```{r}
+```{r create new dataframe, include=FALSE}
 aac_intakes_outcomes2 <- aac_intakes_outcomes[c(5, 22:24, 26, 27, 43, 42, 44, 3, 17, 18, 33:35, 39, 10:12, 30, 7, 40, 41)]
 ```
 
@@ -171,13 +166,13 @@ Folgende Variablen wurden für das neue Dataset nicht verwendet:
 * `found_location` - Diese Variable bietet keine gute Datenqualität, es sind nicht immer gleiche Daten erfasst (z.B. manchmal Ortsname, manchmal komplette Adresse). Eine Bereinigung bzw. Kürzung auf den Ortsnamen bringt keinen Erkenntnisgewinn für das Modell, da alle Aufnahmen in derselben Region stattfanden und einzig über die Adressangabe Subregionen miteinander vergleichbar würden. 
 * `sex_open_intake` - Diese Variable enthält die selben Daten wie `sex_open_outcome`, ist daher redundant.
 
-```{r, echo=FALSE}
+```{r crosstable, echo=FALSE}
 table(aac_intakes_outcomes$sex_upon_intake_second, aac_intakes_outcomes$sex_upon_outcome_second)
 ```
 
 * `outcome_subtype` - Diese Variable enthält nur für sehr wenige Datensätze zusätzliche Informationen, diese sind nicht durchgängig je `Outcome_type` befüllt. Außerdem ist die Kategorisierung nicht gänzlich diskriminant, da z.B. Aggressive eine Teilkategorie von Behavior wäre, wobei nicht klar ist, welches Verhaltensmuster dann in Behavior erfasst wurde bzw. ob dieses mit aggressivem Verhalten gleichzusetzen ist. 
 
-```{r, echo=FALSE}
+```{r crosstable, echo=FALSE}
 table(aac_intakes_outcomes$outcome_subtype, aac_intakes_outcomes$outcome_type)
 ```
 
@@ -186,7 +181,7 @@ table(aac_intakes_outcomes$outcome_subtype, aac_intakes_outcomes$outcome_type)
 * `outcome_monthyear` - Der Monat und das Jahr werden als einzelne Variablen verwendet. Diese Ursprungsvariable wird damit nicht mehr benötigt.
 * `outcome_hour` - Es werden auch zu ungewöhnlichen Uhrzeiten (z.B. Mitternacht) Geschäftsfälle registriert, welche nicht plausibel erscheinen. 
 
-```{r, echo=FALSE}
+```{r crosstable, echo=FALSE}
 table(aac_intakes_outcomes$outcome_hour)
 ```
 
@@ -195,21 +190,21 @@ table(aac_intakes_outcomes$outcome_hour)
 * `sex_upon_intake` - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet
 * `count` - alle Werte sind 1 (Aushilfsspalte) d.h. kein Informationsgewinn durch diese Variable
 
-```{r, echo=FALSE}
+```{r table, echo=FALSE}
 table(aac_intakes_outcomes$count)
 ```
 
 * `intake_monthyear` - der Monat und das Jahr werden als einzelne Variablen verwendet
 * `intake_hour` - Es werden auch zu ungewöhnlichen Uhrzeiten Geschäftsfälle registriert, welche unplausibel erscheinen.
 
-```{r, echo=FALSE}
+```{r table, echo=FALSE}
 table(aac_intakes_outcomes$intake_hour)
 ```
 
 * `outcome_weekday`, `intake_weekday` - es soll keine Klassifikation auf Basis eines Wochentages gemacht werden.
 * `outcome_number` - Diese Variable enthält dieselben Informationen wie `intake_number`, ist daher redundant.
 
-```{r, echo=FALSE}
+```{r table, echo=FALSE}
 table(aac_intakes_outcomes$outcome_number, aac_intakes_outcomes$intake_number)
 ```
 
@@ -219,20 +214,22 @@ table(aac_intakes_outcomes$outcome_number, aac_intakes_outcomes$intake_number)
 * `age_upon_outcome_group` - Die Gruppierung liefert keinen Mehrwert, da darin nicht die extrem variierende Lebenserwartung in Abhängigkeit der Tierart berücksichtigt wird.
 
 
-# Weitere Datenbereinigungsschritte
+# Preprocessing II
 
 ## Prüfung auf fehlende Werte
+
 Über die Summary wird geprüft, wo fehlende Werte vorkommen.
-```{r results='hide'}
+```{r summary, results='hide'}
 summary(aac_intakes_outcomes2)
 ```
-Für die Prüfung werden zuerst alle Ausprägungen der Response `outcome_type` ausgegeben:
-```{r}
+
+Für die Prüfung werden zuerst alle Ausprägungen der Response `outcome_type` angesehen und bereinigt. 
+```{r check uniques, results='hide'}
 unique(aac_intakes_outcomes2$outcome_type)
 table(aac_intakes_outcomes2$outcome_type)
 ```
-Umwandlung:
-```{r}
+
+```{r clean outcometype,  results='hide'}
 v = as.vector(which(aac_intakes_outcomes2$outcome_type == ""))
 aac_intakes_outcomes2 <- aac_intakes_outcomes2[-v,]
 aac_intakes_outcomes2$outcome_type <- factor(aac_intakes_outcomes2$outcome_type)
@@ -240,9 +237,19 @@ aac_intakes_outcomes2$outcome_type <- factor(aac_intakes_outcomes2$outcome_type)
 
 
 ## Anpassen des Animal Types Other
-```{r}
-others = aac_intakes_outcomes2[aac_intakes_outcomes2$animal_type  == "Other", ] 
 
+Auf Basis der Breed Variable wird die fehlende Information der Tierrasse aufgefüllt. 
+
+```{r, include=FALSE}
+others = aac_intakes_outcomes2[aac_intakes_outcomes2$animal_type  == "Other", ] 
+```
+
+```{r count others, echo=FALSE, fig.cap = "Anzahl der Tiere, deren Animaltype Information fehlt"}
+count(others)
+```
+
+
+```{r recode animal_type, include=FALSE}
 
 # Erstellen eines csv files um die verschiedenen Rassen Tieren zuordnen zu können 
 # write.csv(count(others$breed), file = "breed.csv", append = FALSE, quote = TRUE, sep = " ",
@@ -295,24 +302,25 @@ tmp_aac[tmp_aac$animal_type  == "Other", ] = others
 
 aac_intakes_outcomes2 = tmp_aac
 
-
-
 aac_intakes_outcomes2$animal_type <- as.factor(aac_intakes_outcomes2$animal_type)
 
 ```
 
-```{r eval=FALSE}
-kable(count(aac_intakes_outcomes2$animal_type), align = "l") %>%
-  kable_styling(bootstrap_options = "striped")
+Nach Bereinigung der Variable liegt folgende Verteilung vor:
+```{r after cleaning animaltype, echo=FALSE}
+table(aac_intakes_outcomes2$animal_type)
 ```
 
 
 
 ## Anpassen der Animal Color
-```{r results='hide'}
+
+Um die Anzahl der Ausprägungen, welche im Originaldatenset hoch ist (knapp 100 verschiedene Farben), zu reduzieren, werden ähnliche Farben agreggiert. 
+```{r table, results='hide' }
 sort(table(aac_intakes_outcomes2$color),decreasing=T)
 ```
-```{r}
+
+```{r clean color, include=FALSE}
 #Zusammenfassen der Farben 
 aac_intakes_outcomes2$color_new <-
 gsub("Brown/Brown|Sable|Chocolate|Agouti|Liver", "Brown", aac_intakes_outcomes2$color)
@@ -336,17 +344,21 @@ aac_intakes_outcomes2$color_new <-
 gsub("Flame", "Orange", aac_intakes_outcomes2$color_new)
 
 aac_intakes_outcomes2$color_new <- as.factor(aac_intakes_outcomes2$color_new)
-sort(table(aac_intakes_outcomes2$color_new),decreasing=T)
-
 aac_intakes_outcomes2 <- aac_intakes_outcomes2[,-4]
 
 ```
 
-## Altersangaben und Tage im Tierheim neu berechnen
-Da die bestehenden Alters-/Zeitangaben zum Teil nicht mit den Datumsangaben übereingestimmt haben, werden diese neu berechnen bzw. überprüft.
-Beim Alter bei Intake bzw. Outcome kommen dabei auch negative Werte heraus. Zum Teil kann darauf geschlossen werden, dass das trächtige Muttertier vor der Geburt eingeliefert wurde und somit das Alter des Nachwuchs beim Intake im Minusbereich lag. In diesen Fällen wird es auf 0 gesetzt. Andere unschlüssige Fälle werden exkludiert.
+Nach Bereinigung der Variable konnte die Anzahl an Farben extrem reduziert werden:
+```{r table, echo= FALSE}
+table(aac_intakes_outcomes2$color_new)
+```
 
-```{r}
+## Neuberechnung der Altersangaben und Tage im Tierheim 
+
+Da die bestehenden Alters-/Zeitangaben teilweise nicht mit den Datumsangaben übereingestimmt haben, werden diese neu berechnet bzw. überprüft.
+Beim Alter bei Intake bzw. Outcome kommen dabei auch negative Werte vor. Zum Teil kann darauf geschlossen werden, dass das trächtige Muttertier vor der Geburt eingeliefert wurde und somit das Alter des Nachwuchs beim Intake im Minusbereich lag. In diesen Fällen wird es auf 0 gesetzt. Andere unschlüssige Fälle werden exkludiert.
+
+```{r calculate age, include=FALSE}
 # Age upon intake
 dtime <- round(difftime(aac_intakes_outcomes2$intake_datetime, aac_intakes_outcomes2$date_of_birth,
          units = c("days")))
@@ -375,7 +387,6 @@ names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "age_upon_outcome_d
 names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "age_upon_intake_days_calc"] <- "age_upon_intake_.days."
 names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "time_in_shelter_days_calc"] <- "time_in_shelter_days"
 
-
 # Negatives Alter exkludieren bzw. auf Null setzen
 aac_intakes_outcomes_temp1 <- 
   aac_intakes_outcomes2[aac_intakes_outcomes2$age_upon_intake_.days.  >= -46 &
@@ -389,10 +400,9 @@ aac_intakes_outcomes2$age_upon_intake_.days.[aac_intakes_outcomes2$age_upon_inta
 
 aac_intakes_outcomes2$time_in_shelter <- NULL
 
-
 ```
 
-```{r results='hide'}
+```{r check recodings, include=FALSE}
 # Kontrolle, dass Alter bei Outcome immer höher ist als bei Intake
 aac_intakes_outcomes_temp2 <- 
   aac_intakes_outcomes2[aac_intakes_outcomes2$age_upon_intake_.days. >
@@ -401,9 +411,11 @@ aac_intakes_outcomes_temp2 <-
 
 
 ## Anpassen der Zeugungsfähigkeit
+
 Bei Analyse der Daten wurde bemerkt, dass 3 Beobachtungen bei den Geschlechtsmerkmalen fehlerhaft sein müssen, da Intake und Outcome-Wert nicht zusammengepasst haben (siehe oben bei Anmerkungen zu Datenset). Bei diesen Beobachtungen war das Merkmal bei Intake Neutered/Spayed und bei Outcome Intact. Es wurde daher entschieden, dass diese Datensätze behalten werden und die Werte durch "Unknown" ersetzt werden.   
-Da Neutered und Spayed unterschiedliche Worte für die Sterilisation der weiblichen bzw. männlichen Tiere, wurden diese vereinheitlicht in der Ausprägung "Sterilized" zusammengefasst.
-```{r}
+Da Neutered und Spayed unterschiedliche Wordings für die Sterilisation der weiblichen bzw. männlichen Tiere sind, wurden diese vereinheitlicht in der Ausprägung "Sterilized" zusammengefasst.
+
+```{r, includ=FALSE}
 detectwrong <- function(v1,c1,v2,c2,x) {ifelse((v1==c1)&(v2==c2),"Unknown",x)}
 
 aac_intakes_outcomes2$sex_upon_intake_first_new <- detectwrong(
@@ -454,15 +466,18 @@ names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_intake_fi
 names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_outcome_first_new"] <- "sex_upon_outcome_first"
 ```
 
-# Exemplarisches glm Modell
+## Prüfung ob statistische Modellierung möglich ist
+
+###glm Modell
+
 Es wird ein GLM Modell am Beispiel von 3 Prädiktoren aufgestellt, um die grundsätzliche Modellierbarkeit darzustellen.
-```{r}
+```{r glm model}
 glm.fit = glm(outcome_type~animal_type+intake_condition+intake_type, data = aac_intakes_outcomes2, family = binomial)
 summary(glm.fit)
 ```
 
 **Prediction**  
-```{r}
+```{r pred glm, echo=FALSE}
 glm.prob = predict(glm.fit, type = "response")
 glm.prob[1:10]
 ```
@@ -470,13 +485,16 @@ glm.prob[1:10]
 **Erläuterung**   
 Eine Prediction wie sie hier dargestellt ist, ist noch nicht sinnvoll, da mehrere Klassen in der Response vorhanden sind. Für mehrere Klassen sollte eine andere Funktion bzw. ein anderes Modell verwendet werden. Auf Basis der obenstehenden Analysen und Erkenntnisse halten wir Tree Modelle für die Vorhersage des `outcome_type` für geeignet.
 
-# Löschen aller Tierarten mit wenigen Fällen 
 
-```{r}
+## Einschränkung der Tierarten 
+
+```{r, echo=FALSE}
 summary(aac_intakes_outcomes2$animal_type)
 
 ```
-Der primäre Fokus der Vorhersage des Outcometypes liegt bei Hunden und Katzen. 
+Da eine statistische Modellierung für Tierarten mit geringer Anzahl an Fällen nicht sinnvoll erscheint, wurde an dieser Stelle eine weitere Einschränkung des Datensatzes entschieden.
+
+Der primäre Fokus der Vorhersage des Outcometypes soll nun bei Hunden und Katzen liegen. 
 Jedoch sollen auch Tiere, von denen mind. n=500 Beobachtungen vorliegen, betrachtet werden, und zwar: 
 
 * Dog: 45.364
@@ -487,7 +505,7 @@ Jedoch sollen auch Tiere, von denen mind. n=500 Beobachtungen vorliegen, betrach
 
 Für jede Tierart soll ein eigenes Modell gefittet werden, gegebenenfalls müssen dann in weiterer Folge aufgrund zu geringer Fallzahlen die Tierarten weiter eingeschränkt werden. 
 
-```{r}
+```{r remove animaltypes with too few cases, echo=FALSE}
 aac_intakes_outcomes3<- data.frame(subset(aac_intakes_outcomes2, animal_type=="Dog"|animal_type=="Cat"|animal_type=="Bat"|animal_type=="Raccoon"|animal_type=="Rabbit"))
 
 
@@ -497,32 +515,30 @@ summary(aac_intakes_outcomes2$animal_type)
 
 ```
 
-```{r}
-
+### Verteilung der Y-Variable für verbleibende Tierarten
+```{r plot, echo=FALSE}
 a<- ggplot(aac_intakes_outcomes2, aes(animal_type))+geom_bar(fill = "#0073C2FF") 
 
 a+geom_bar(aes(fill = outcome_type))
 
-
 ```
 
-```{r}
+```{r check numerics, include=FALSE}
 types <- table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type)
-
 types[order(types[,1], decreasing=T),]
 ```
 
-# Auswahl von OutcomeTypes
+## Einschränkung des OutcomeTypes
 
-Da das Interesse des Tierheims vorallem darin liegt, dass Hunde, Katzen und Hasen *adoptiert* werden, und dieser Anteil auch bei den beiden Tierarten relativ hoch ist, soll für diese Tierarten dieser *Outcometype* vorhergesagt werden. 
+Da das Interesse des Tierheims vorallem darin liegt, dass Hunde, Katzen und Hasen *adoptiert* werden, und dieser Anteil auch bei den beiden Tierarten relativ hoch ist, d.h. ausreichend Daten zum trainieren des Modells vorhanden sind, soll für diese Tierarten dieser *Outcometype* vorhergesagt werden. 
+
+### weitere Einschränkung nach Outcome Type und Tierart
 
 Da der Anteil bei Wildtieren, die eingeschläfert werden, sehr hoch ist, liegen nur wenige Fälle für andere Outcome types vor, weshalb an dieser Stelle davon abgesehen wird, Modelle für Racoons und Bats aufzustellen.  
 
 Im Folgenden wird deshalb der Datensatz weiter reduziert (durch Entfernung der Wildtiere), es sollen ausschließlich Hunde, Katzen und Hasen verbleiben. Es wird eine neue Variable erstellt, die binär codiert angibt, ob das jeweilige Tier adoptiert wurde. 
 
-# weitere Verkleinerung des Datasets
-
-```{r}
+```{r remove wild animals and dummycode adoption, warning=FALSE, message=FALSE, include = FALSE}
 #entferne wildtiere
 
 aac_intakes_outcomes_3 <- subset(aac_intakes_outcomes2, animal_type  == "Dog" | animal_type == "Cat" | aac_intakes_outcomes2$animal_type  == "Rabbit")
@@ -537,17 +553,19 @@ aac_intakes_outcomes_3$outcome_type_adopt <- dummies_outcometype[,1]
 
 ```
 
-```{r check recoding, eval = FALSE}
+```{r check recoding, include=FALSE, message=FALSE, warning=FALSE}
 aac_intakes_outcomes_3$outcome_type <- factor(aac_intakes_outcomes_3$outcome_type)
 table(aac_intakes_outcomes_3$outcome_type, aac_intakes_outcomes_3$outcome_type_adopt)
 ```
 
-```{r}
+```{r merge datasets, include=FALSE}
 aac_intakes_outcomes2 <- aac_intakes_outcomes_3
 ```
 
 
-# Adoptionen nach Tieren
+### Adoptionen nach Tieren
+
+Es liegen ausreichend Daten für die Vorhersage der Adoption vor. 
 
 ```{r}
 b<- ggplot(aac_intakes_outcomes2, aes(animal_type))+geom_bar(fill = "#0073C2FF") 
@@ -557,11 +575,13 @@ b+geom_bar(aes(fill = outcome_type_adopt))
 
 ```
 
-```{r}
+```{r table, include=FALSE}
 table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adopt)
 ```
 
-```{r}
+Da ein erster Testlauf/Fitting des Datensatzes mit einem Decision Tree aufgrund der Datenstrukturen wenig performant ist, wurden die Daten überwiegend Dummycodiert um ein schnelleres Training zu erzielen. 
+
+```{r recode dummies, warning=FALSE, message=FALSE, include=FALSE}
 #Löschung unbenötigter Spalten: outcometype (alle types) &date_of_birth_month & year
 
 aac_intakes_outcomes2 <- aac_intakes_outcomes2[,c(2:6,9:20)]
@@ -682,9 +702,9 @@ aac_intakes_outcomes2[ ,c('intake_condition', 'intake_type', 'sex_upon_outcome_s
 
 ```
 
-# FINALE DATENSÄTZE ZUR MODELLIERUNG
+# Finale Datensätze zur Modellierung
 
-```{r}
+```{r datasets new, message=FALSE, warning=FALSE}
 allanimals <- aac_intakes_outcomes2
 dummies_animals<- dummy.data.frame(data.frame(allanimals$animal_type))
 
@@ -697,9 +717,12 @@ allanimals<- allanimals[,-c(1)]
 ```
 
 
-# split Daten nach Tier & entfernen der animal_type variable
+## Split Daten nach Tier 
 
-```{r}
+Das finale Datenset dient für das Subsetting pro Tierart. 
+Da für jede Tierart ein eigenes Modell gefittet wird, wird die Tierartvariable innerhalb dieser Datensätze nicht benötigt und entfernt.
+
+```{r dataset split, results='hide'}
 
 rabbits <- subset(aac_intakes_outcomes2, animal_type == "Rabbit")
 rabbits <- rabbits[,-c(1)]
@@ -712,9 +735,8 @@ cats <- cats[,-c(1)]
 
 ```
 
-
-# Train Test Split - alle Tierarten
-```{r}
+### Train Test Split - alle Tierarten
+```{r, include=FALSE}
 
 train_function <- createDataPartition(
   y = allanimals$outcome_type_adopt,
@@ -727,8 +749,11 @@ testing  <- allanimals[-train_function,]
 
 ```
 
-# Train/Test Split für Hunde
-```{r}
+### Train/Test Split für Hunde
+
+Jedes Subset wird wiederum in ein Test- und Trainingsset unterteilt. 
+Beispiel Hunde:
+```{r, results='hide'}
 train_function <- createDataPartition(
   y = dogs$outcome_type_adopt,
   p = .70,
@@ -739,8 +764,8 @@ training_dog <- dogs[train_function,]
 testing_dog  <- dogs[-train_function,]
 ```
 
-# Train/Test Split für Katzen
-```{r}
+### Train/Test Split für Katzen
+```{r, include=FALSE}
 train_function <- createDataPartition(
   y = cats$outcome_type_adopt,
   p = .70,
@@ -751,8 +776,8 @@ training_cat <- cats[ train_function,]
 testing_cat  <- cats[-train_function,]
 ```
 
-# Train/Test Split für Hasen
-```{r}
+### Train/Test Split für Hasen
+```{r, include=FALSE}
 train_function <- createDataPartition(
   y = rabbits$outcome_type_adopt,
   p = .70,
