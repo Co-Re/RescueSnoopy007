@@ -76,6 +76,8 @@ library("kableExtra")
 library(caret)
 library(rpart.plot)
 library(dummies)
+library(neuralnet)
+library(tibble)
 ```
 
 ## Laden der Daten
@@ -924,5 +926,204 @@ Hier sind neben den bekannten Prädiktoren u.a. noch die Prädiktoren
 von Bedeutung.
 
 
+## Neuronales Netzwerk
+Bei den neuronalen Netzen wird die Breed Variable ausgeschlossen, da sie schon bei den Bäumen als nicht relevant identifiziert wurde. Außerdem werden die numerischen Variablen intake_number, age_upon_intake_.days, age_upon_outcome_.days und time_in_shelter_days vorab min-max normalisiert, um die Geschwindigkeit der Berechnung zu verbessern bzw. bei den Hundedatenset konnte keine Berechnung aus Computer Performance technischen Gründen durchgeführt werden. Mit Normalisierung konnte, dann jedoch eine Berechnung durchgeführt werden.
+Es werden für jede Tierart jeweil zwei neuronale Netze erstellt, einmal mit allen Variabeln und einmal mit den Variablen die im Decision Tree schon als wichtig festgestellt wurden.
 
+
+Laden der gespeicherten Neuronalen Netze Modelle
+```{r}
+if (file.exists("neuronale_netze.RData"))
+  load("neuronale_netze.RData")
+```
+
+Allgemeine Funktionen
+```{r}
+maxidx <- function(arr) {
+    return(which(arr == max(arr)))
+}
+
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+
+```
+
+### Neuronales Netz für Hunde
+
+Alle Variablen außer Breed
+```{r}
+set.seed(seed_val)
+
+training_dog_norm = training_dog
+training_dog_norm[c(2:5)] <- as.data.frame(lapply(training_dog_norm[c(2:5)], normalize))
+
+if (!exists("net_model_dog"))
+  net_model_dog <- neuralnet(outcome_type_adopt ~ .,
+                  data=training_dog_norm[c(2:78)], 
+                  hidden=c(3),
+                  stepmax = 1000000,
+                  threshold = 1, 
+                  linear.output=T,
+                  act.fct = "logistic")
+```
+
+Neuronales Netz mit time_in_shelter_days und sex_upon_intake_first_Sterilized
+```{r}
+set.seed(seed_val)
+
+if (!exists("net_model_dog_selected"))
+  net_model_dog_selected <- neuralnet(outcome_type_adopt ~ time_in_shelter_days+sex_upon_intake_first_Sterilized,
+                  data=training_dog_norm[c(2:78)], 
+                  hidden=c(3),
+                  stepmax = 1000000,
+                  threshold = 1, 
+                  linear.output=T,
+                  act.fct = "logistic")
+```
+
+Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
+```{r}
+plot(net_model_dog_selected , rep="best")
+```
+Verlgeich der Accuracy der Modelle
+```{r}
+pred_net_dog <- predict(net_model_dog,testing_dog[c(2:5,7:78)])
+idx <- apply(pred_net_dog, c(1), maxidx)
+pred_net_dog <-as.factor(c('0', '1')[idx])
+
+pred_net_dog_selected <- predict(net_model_dog_selected,testing_dog[c(2:5,7:78)])
+idx <- apply(pred_net_dog_selected, c(1), maxidx)
+pred_net_dog_selected <-as.factor(c('0', '1')[idx])
+
+cf_net_dog <- confusionMatrix(pred_net_dog,testing_dog$outcome_type_adopt)
+cf_net_dog_selected <- confusionMatrix(pred_net_dog_selected,testing_dog$outcome_type_adopt)
+
+cat("All Variables: Accuracy", cf_net_dog$overall["Accuracy"], "\n")
+cat("Selected Variables: Accuracy", cf_net_dog_selected$overall["Accuracy"], "\n")
+```
+
+### Neuronales Netz für Katzen
+
+Alle Variablen außer Breed
+```{r}
+
+set.seed(seed_val)
+
+training_cat_norm = training_cat
+training_cat_norm[c(2:5)] <- as.data.frame(lapply(training_cat_norm[c(2:5)], normalize))
+
+if (!exists("net_model_cat"))
+  net_model_cat <- neuralnet(outcome_type_adopt ~ .,
+                  data=training_cat_norm[c(2:78)], 
+                  hidden=c(3),
+                  stepmax = 1000000,
+                  threshold = 1, 
+                  act.fct = "logistic")
+```
+
+Neuronales Netz mit sex_upon_outcome_first_Sterilized, Alter und time_in_shelter
+```{r}
+set.seed(seed_val)
+
+if (!exists("net_model_cat_selected"))
+  net_model_cat_selected <- neuralnet(outcome_type_adopt ~ sex_upon_outcome_first_Sterilized+age_upon_outcome_.days.+time_in_shelter_days,
+                  data=training_cat_norm[c(2:78)], 
+                  hidden=c(3),
+                  stepmax = 1000000,
+                  threshold = 1, 
+                  act.fct = "logistic")
+```
+
+
+Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
+```{r}
+plot(net_model_cat_selected , rep="best")
+```
+
+Verlgeich der Accuracy der Modelle
+```{r}
+pred_net_cat <- predict(net_model_cat,testing_cat[,-6] )
+idx <- apply(pred_net_cat, c(1), maxidx)
+pred_net_cat <-as.factor(c('0', '1')[idx])
+
+cf_net_cat <- confusionMatrix(pred_net_cat,testing_cat$outcome_type_adopt)
+
+pred_net_cat_selected <- predict(net_model_cat_selected,testing_cat[,-6] )
+idx <- apply(pred_net_cat_selected, c(1), maxidx)
+pred_net_cat_selected <-as.factor(c('0', '1')[idx])
+
+cf_net_cat_selected  <- confusionMatrix(pred_net_cat_selected,testing_cat$outcome_type_adopt)
+
+cat("All Variables: Accuracy", cf_net_cat$overall["Accuracy"], "\n")
+cat("Selected Variables: Accuracy", cf_net_cat_selected$overall["Accuracy"], "\n")
+```
+
+
+### Neuronales Netz für Hasen
+
+Alle Variablen außer Breed
+```{r}
+
+set.seed(seed_val)
+training_rabbit_norm = training_rabbit
+training_rabbit_norm[c(2:5)] <- as.data.frame(lapply(training_rabbit_norm[c(2:5)], normalize))
+
+if (!exists("net_model_rabbit"))
+  net_model_rabbit <- neuralnet(outcome_type_adopt ~ .,
+                  data=training_rabbit[c(2:78)], 
+                  hidden=c(3),
+                  stepmax = 1000000,
+                  threshold = 1, 
+                  act.fct = "logistic")
+```
+
+Neuronales Netz mit sex_upon_outcome_first_Sterilized
+```{r}
+set.seed(seed_val)
+if (!exists("net_model_rabbit_selected"))
+  net_model_rabbit_selected <- neuralnet(outcome_type_adopt ~ sex_upon_outcome_first_Sterilized,
+                  data=training_rabbit[c(2:78)], 
+                  hidden=c(3),
+                  stepmax = 1000000,
+                  threshold = 1, 
+                  act.fct = "logistic")
+```
+
+Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
+```{r}
+plot(net_model_rabbit_selected , rep="best")
+```
+
+Verlgeich der Accuracy der Modelle
+```{r}
+pred_net_rabbit <- predict(net_model_rabbit,testing_rabbit[c(2:5,7:78)])
+idx <- apply(pred_net_rabbit, c(1), maxidx)
+pred_net_rabbit <-as.factor(c('0', '1')[idx])
+
+pred_net_rabbit_selected <- predict(net_model_rabbit_selected,testing_rabbit[c(2:5,7:78)])
+idx <- apply(pred_net_rabbit_selected, c(1), maxidx)
+pred_net_rabbit_selected <-as.factor(c('0', '1')[idx])
+
+cf_net_rabbit <- confusionMatrix(pred_net_rabbit,testing_rabbit$outcome_type_adopt)
+cf_net_rabbit_selected <- confusionMatrix(pred_net_rabbit_selected,testing_rabbit$outcome_type_adopt)
+cat("All Variables: Accuracy", cf_net_rabbit$overall["Accuracy"], "\n")
+cat("Selected Variables: Accuracy", cf_net_rabbit_selected$overall["Accuracy"], "\n")
+```
+Tabelle der Accuracies aller neuronalen Netze
+```{r}
+accuracyTable = tibble(Tierart="Hunde", Accuracy_All=cf_net_dog$overall["Accuracy"], Accuracy_Selected_Features=cf_net_dog_selected$overall["Accuracy"])
+accuracyTable = add_row(accuracyTable, Tierart="Katzen", Accuracy_All=cf_net_cat$overall["Accuracy"], Accuracy_Selected_Features=cf_net_cat_selected$overall["Accuracy"])
+accuracyTable = add_row(accuracyTable, Tierart="Hasen", Accuracy_All=cf_net_rabbit$overall["Accuracy"], Accuracy_Selected_Features=cf_net_rabbit_selected$overall["Accuracy"])
+
+kable(accuracyTable, align = "l") %>%
+  kable_styling(bootstrap_options = "striped") %>%
+  footnote(general = "", general_title = "Tabelle 1: Accuracies der Neuronalen Netze")
+
+```
+### Save Neuronale Netze
+```{r}
+if (!file.exists("neuronale_netze.RData"))
+  save(net_model_dog, net_model_dog_selected, net_model_cat, net_model_cat_selected, net_model_rabbit,net_model_rabbit_selected, file = "neuronale_netze.RData")
+```
 ![](snoopy.png)
