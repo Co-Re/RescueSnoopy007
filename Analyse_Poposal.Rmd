@@ -96,7 +96,7 @@ str(aac_intakes_outcomes)
 head(aac_intakes_outcomes)
 ```
 
-```{r summary, include=FALSE}
+```{r summary1, include=FALSE}
 summary(aac_intakes_outcomes)
 ```
 
@@ -147,7 +147,7 @@ table(aac_intakes_outcomes$animal_type)
 
 Folgende Kombinationen sind bei der Zeugungsfähigkeit des Geschlechts möglich, wobei in den Zeilen der Zustand bei Aufnahme im Tierheim dargestellt wird, in den Spalten bei Verlassen:
 
-```{r crosstable, echo=FALSE}
+```{r crosstable1, echo=FALSE}
 table(aac_intakes_outcomes$sex_upon_intake_first, aac_intakes_outcomes$sex_upon_outcome_first) 
 
 ```
@@ -166,13 +166,13 @@ Folgende Variablen wurden für das neue Dataset nicht verwendet:
 * `found_location` - Diese Variable bietet keine gute Datenqualität, es sind nicht immer gleiche Daten erfasst (z.B. manchmal Ortsname, manchmal komplette Adresse). Eine Bereinigung bzw. Kürzung auf den Ortsnamen bringt keinen Erkenntnisgewinn für das Modell, da alle Aufnahmen in derselben Region stattfanden und einzig über die Adressangabe Subregionen miteinander vergleichbar würden. 
 * `sex_open_intake` - Diese Variable enthält die selben Daten wie `sex_open_outcome`, ist daher redundant.
 
-```{r crosstable, echo=FALSE}
+```{r crosstable2, echo=FALSE}
 table(aac_intakes_outcomes$sex_upon_intake_second, aac_intakes_outcomes$sex_upon_outcome_second)
 ```
 
 * `outcome_subtype` - Diese Variable enthält nur für sehr wenige Datensätze zusätzliche Informationen, diese sind nicht durchgängig je `Outcome_type` befüllt. Außerdem ist die Kategorisierung nicht gänzlich diskriminant, da z.B. Aggressive eine Teilkategorie von Behavior wäre, wobei nicht klar ist, welches Verhaltensmuster dann in Behavior erfasst wurde bzw. ob dieses mit aggressivem Verhalten gleichzusetzen ist. 
 
-```{r crosstable, echo=FALSE}
+```{r crosstable3, echo=FALSE}
 table(aac_intakes_outcomes$outcome_subtype, aac_intakes_outcomes$outcome_type)
 ```
 
@@ -181,7 +181,7 @@ table(aac_intakes_outcomes$outcome_subtype, aac_intakes_outcomes$outcome_type)
 * `outcome_monthyear` - Der Monat und das Jahr werden als einzelne Variablen verwendet. Diese Ursprungsvariable wird damit nicht mehr benötigt.
 * `outcome_hour` - Es werden auch zu ungewöhnlichen Uhrzeiten (z.B. Mitternacht) Geschäftsfälle registriert, welche nicht plausibel erscheinen. 
 
-```{r crosstable, echo=FALSE}
+```{r crosstable4, echo=FALSE}
 table(aac_intakes_outcomes$outcome_hour)
 ```
 
@@ -190,21 +190,21 @@ table(aac_intakes_outcomes$outcome_hour)
 * `sex_upon_intake` - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet
 * `count` - alle Werte sind 1 (Aushilfsspalte) d.h. kein Informationsgewinn durch diese Variable
 
-```{r table, echo=FALSE}
+```{r table1, echo=FALSE}
 table(aac_intakes_outcomes$count)
 ```
 
 * `intake_monthyear` - der Monat und das Jahr werden als einzelne Variablen verwendet
 * `intake_hour` - Es werden auch zu ungewöhnlichen Uhrzeiten Geschäftsfälle registriert, welche unplausibel erscheinen.
 
-```{r table, echo=FALSE}
+```{r table2, echo=FALSE}
 table(aac_intakes_outcomes$intake_hour)
 ```
 
 * `outcome_weekday`, `intake_weekday` - es soll keine Klassifikation auf Basis eines Wochentages gemacht werden.
 * `outcome_number` - Diese Variable enthält dieselben Informationen wie `intake_number`, ist daher redundant.
 
-```{r table, echo=FALSE}
+```{r table3, echo=FALSE}
 table(aac_intakes_outcomes$outcome_number, aac_intakes_outcomes$intake_number)
 ```
 
@@ -219,7 +219,7 @@ table(aac_intakes_outcomes$outcome_number, aac_intakes_outcomes$intake_number)
 ## Prüfung auf fehlende Werte
 
 Über die Summary wird geprüft, wo fehlende Werte vorkommen.
-```{r summary, results='hide'}
+```{r summary2, results='hide'}
 summary(aac_intakes_outcomes2)
 ```
 
@@ -316,7 +316,7 @@ table(aac_intakes_outcomes2$animal_type)
 ## Anpassen der Animal Color
 
 Um die Anzahl der Ausprägungen, welche im Originaldatenset hoch ist (knapp 100 verschiedene Farben), zu reduzieren, werden ähnliche Farben agreggiert. 
-```{r table, results='hide' }
+```{r table4, results='hide' }
 sort(table(aac_intakes_outcomes2$color),decreasing=T)
 ```
 
@@ -349,7 +349,7 @@ aac_intakes_outcomes2 <- aac_intakes_outcomes2[,-4]
 ```
 
 Nach Bereinigung der Variable konnte die Anzahl an Farben extrem reduziert werden:
-```{r table, echo= FALSE}
+```{r table5, echo= FALSE}
 table(aac_intakes_outcomes2$color_new)
 ```
 
@@ -402,7 +402,7 @@ aac_intakes_outcomes2$time_in_shelter <- NULL
 
 ```
 
-```{r check recodings, include=FALSE}
+```{r check recodings2, include=FALSE}
 # Kontrolle, dass Alter bei Outcome immer höher ist als bei Intake
 aac_intakes_outcomes_temp2 <- 
   aac_intakes_outcomes2[aac_intakes_outcomes2$age_upon_intake_.days. >
@@ -415,7 +415,7 @@ aac_intakes_outcomes_temp2 <-
 Bei Analyse der Daten wurde bemerkt, dass 3 Beobachtungen bei den Geschlechtsmerkmalen fehlerhaft sein müssen, da Intake und Outcome-Wert nicht zusammengepasst haben (siehe oben bei Anmerkungen zu Datenset). Bei diesen Beobachtungen war das Merkmal bei Intake Neutered/Spayed und bei Outcome Intact. Es wurde daher entschieden, dass diese Datensätze behalten werden und die Werte durch "Unknown" ersetzt werden.   
 Da Neutered und Spayed unterschiedliche Wordings für die Sterilisation der weiblichen bzw. männlichen Tiere sind, wurden diese vereinheitlicht in der Ausprägung "Sterilized" zusammengefasst.
 
-```{r, includ=FALSE}
+```{r recode sterilized, include=FALSE}
 detectwrong <- function(v1,c1,v2,c2,x) {ifelse((v1==c1)&(v2==c2),"Unknown",x)}
 
 aac_intakes_outcomes2$sex_upon_intake_first_new <- detectwrong(
@@ -516,7 +516,7 @@ summary(aac_intakes_outcomes2$animal_type)
 ```
 
 ### Verteilung der Y-Variable für verbleibende Tierarten
-```{r plot, echo=FALSE}
+```{r plot1, echo=FALSE}
 a<- ggplot(aac_intakes_outcomes2, aes(animal_type))+geom_bar(fill = "#0073C2FF") 
 
 a+geom_bar(aes(fill = outcome_type))
@@ -553,7 +553,7 @@ aac_intakes_outcomes_3$outcome_type_adopt <- dummies_outcometype[,1]
 
 ```
 
-```{r check recoding, include=FALSE, message=FALSE, warning=FALSE}
+```{r check recoding2, include=FALSE, message=FALSE, warning=FALSE}
 aac_intakes_outcomes_3$outcome_type <- factor(aac_intakes_outcomes_3$outcome_type)
 table(aac_intakes_outcomes_3$outcome_type, aac_intakes_outcomes_3$outcome_type_adopt)
 ```
@@ -575,7 +575,7 @@ b+geom_bar(aes(fill = outcome_type_adopt))
 
 ```
 
-```{r table, include=FALSE}
+```{r table6, include=FALSE}
 table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adopt)
 ```
 
@@ -690,10 +690,6 @@ aac_intakes_outcomes2$sex_upon_outcome_first_Unknown <- dummies_suof[,3]
 
 aac_intakes_outcomes2$outcome_type_adopt <- as.factor(aac_intakes_outcomes2$outcome_type_adopt)
 aac_intakes_outcomes2$breed <- as.factor(aac_intakes_outcomes2$breed)
-
-
-
-aac_intakes_outcomes2$breed <- factor(aac_intakes_outcomes2$breed)
 
 #Entfernen aller 10 Originalspalten, die Dummycodiert wurden
 
@@ -849,7 +845,7 @@ Die Specificity ist mit 87% um fast 20% höher als die Sensitivity, d.h. die Vor
 
 ### Decision Tree für Katzen
 
-```{r cats tree, include==FALSE}
+```{r cats tree1, include=FALSE}
 set.seed(seed_val)
 if (!exists("tree_cat1"))
   tree_cat1 <- train(
@@ -863,7 +859,7 @@ if (!exists("tree_cat1"))
 
 Das gefittete Modell: 
 
-```{r cats tree,  echo=FALSE}
+```{r cats tree2,  echo=FALSE}
 print(tree_cat1)
 ```
 
@@ -910,7 +906,7 @@ conf_matrix_tree_rabbit1 <- confusionMatrix(pred_tree_rabbit1, testing_rabbit$ou
 conf_matrix_tree_rabbit1
 ```
 
-```{r model plot, echo=FALSE}
+```{r model plot2, echo=FALSE}
 rpart.plot(tree_rabbit1$finalModel)
 ```
 
@@ -1176,7 +1172,7 @@ plot(net_model_dog_selected , rep="best")
 ```
 
 Verlgeich der Accuracy der Modelle
-```{r model accuracy }
+```{r model accuracy1 }
 #Vorhersage und De-Normalisierung für Modell mit allen Variablen 
 pred_net_dog <- predict(net_model_dog,testing_dog[c(2:5,7:78)])
 idx <- apply(pred_net_dog, c(1), maxidx)
@@ -1216,7 +1212,7 @@ if (!exists("net_model_cat"))
                   act.fct = "logistic")
 ```
 
-```{r model fitting selected vars, include=FALSE}
+```{r model fitting selected vars1, include=FALSE}
 set.seed(seed_val)
 
 if (!exists("net_model_cat_selected"))
@@ -1269,7 +1265,7 @@ if (!exists("net_model_rabbit"))
                   act.fct = "logistic")
 ```
 
-```{r model fitting selected vars, include=FALSE}
+```{r model fitting selected vars2, include=FALSE}
 set.seed(seed_val)
 if (!exists("net_model_rabbit_selected"))
   net_model_rabbit_selected <- neuralnet(outcome_type_adopt ~ sex_upon_outcome_first_Sterilized,
@@ -1281,7 +1277,7 @@ if (!exists("net_model_rabbit_selected"))
 ```
 
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
-```{r model plot, echo=FALSE}
+```{r model plot3, echo=FALSE}
 plot(net_model_rabbit_selected , rep="best")
 ```
 
