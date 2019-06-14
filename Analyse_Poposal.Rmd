@@ -68,7 +68,6 @@ Wir haben uns für dieses Datenset mit dieser Fragestellung entschieden, da eini
 
 # Initiales Preprocessing
 
-##benötigte Packages
 
 ```{r load packages, include=F, message=FALSE, warning = FALSE}
 library("plyr")
@@ -81,6 +80,7 @@ library(dummies)
 library(dplyr)
 library(neuralnet)
 library(tibble)
+library(vip)
 library(labeling)
 ```
 
@@ -924,17 +924,20 @@ if (!file.exists("decision_trees.RData"))
 
 ## Variable Importance
 
-Die einfachen Klassifikationsbäume geben bereits einen guten ersten Einblick darin, welche Variablen für die Klassifikation bzw Splitpunkte vorrangig herangezogen werden. 
-Da sich zeigt, dass über die Tierarten hinweg die Hauptsplitpunkte auf ähnlichen Variablen basieren, soll mithilfe der Variable Importance ermittelt werden, ob noch weitere Zusatzinformationen aus den Modellen gewonnen werden können, die für das Tierheim für das bessere Verständnis von Adoptionsgründen genutzt werden kann. 
-Dafür wird die Variable Importance aus den obig erstellten Bäumen (je Tier) erstellt und beschrieben. 
+Je Modell ist eine Tabelle der Wichtigkeit einer Variable sowie eine Grafik dargestellt. Die Tabelle enthält lediglich Variablen, bei denen die Importance größer 0.
 
 ### Variable Importance des Hundemodells
 
-```{r var imp dogs}
-importance <- varImp(tree_dog1)
-print(importance)
-plot(importance, top=20)
+```{r}
+imp_dog = vi(tree_dog1)
+imp_dog = imp_dog[imp_dog$Importance>0,]
+imp_dog_tab = tibble(Variable = imp_dog$Variable, Importance = imp_dog$Importance)
+imp_dog_tab
+vip(tree_dog1, width = 0.5, fill = "green3")
 ```
+Die einfachen Klassifikationsbäume geben bereits einen guten ersten Einblick darin, welche Variablen für die Klassifikation bzw Splitpunkte vorrangig herangezogen werden. 
+Da sich zeigt, dass über die Tierarten hinweg die Hauptsplitpunkte auf ähnlichen Variablen basieren, soll mithilfe der Variable Importance ermittelt werden, ob noch weitere Zusatzinformationen aus den Modellen gewonnen werden können, die für das Tierheim für das bessere Verständnis von Adoptionsgründen genutzt werden kann. 
+Dafür wird die Variable Importance aus den obig erstellten Bäumen (je Tier) erstellt und beschrieben. 
 
 Es ist ersichtlich, dass für den Decision Tree der Hunde 6 Prädiktoren eine Rolle spielen:
 * `sex_upon_outcome_first_Sterilized`
@@ -948,10 +951,12 @@ Die wichtigsten Variablen sind neben der bereits im Decisiontree als Splitpunkt 
 
 ### Variable Importance des Katzenmodells
 
-```{r, echo=FALSE}
-importance <- varImp(tree_cat1)
-print(importance)
-plot(importance, top=20)
+```{r}
+imp_cat = vi(tree_cat1)
+imp_cat = imp_cat[imp_cat$Importance>0,]
+imp_cat_tab = tibble(Variable = imp_cat$Variable, Importance = imp_cat$Importance)
+imp_cat_tab
+vip(tree_cat1, width = 0.5, fill = "green3")
 ```
 
 Im Modell der Katzen finden sich ähnliche Prädiktoren wieder, hinzugekommen ist hier:
@@ -964,13 +969,13 @@ Im Modell der Katzen finden sich ähnliche Prädiktoren wieder, hinzugekommen is
 Hier ist im Gegensatz zu den Hunden das Alter der Tiere und die `time_in_shelter` am wichtigsten.
 
 ### Variable Importance des Hasenmodells
-
-```{r, echo=FALSE}
-importance <- varImp(tree_rabbit1)
-print(importance)
-plot(importance, top=20)
+```{r}
+imp_rab= vi(tree_rabbit1)
+imp_rab = imp_rab[imp_rab$Importance>0,]
+imp_rab_tab = tibble(Variable = imp_rab$Variable, Importance = imp_rab$Importance)
+imp_rab_tab
+vip(tree_rabbit1, width = 0.5, fill = "green3")
 ```
-
 
 Hier ist wie im Modell der Hunde die Variable `sex_upon_outcome_first_Sterilized` am wichtigsten.
 Neben den bekannten Prädiktoren sind u.a. noch die Prädiktoren
@@ -1015,6 +1020,14 @@ conf_matrix_tree_bagged <- confusionMatrix(baggedT_predict, data_test_model$outc
 
 ```
 
+```{r}
+imp_bag = vi(baggedtree)
+imp_bag = imp_bag[imp_bag$Importance>5,]
+imp_bag_tab = tibble(Variable = imp_bag$Variable, Importance = imp_bag$Importance)
+imp_bag_tab
+vip(baggedtree, width = 0.5, fill = "green3")
+```
+
 # Random Forrest mit CV 
 
 ## Max. Zahl für das tuneGrid (für die Metry) wurde mit 9 gewählt, da üblicherweise das Optimum von m= Wurzel aus p, d.h. Wurzel aus 78=9 (gerundet)
@@ -1038,6 +1051,13 @@ conf_matrix_RF_CV <- confusionMatrix(RF_CV_predict, data_test_model$outcome_type
 
 ```
 
+```{r}
+imp_rfcv = vi(randomforest_CV)
+imp_rfcv = imp_rfcv[imp_rfcv$Importance>5,]
+imp_rfcv_tab = tibble(Variable = imp_rfcv$Variable, Importance = imp_rfcv$Importance)
+imp_rfcv_tab
+vip(randomforest_CV, width = 0.5, fill = "green3")
+```
 
 # Random Forrest mit OOB 
 
@@ -1067,6 +1087,13 @@ conf_matrix_RF_OOB <- confusionMatrix(RF_OOB_predict, data_test_model$outcome_ty
 
 ```
 
+```{r}
+imp_rfoob = vi(randomforest_OOB)
+imp_rfoob = imp_rfoob[imp_rfoob$Importance>5,]
+imp_rfoob_tab = tibble(Variable = imp_rfoob$Variable, Importance = imp_rfoob$Importance)
+imp_rfoob_tab
+vip(randomforest_OOB, width = 0.5, fill = "green3")
+```
 
 
 # Modellvergleich
@@ -1152,8 +1179,17 @@ if (!exists("net_model_dog"))
                   act.fct = "logistic")
 ```
 
+```{r}
+imp_nn = vi(net_model_dog)
+imp_nn = imp_nn[imp_nn$Importance>5,]
+imp_nn_tab = tibble(Variable = imp_nn$Variable, Importance = imp_nn$Importance)
+imp_nn_tab
+vip(net_model_dog, width = 0.5, fill = "green3")
+```
+
 Modellfitting mit einer Teilmenge/ Auswahl von Variablen (Auswahl auf Basis der Feature Importance): 
 ```{r NN dogs selected Vars, output='hide'}
+
 set.seed(seed_val)
 
 if (!exists("net_model_dog_selected"))
@@ -1164,6 +1200,14 @@ if (!exists("net_model_dog_selected"))
                   threshold = 1, 
                   linear.output=T,
                   act.fct = "logistic")
+```
+
+```{r}
+imp_nn_s = vi(net_model_dog_selected)
+imp_nn_s = imp_nn_s[imp_nn_s$Importance>5,]
+imp_nn_s_tab = tibble(Variable = imp_nn_s$Variable, Importance = imp_nn_s$Importance)
+imp_nn_s_tab
+vip(net_model_dog_selected, width = 0.5, fill = "green3")
 ```
 
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
@@ -1212,6 +1256,15 @@ if (!exists("net_model_cat"))
                   act.fct = "logistic")
 ```
 
+```{r}
+imp_nn_cat = vi(net_model_cat)
+imp_nn_cat = imp_nn_cat[imp_nn_cat$Importance>5,]
+imp_nn_cat_tab = tibble(Variable = imp_nn_cat$Variable, Importance = imp_nn_cat$Importance)
+imp_nn_cat_tab
+vip(net_model_cat, width = 0.5, fill = "green3")
+```
+
+
 ```{r model fitting selected vars1, include=FALSE}
 set.seed(seed_val)
 
@@ -1223,6 +1276,15 @@ if (!exists("net_model_cat_selected"))
                   threshold = 1, 
                   act.fct = "logistic")
 ```
+
+```{r}
+imp_nn_s_cat = vi(net_model_cat_selected)
+imp_nn_s_cat = imp_nn_s_cat[imp_nn_s_cat$Importance>5,]
+imp_nn_s_cat_tab = tibble(Variable = imp_nn_s_cat$Variable, Importance = imp_nn_s_cat$Importance)
+imp_nn_s_cat_tab
+vip(net_model_cat_selected, width = 0.5, fill = "green3")
+```
+
 
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
 ```{r plot cats model, echo=FALSE}
@@ -1265,6 +1327,15 @@ if (!exists("net_model_rabbit"))
                   act.fct = "logistic")
 ```
 
+```{r}
+imp_nn_rab = vi(net_model_rabbit)
+imp_nn_rab = imp_nn_rab[imp_nn_rab$Importance>5,]
+imp_nn_rab_tab = tibble(Variable = imp_nn_rab$Variable, Importance = imp_nn_rab$Importance)
+imp_nn_rab_tab
+vip(net_model_rabbit, width = 0.5, fill = "green3")
+```
+
+
 ```{r model fitting selected vars2, include=FALSE}
 set.seed(seed_val)
 if (!exists("net_model_rabbit_selected"))
@@ -1274,6 +1345,14 @@ if (!exists("net_model_rabbit_selected"))
                   stepmax = 1000000,
                   threshold = 1, 
                   act.fct = "logistic")
+```
+
+```{r}
+imp_nn_s_rab = vi(net_model_rabbit_selected)
+imp_nn_s_rab = imp_nn_s_rab[imp_nn_s_rab$Importance>5,]
+imp_nn_s_rab_tab = tibble(Variable = imp_nn_s_rab$Variable, Importance = imp_nn_s_rab$Importance)
+imp_nn_s_rab_tab
+vip(net_model_rabbit_selected, width = 0.5, fill = "green3")
 ```
 
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
