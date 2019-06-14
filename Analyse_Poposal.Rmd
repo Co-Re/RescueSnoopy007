@@ -934,11 +934,10 @@ imp_dog = imp_dog[imp_dog$Importance>0,]
 imp_dog_tab = tibble(Variable = imp_dog$Variable, Importance = imp_dog$Importance)
 imp_dog_tab
 vip(tree_dog1, width = 0.5, fill = "green3")
-
+```
 Die einfachen Klassifikationsbäume geben bereits einen guten ersten Einblick darin, welche Variablen für die Klassifikation bzw Splitpunkte vorrangig herangezogen werden. 
 Da sich zeigt, dass über die Tierarten hinweg die Hauptsplitpunkte auf ähnlichen Variablen basieren, soll mithilfe der Variable Importance ermittelt werden, ob noch weitere Zusatzinformationen aus den Modellen gewonnen werden können, die für das Tierheim für das bessere Verständnis von Adoptionsgründen genutzt werden kann. 
 Dafür wird die Variable Importance aus den obig erstellten Bäumen (je Tier) erstellt und beschrieben. 
-```
 
 Es ist ersichtlich, dass für den Decision Tree der Hunde 6 Prädiktoren eine Rolle spielen:
 * `sex_upon_outcome_first_Sterilized`
