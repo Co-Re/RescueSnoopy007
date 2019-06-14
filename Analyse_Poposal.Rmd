@@ -791,19 +791,19 @@ testing_rabbit  <- rabbits[-train_function,]
 ***
 
 # Aufstellen der Modelle
-Zuerst werden Modell mithilfe von Decisoin Trees aufgestellt. Danach wird untersucht, ob andere Methoden wie neuronale Netze ein ähnliche oder sogar besseres Ergebnis liefern.
+Zuerst werden Modell mithilfe von Decisoin Trees aufgestellt, da diese gut interpretierbar sind. Danach wird untersucht, ob andere Methoden wie neuronale Netze ein ähnliches oder sogar besseres Ergebnis hinsichtlich Accuracy liefern.
 
 ## Decision Trees
 
 Allgemeine Werte
-```{r}
+```{r define CV and seed, results='hide'}
 cv_5 = trainControl(method = "cv", number = 5)
 seed_val = 123
 ```
 
 
 Laden der gespeicherten Decision Tree Modelle
-```{r}
+```{r load RData, results='hide'}
 if (file.exists("decision_trees.RData"))
   load("decision_trees.RData")
 ```
@@ -811,7 +811,8 @@ if (file.exists("decision_trees.RData"))
 
 ### Decion Tree für Hunde
 
-```{r}
+Wie auch bei der Datensatzerstellung je Tierart werden im Folgenden pro Tierart Klassifikationsbäume mit 5-fold crossvalidation gefittet. Dafür werden alle Variablen im Datensatz und die Methode 'rpart' aus dem Caret Package verwendet, um eine Adoption vorherzusagen. 
+```{r tree dogs, results='hide'}
 set.seed(seed_val)
 
 if (!exists("tree_dog1"))
@@ -821,31 +822,34 @@ if (!exists("tree_dog1"))
     trControl = cv_5,
     method = "rpart")
 
-print(tree_dog1)
-
 ```
 
-```{r}
+Das gefittete Modell: 
+
+```{r print tree dogs, echo=FALSE}
+print(tree_dog1)
+```
+
+```{r confusion matrix dogs, echo=FALSE}
 pred_tree_dog1 <- predict(tree_dog1, testing_dog)
 conf_matrix_tree_dog1 <- confusionMatrix(pred_tree_dog1, testing_dog$outcome_type)
 conf_matrix_tree_dog1
 
 ```
 
-
-```{r}
+```{r model plot, echo=FALSE}
 rpart.plot(tree_dog1$finalModel)
 ```
 
-
+*Interpretation*
 Der Tree zeigt, dass zuerst time_in_shelter eine Rolle spielt und somit die erste Abzweigung im Baum ist. Als weitere Variable verwendet der Baum sex_upon_outcome_first_ Sterilized = 0.
-Wenn der Hund weniger als 4 Tage im Tierheim ist, scheint eine Adoption auf Basis des Modells also als unwahrscheinlich, wohingegen bei Hunden, die länger als 4 Tage im Tierheim verbleiben, die Wahrscheinlichkeit einer Adoption dann hoch ist, wenn der Hund sterilisiert ist. 
+Wenn der Hund weniger als 4 Tage im Tierheim ist, scheint eine Adoption auf Basis des Modells also als unwahrscheinlich (vermutlich handelt es sich dabei um entlaufene Tiere die bereits innerhalb der ersten 4 Tage wieder vom Besitzer abgeholt werden), wohingegen bei Hunden, die länger als 4 Tage im Tierheim verbleiben, die Wahrscheinlichkeit einer Adoption dann hoch ist, wenn der Hund sterilisiert ist. 
 
 Die Specitivity ist mit 87% um fast 20% höher als die Sensitivity, d.h. die Vorhersage von Hunden, die *nicht* adoptiert werden, ist genauer, als die für Hunde, die adoptiert werden. Gleichzeitig muss festgehalten werden, dass das Modell nur eine Accuracy von 76% hat, weshalb eine weitere Optimierung besonders sinnvoll erscheint. 
 
 ### Decion Tree für Katzen
 
-```{r}
+```{r cats tree, include==FALSE}
 set.seed(seed_val)
 if (!exists("tree_cat1"))
   tree_cat1 <- train(
@@ -854,30 +858,36 @@ if (!exists("tree_cat1"))
     trControl = cv_5,
     method = "rpart")
 
+
+```
+
+Das gefittete Modell: 
+
+```{r cats tree,  echo=FALSE}
 print(tree_cat1)
 ```
 
-```{r}
+```{r confusion matrix cats,  echo=FALSE}
 pred_tree_cat1 <- predict(tree_cat1, testing_cat)
 conf_matrix_tree_cat1 <- confusionMatrix(pred_tree_cat1, testing_cat$outcome_type)
 conf_matrix_tree_cat1
 
 ```
 
-
-```{r}
+```{r plot model cats, echo=FALSE}
 rpart.plot(tree_cat1$finalModel)
 ```
 
+*Interpretation*
 
 Bei Katzen ist sex_upon_outcome_first_Sterilized = 0 die erste Split Variable des Baumes, gefolgt von dem Alter und der Zeit, die die Katze im Tierheim verbracht hat.
-Daher scheinen für die Adoption einer Katze ähnliche Kriterien eine Rolle zu spielen als bei Hunden. Im Gegensatz zur Wahrscheinlichkeit einer Adoption eines Hundes spielt diesem Klassifikationsbaum zufolge auch das Alter der Katze eine Rolle: Wenn die Katze sterilisiert, und älter als ein halbes Jahr alt ist, ist eine Adoption wahrscheinlich. Ist die Katze jünger als ein halbes Jahr, hängt die Adoption davon ab, wie lange die Katze bereits im Tierheim war (Wahrscheinlich ist eine Adoption nämlich nur dann, wenn sie bereits länger als 12 Tage dort war).
-Dies könnte daran liegen, dass Jungtiere erst ab einem bestimmten Alter adoptiert werden können. 
+Daher scheinen für die Adoption einer Katze ähnliche Kriterien eine Rolle zu spielen, wie bei Hunden. Im Gegensatz zur Wahrscheinlichkeit einer Adoption eines Hundes spielt diesem Klassifikationsbaum zufolge auch das Alter der Katze eine Rolle: Wenn die Katze sterilisiert, und älter als ein halbes Jahr alt ist, ist eine Adoption wahrscheinlich. Ist die Katze jünger als ein halbes Jahr, hängt die Adoption davon ab, wie lange die Katze bereits im Tierheim war (Wahrscheinlich ist eine Adoption nämlich nur dann, wenn sie bereits länger als 12 Tage dort war).
+Dies könnte daran liegen, dass Jungtiere erst ab einem bestimmten Alter adoptiert (und sterilisiert) werden können. 
 
 Im Vergleich zum ersten Tree für die Vorhersage einer Adoption eines Hundes, zeigt sich beim Entscheidungsbaum für Katzen ohne Optimierung bereits eine bessere bzw. höhere Accuracy von über 80%. Auffallend ist im direkten Vergleich der Modelle vor allem auch, dass bei Katzen (umgekehrt als bei Hunden), die Adoption besser vorhergesagt werden kann (Sensitivity = 88%), als Fälle, in denen Katzen nicht adoptiert werden (Specitivity = 81,5%). 
 
 ### Decion Tree für Hasen
-```{r}
+```{r model fitting rabbits, include= FALSE}
 set.seed(seed_val)
 
 if (!exists("tree_rabbit1"))
@@ -886,44 +896,51 @@ if (!exists("tree_rabbit1"))
     data = training_rabbit,
     trControl = cv_5,
     method = "rpart")
+```
 
+Das gefittete Modell: 
+
+```{r print model, echo=FALSE}
 print(tree_rabbit1)
 ```
 
-```{r}
+```{r confusion matrix rabbits, echo=FALSE}
 pred_tree_rabbit1 <- predict(tree_rabbit1, testing_rabbit)
 conf_matrix_tree_rabbit1 <- confusionMatrix(pred_tree_rabbit1, testing_rabbit$outcome_type)
 conf_matrix_tree_rabbit1
-
 ```
 
-
-```{r}
+```{r model plot, echo=FALSE}
 rpart.plot(tree_rabbit1$finalModel)
 ```
 
+*Interpretation*
 
 Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0. Daher erfolgt die Vorhersage einer Adoption eines Hasens ausschließlich auf Basis der Information, ob das Tier sterilisiert ist. Wie auch bei den anderen Tieren ist die Adoptionswahrscheinlichkeit dann deutlich höher, wenn das Tier bereits sterilisiert ist.
 Die Accuracy ist mit 88% noch besser als jene der anderen beiden Trees (Hunde und Katzen). 
 
 
-### Save Decision Trees
-```{r}
+```{r save decision trees, include=FALSE}
 if (!file.exists("decision_trees.RData"))
   save(tree_dog1, tree_cat1, tree_rabbit1, file = "decision_trees.RData")
 
 ```
 
+## Variable Importance
+
+Die einfachen Klassifikationsbäume geben bereits einen guten ersten Einblick darin, welche Variablen für die Klassifikation bzw Splitpunkte vorrangig herangezogen werden. 
+Da sich zeigt, dass über die Tierarten hinweg die Hauptsplitpunkte auf ähnlichen Variablen basieren, soll mithilfe der Variable Importance ermittelt werden, ob noch weitere Zusatzinformationen aus den Modellen gewonnen werden können, die für das Tierheim für das bessere Verständnis von Adoptionsgründen genutzt werden kann. 
+Dafür wird die Variable Importance aus den obig erstellten Bäumen (je Tier) erstellt und beschrieben. 
+
 ### Variable Importance des Hundemodells
 
-```{r}
-?varImp
+```{r var imp dogs}
 importance <- varImp(tree_dog1)
 print(importance)
 plot(importance, top=20)
 ```
 
-Es ist ersichtlich, dass für den Decision Tree der Hunde lediglich 6 Prädiktoren eine Rolle spielen:
+Es ist ersichtlich, dass für den Decision Tree der Hunde 6 Prädiktoren eine Rolle spielen:
 * `sex_upon_outcome_first_Sterilized`
 * `sex_upon_outcome_first_Intact`
 * `time_in_shelter_days`
@@ -931,11 +948,11 @@ Es ist ersichtlich, dass für den Decision Tree der Hunde lediglich 6 Prädiktor
 * `age_upon_intake_.days.`
 * `intake_typeStray`
 
-Am wichtigsten sind die Variablen `sex_upon_outcome_first_Sterilized` und `sex_upon_outcome_first_Intact.`
+Die wichtigsten Variablen sind neben der bereits im Decisiontree als Splitpunkt ermittelten `sex_upon_outcome_first_Sterilized` auch das `sex_upon_outcome_first_Intact.`
 
 ### Variable Importance des Katzenmodells
 
-```{r}
+```{r, echo=FALSE}
 importance <- varImp(tree_cat1)
 print(importance)
 plot(importance, top=20)
@@ -948,11 +965,11 @@ Im Modell der Katzen finden sich ähnliche Prädiktoren wieder, hinzugekommen is
 * `sexuponoutcomesecond_unknown`
 * `intake_typeStray`
 
-Hier ist im Gegensatz zu den Hunden die `time_in_shelter` am wichtigsten.
+Hier ist im Gegensatz zu den Hunden das Alter der Tiere und die `time_in_shelter` am wichtigsten.
 
 ### Variable Importance des Hasenmodells
 
-```{r}
+```{r, echo=FALSE}
 importance <- varImp(tree_rabbit1)
 print(importance)
 plot(importance, top=20)
@@ -960,7 +977,7 @@ plot(importance, top=20)
 
 
 Hier ist wie im Modell der Hunde die Variable `sex_upon_outcome_first_Sterilized` am wichtigsten.
-Hier sind neben den bekannten Prädiktoren u.a. noch die Prädiktoren
+Neben den bekannten Prädiktoren sind u.a. noch die Prädiktoren
 * `intake_year2016`
 * `outcome_year2016`
 * `intake_year2015`
@@ -968,11 +985,7 @@ Hier sind neben den bekannten Prädiktoren u.a. noch die Prädiktoren
 * `outcome_year2014`
 von Bedeutung.
 
-
-## Neuronales Netzwerk
-Bei den neuronalen Netzen wird die Breed Variable ausgeschlossen, da sie schon bei den Bäumen als nicht relevant identifiziert wurde. Außerdem werden die numerischen Variablen intake_number, age_upon_intake_.days, age_upon_outcome_.days und time_in_shelter_days vorab min-max normalisiert, um die Geschwindigkeit der Berechnung zu verbessern bzw. bei den Hundedatenset konnte keine Berechnung aus Computer Performance technischen Gründen durchgeführt werden. Mit Normalisierung konnte, dann jedoch eine Berechnung durchgeführt werden.
-Es werden für jede Tierart jeweil zwei neuronale Netze erstellt, einmal mit allen Variabeln und einmal mit den Variablen die im Decision Tree schon als wichtig festgestellt wurden.
-
+Die Relevanz der Jahreszeiten lässt darauf schließen, dass die Adoptionen von Hasen sich über die Jahre hinweg unterscheiden. Was Grund für das Ausreißerjahr 2016 war, müsste anhand von Brancheninformationen ermittelt werden, es könnt z.B. sein, dass es vermehrte mediale Aufmerksamkeit (z.B. durch Kampagnen / Testimonials) oder eine Art "Haustiertrend-Boost" für Hasen in diesem Jahr gab. 
 
 
 
@@ -1092,15 +1105,23 @@ print(comp_table_trees)
 ```
 
 
+## Neuronales Netzwerk
 
-Laden der gespeicherten Neuronalen Netze Modelle
-```{r}
+Die Bäume dienen als gut interpretierbare Modelle für ein besseres Verständnis der Adoptionsgründe, nun soll noch getestet werden, ob ein Modell, dass primär auf Vorhersage, als auf Interpretierbarket abzielt, helfen kann, die Modellaccuracy noch weiter zu steigern. 
+Bei den neuronalen Netzen wird die Breed Variable ausgeschlossen, da sie  bei den Bäumen als nicht relevant identifiziert wurde. Außerdem werden die numerischen Variablen intake_number, age_upon_intake_.days, age_upon_outcome_.days und time_in_shelter_days vorab min-max normalisiert, um die Geschwindigkeit der Berechnung zu erhöhen (für das Hundedatenset konnte ohne Normalisierung aus Computer Performance technischen Gründen gar keine Berechnung  durchgeführt werden). Die Normalisierung ermöglichte dann eine (schnellere) Berechnung.
+Es werden für jede Tierart jeweil zwei neuronale Netze erstellt, einmal mit allen Variabeln und einmal mit den Variablen die im Decision Tree schon als wichtig festgestellt wurden. 
+
+Es wird erwartet, dass das Modell, das alle Variablen inkludiert, eine höhere Accuracy erzielt als jenes, das nur eine Teilmenge der Variablen enthält (weil die Mustererkennung unter Berücksichtigung von mehr Variablen genauer sein müsste). Andererseits soll auch getestet werden, ob ausschließlich unter Verwendung der (auf Basis der Variable Importance) wichtigsten Prädiktoren ein gleich gutes Ergebnis erzielt werden kann, wie mit dem gefitteten einfachen Baummodell.
+
+
+
+```{r load model, include=FALSE}
 if (file.exists("neuronale_netze.RData"))
   load("neuronale_netze.RData")
 ```
 
-Allgemeine Funktionen
-```{r}
+Definition von allgemeinen Funktionen
+```{r, output='hide'}
 maxidx <- function(arr) {
     return(which(arr == max(arr)))
 }
@@ -1113,12 +1134,17 @@ normalize <- function(x) {
 
 ### Neuronales Netz für Hunde
 
-Alle Variablen außer Breed
-```{r}
+Wie auch bei den Decision Trees wird pro Tierrasse ein Modell mit denselben Parametern wie für die anderen Tierrassen gefittet. 
+
+Modellfitting unter Verwendung aller Variablen (normalisiert) außer Breed: 
+```{r NN dogs, output='hide'}
 set.seed(seed_val)
 
+#Normalisierung der Daten
 training_dog_norm = training_dog
 training_dog_norm[c(2:5)] <- as.data.frame(lapply(training_dog_norm[c(2:5)], normalize))
+
+#'Fullmodel' Fitting
 
 if (!exists("net_model_dog"))
   net_model_dog <- neuralnet(outcome_type_adopt ~ .,
@@ -1130,8 +1156,8 @@ if (!exists("net_model_dog"))
                   act.fct = "logistic")
 ```
 
-Neuronales Netz mit time_in_shelter_days und sex_upon_intake_first_Sterilized
-```{r}
+Modellfitting mit einer Teilmenge/ Auswahl von Variablen (Auswahl auf Basis der Feature Importance): 
+```{r NN dogs selected Vars, output='hide'}
 set.seed(seed_val)
 
 if (!exists("net_model_dog_selected"))
@@ -1145,19 +1171,23 @@ if (!exists("net_model_dog_selected"))
 ```
 
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
-```{r}
+```{r plot NN selected, echo=FALSE}
 plot(net_model_dog_selected , rep="best")
 ```
+
 Verlgeich der Accuracy der Modelle
-```{r}
+```{r model accuracy }
+#Vorhersage und De-Normalisierung für Modell mit allen Variablen 
 pred_net_dog <- predict(net_model_dog,testing_dog[c(2:5,7:78)])
 idx <- apply(pred_net_dog, c(1), maxidx)
 pred_net_dog <-as.factor(c('0', '1')[idx])
 
+#Vorhersage und De-Normalisierung für Modell mit Teilmenge von Variablen 
 pred_net_dog_selected <- predict(net_model_dog_selected,testing_dog[c(2:5,7:78)])
 idx <- apply(pred_net_dog_selected, c(1), maxidx)
 pred_net_dog_selected <-as.factor(c('0', '1')[idx])
 
+#Confusion Matrizen für beide Modelle 
 cf_net_dog <- confusionMatrix(pred_net_dog,testing_dog$outcome_type_adopt)
 cf_net_dog_selected <- confusionMatrix(pred_net_dog_selected,testing_dog$outcome_type_adopt)
 
@@ -1165,10 +1195,12 @@ cat("All Variables: Accuracy", cf_net_dog$overall["Accuracy"], "\n")
 cat("Selected Variables: Accuracy", cf_net_dog_selected$overall["Accuracy"], "\n")
 ```
 
+*Interpreation*
+
+
 ### Neuronales Netz für Katzen
 
-Alle Variablen außer Breed
-```{r}
+```{r model fitting cats, include=FALSE}
 
 set.seed(seed_val)
 
@@ -1184,8 +1216,7 @@ if (!exists("net_model_cat"))
                   act.fct = "logistic")
 ```
 
-Neuronales Netz mit sex_upon_outcome_first_Sterilized, Alter und time_in_shelter
-```{r}
+```{r model fitting selected vars, include=FALSE}
 set.seed(seed_val)
 
 if (!exists("net_model_cat_selected"))
@@ -1197,14 +1228,13 @@ if (!exists("net_model_cat_selected"))
                   act.fct = "logistic")
 ```
 
-
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
-```{r}
+```{r plot cats model, echo=FALSE}
 plot(net_model_cat_selected , rep="best")
 ```
 
 Verlgeich der Accuracy der Modelle
-```{r}
+```{r, echo=FALSE}
 pred_net_cat <- predict(net_model_cat,testing_cat[,-6] )
 idx <- apply(pred_net_cat, c(1), maxidx)
 pred_net_cat <-as.factor(c('0', '1')[idx])
@@ -1221,12 +1251,11 @@ cat("All Variables: Accuracy", cf_net_cat$overall["Accuracy"], "\n")
 cat("Selected Variables: Accuracy", cf_net_cat_selected$overall["Accuracy"], "\n")
 ```
 
+*Interpretation*
 
 ### Neuronales Netz für Hasen
 
-Alle Variablen außer Breed
-```{r}
-
+```{r modell fitting rabbits all vars, include=FALSE}
 set.seed(seed_val)
 training_rabbit_norm = training_rabbit
 training_rabbit_norm[c(2:5)] <- as.data.frame(lapply(training_rabbit_norm[c(2:5)], normalize))
@@ -1240,8 +1269,7 @@ if (!exists("net_model_rabbit"))
                   act.fct = "logistic")
 ```
 
-Neuronales Netz mit sex_upon_outcome_first_Sterilized
-```{r}
+```{r model fitting selected vars, include=FALSE}
 set.seed(seed_val)
 if (!exists("net_model_rabbit_selected"))
   net_model_rabbit_selected <- neuralnet(outcome_type_adopt ~ sex_upon_outcome_first_Sterilized,
@@ -1253,12 +1281,12 @@ if (!exists("net_model_rabbit_selected"))
 ```
 
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
-```{r}
+```{r model plot, echo=FALSE}
 plot(net_model_rabbit_selected , rep="best")
 ```
 
 Verlgeich der Accuracy der Modelle
-```{r}
+```{r compare models, echo=FALSE}
 pred_net_rabbit <- predict(net_model_rabbit,testing_rabbit[c(2:5,7:78)])
 idx <- apply(pred_net_rabbit, c(1), maxidx)
 pred_net_rabbit <-as.factor(c('0', '1')[idx])
@@ -1272,8 +1300,11 @@ cf_net_rabbit_selected <- confusionMatrix(pred_net_rabbit_selected,testing_rabbi
 cat("All Variables: Accuracy", cf_net_rabbit$overall["Accuracy"], "\n")
 cat("Selected Variables: Accuracy", cf_net_rabbit_selected$overall["Accuracy"], "\n")
 ```
+
+### Vergleich aller Neuronalen Netzwerke 
+
 Tabelle der Accuracies aller neuronalen Netze
-```{r}
+```{r accuracies, echo=FALSE}
 accuracyTable = tibble(Tierart="Hunde", Accuracy_All=cf_net_dog$overall["Accuracy"], Accuracy_Selected_Features=cf_net_dog_selected$overall["Accuracy"])
 accuracyTable = add_row(accuracyTable, Tierart="Katzen", Accuracy_All=cf_net_cat$overall["Accuracy"], Accuracy_Selected_Features=cf_net_cat_selected$overall["Accuracy"])
 accuracyTable = add_row(accuracyTable, Tierart="Hasen", Accuracy_All=cf_net_rabbit$overall["Accuracy"], Accuracy_Selected_Features=cf_net_rabbit_selected$overall["Accuracy"])
@@ -1283,10 +1314,12 @@ kable(accuracyTable, align = "l") %>%
   footnote(general = "", general_title = "Tabelle 1: Accuracies der Neuronalen Netze")
 
 ```
-### Save Neuronale Netze
-```{r}
+
+```{r save NN models, include=FALSE}
 if (!file.exists("neuronale_netze.RData"))
   save(net_model_dog, net_model_dog_selected, net_model_cat, net_model_cat_selected, net_model_rabbit,net_model_rabbit_selected, file = "neuronale_netze.RData")
 ```
+
+#Conclusio
 
 ![](snoopy.png)
