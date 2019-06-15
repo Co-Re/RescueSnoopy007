@@ -1154,7 +1154,7 @@ cat("Selected Variables: Accuracy", cf_net_dog_selected$overall["Accuracy"], "\n
 
 *Interpretation*
 
-Die Accuracy 
+Die Accuracy des NNs für Hunde ist unter Berücksichtigung aller Variablen deutlich besser als unter Verwendung eines Subsets und übertrifft in der Accuracy auch den Decision Tree. 
 
 
 ### Neuronales Netz für Katzen
@@ -1219,6 +1219,8 @@ cat("All Variables: Accuracy", cf_net_cat$overall["Accuracy"], "\n")
 cat("Selected Variables: Accuracy", cf_net_cat_selected$overall["Accuracy"], "\n")
 ```
 *Interpretation*
+
+Die Accuracy des NNs für Katzen ist unter Berücksichtigung aller Variablen deutlich besser als unter Verwendung eines Subsets. Die Accuracy des Treemodels kann mit dem Neuronalen Netz nicht verbessert werden. 
 
 ### Neuronales Netz für Hasen
 
@@ -1290,6 +1292,17 @@ cf_nnet_rabbit <- confusionMatrix(pred_nnet_rabbit,testing_rabbit_norm$outcome_t
 cat("All Variables: Accuracy", cf_nnet_rabbit$overall["Accuracy"], "\n")
 ```
 
+*Interpretation*
+
+Die Accuracy des NNs für Hasen ist unter Berücksichtigung aller Variablen deutlich besser als unter Verwendung eines Subsets. Die Accuracy des Treemodels kann, wie auch bei den Katzen, mit dem Neuronalen Netz nicht mehr verbessert werden. 
+
+
+####Variablen Importance im NN
+
+Da die in den Bäumen ermittelten Variablen mit hoher Wichtigkeit für das Modell stark von jenen für Hunde und Katzen abweichen, wurde noch ein weiteres Neuronales Net (andere Library, die auch Einsicht der Variablen Importance des NNs ermöglicht) gefittet, um zu prüfen, inwiefern die Relevanz der Variablen im Neuronalen Netz von jenen abweicht, die im Tree ermittelt wurden.
+
+Neben der Sterilisation, die auch im Tree  eine der wichtigsten Variable darstellt, spielten vorrangig Monate und Jahre, in denen das Tier ins Tierheim gekommen ist bzw. das Tierheim verlassen hat, eine Rolle. Diese weichen leicht von den wichtigen Variablen ab, die im Tree als wichtig erachtet werden. Die Darstellung bestätigt aber jedenfalls nochmals, dass bei Hasen tatsächlich Saisoninformationen hilfreich dafür sind, die Adoption vorherzusagen.
+
 ```{r}
 imp_nn_s_rab = vi(nnet_model_rabbit)
 imp_nn_s_rab = imp_nn_s_rab[imp_nn_s_rab$Importance>5,]
@@ -1311,6 +1324,8 @@ kable(accuracyTable, align = "l") %>%
   footnote(general = "", general_title = "Tabelle 1: Accuracies der Neuronalen Netze")
 
 ```
+Bei allen Netzen ist die Accuracy unter Verwendung aller Features höher, als unter Verwendung eines Subsets, obwohl bei den Modellen für Katzen kaum ein Unterschied merkbar ist. 
+Wie auch bei den Bäumen ist die Accuracy für HUnde weiterhin am geringsten, konnte jedoch deutlich verbessert werden mit dem NN. 
 
 <details>
   <summary>Code Details</summary>
