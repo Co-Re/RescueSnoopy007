@@ -1313,6 +1313,6 @@ accuracy_compare_table = add_row(accuracy_compare_table, Modell="Neuronales Netz
 
 kable(accuracy_compare_table, align = "l") %>%
   kable_styling(bootstrap_options = "striped") %>%
-  footnote(general = "", general_title = "Tabelle 2: Test Accuracies der verschiedenen Netze")
+  footnote(general = "", general_title = "Tabelle 2: Test Accuracies der Modelle")
 ```
 ![](snoopy.png)
