@@ -1077,14 +1077,6 @@ if (!exists("net_model_dog"))
                   act.fct = "logistic")
 ```
 
-```{r}
-imp_nn = vi(net_model_dog)
-imp_nn = imp_nn[imp_nn$Importance>5,]
-imp_nn_tab = tibble(Variable = imp_nn$Variable, Importance = imp_nn$Importance)
-imp_nn_tab
-vip(net_model_dog, width = 0.5, fill = "green3")
-```
-
 Modellfitting mit einer Teilmenge/ Auswahl von Variablen (Auswahl auf Basis der Feature Importance): 
 ```{r NN dogs selected Vars, output='hide'}
 
@@ -1098,14 +1090,6 @@ if (!exists("net_model_dog_selected"))
                   threshold = 1, 
                   linear.output=T,
                   act.fct = "logistic")
-```
-
-```{r}
-imp_nn_s = vi(net_model_dog_selected)
-imp_nn_s = imp_nn_s[imp_nn_s$Importance>5,]
-imp_nn_s_tab = tibble(Variable = imp_nn_s$Variable, Importance = imp_nn_s$Importance)
-imp_nn_s_tab
-vip(net_model_dog_selected, width = 0.5, fill = "green3")
 ```
 
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
@@ -1154,14 +1138,6 @@ if (!exists("net_model_cat"))
                   act.fct = "logistic")
 ```
 
-```{r}
-imp_nn_cat = vi(net_model_cat)
-imp_nn_cat = imp_nn_cat[imp_nn_cat$Importance>5,]
-imp_nn_cat_tab = tibble(Variable = imp_nn_cat$Variable, Importance = imp_nn_cat$Importance)
-imp_nn_cat_tab
-vip(net_model_cat, width = 0.5, fill = "green3")
-```
-
 
 ```{r model fitting selected vars1, include=FALSE}
 set.seed(seed_val)
@@ -1174,15 +1150,6 @@ if (!exists("net_model_cat_selected"))
                   threshold = 1, 
                   act.fct = "logistic")
 ```
-
-```{r}
-imp_nn_s_cat = vi(net_model_cat_selected)
-imp_nn_s_cat = imp_nn_s_cat[imp_nn_s_cat$Importance>5,]
-imp_nn_s_cat_tab = tibble(Variable = imp_nn_s_cat$Variable, Importance = imp_nn_s_cat$Importance)
-imp_nn_s_cat_tab
-vip(net_model_cat_selected, width = 0.5, fill = "green3")
-```
-
 
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
 ```{r plot cats model, echo=FALSE}
@@ -1225,15 +1192,6 @@ if (!exists("net_model_rabbit"))
                   act.fct = "logistic")
 ```
 
-```{r}
-imp_nn_rab = vi(net_model_rabbit)
-imp_nn_rab = imp_nn_rab[imp_nn_rab$Importance>5,]
-imp_nn_rab_tab = tibble(Variable = imp_nn_rab$Variable, Importance = imp_nn_rab$Importance)
-imp_nn_rab_tab
-vip(net_model_rabbit, width = 0.5, fill = "green3")
-```
-
-
 ```{r model fitting selected vars2, include=FALSE}
 set.seed(seed_val)
 if (!exists("net_model_rabbit_selected"))
@@ -1243,14 +1201,6 @@ if (!exists("net_model_rabbit_selected"))
                   stepmax = 1000000,
                   threshold = 1, 
                   act.fct = "logistic")
-```
-
-```{r}
-imp_nn_s_rab = vi(net_model_rabbit_selected)
-imp_nn_s_rab = imp_nn_s_rab[imp_nn_s_rab$Importance>5,]
-imp_nn_s_rab_tab = tibble(Variable = imp_nn_s_rab$Variable, Importance = imp_nn_s_rab$Importance)
-imp_nn_s_rab_tab
-vip(net_model_rabbit_selected, width = 0.5, fill = "green3")
 ```
 
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
