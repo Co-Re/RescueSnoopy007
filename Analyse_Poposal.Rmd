@@ -1,14 +1,14 @@
 ---
-title: "Algorithmik & Statistik Lab 2: Analyse Proposal - 'Rescue Snoopy'"
+title: "Algorithmik & Statistik Lab 2: Finaler Bericht - 'Rescue Snoopy'"
 author: "Lara Knapwost - 1810837601, Cornelia Reithmeier - 1810837362, Isabelle Veitl - 1810837521, Anna Weber - 1810837818"
-date: '9. April 2019'
+date: '15. Juni 2019'
 output: 
   html_document:
     toc: TRUE
 urlcolor: cyan
 ---
 ***
-Unter dem Arbeitstitel "Rescue Snoopy" wurden in einem ersten Schritt folgende Daten ausgewählt, analysiert und das statistische Analyse-Interesse dargelegt.
+Unter dem Arbeitstitel "Rescue Snoopy" wurden in einem ersten Schritt die unten beschriebenen Daten ausgewählt, analysiert und das statistische Analyse-Interesse dargelegt.
 Die gemeinsame Arbeit an diesem Projekt wird über Github abgewickelt und dokumentiert: https://github.com/Co-Re/RescueSnoopy007
  
 
@@ -45,7 +45,7 @@ Neben diesen Variablen existierten weitere, die beispielsweise Zeiträume in ein
 
 ## Hintergrundinformationen zum Datenset
 Die Daten wurden vom [Austin Animal Center](http://www.austintexas.gov/department/aac) erhoben. Dieses Animal Center ist das größte Tierheim in den USA, in dem keine Tiere getötet werden und kann bis zu 18.000 Tiere pro Jahr aufnehmen. Es werden alle Arten von Tieren aufgenommen. Das Tierheim befindet sich im Travis County im US-Bundesstaat Texas.
-Die Daten werden im Rahmen der Austin's Open Data Intitiative online bereitgestellt.  
+Die Daten werden im Rahmen der Austin Open Data Intitiative online bereitgestellt.  
 
 Das Datenset enthält n = 79.672 Observationen und 41 Variablen.   
 Die Daten stammen aus der Zeit zwischen Oktober 2013 bis April 2018 (Outcomes).  
@@ -56,10 +56,10 @@ Knapp die Hälfte der im Datenset enthaltenen Tiere wurde adoptiert.
 ## Statistische Lernaufgabe
 Im Rahmen der Gruppenarbeit soll folgendes Klassifikationsproblem betrachtet werden:
 
-Vorhersage des Outcome-Types auf Basis der gegebenen Variablen. Die initale Idee war es, die Prädiktoren zu finden, anhand derer eine Rückgabe an den Besitzer, ein Transfer / eine Adoption, Euthanasie, Tod etc. möglichst genau (durch Vorhersage der Klasse) vorhergesagt werden können. Eine detaillierte Auseinandersetzung bzw. im Zuge des Preprocessings stellte sich heraus, dass für viele der angeführten Outcome-Types wenige Fälle vorhanden sind, sodass eine Modellierung ohne Overfitting schwierig erscheint. Deshalb wurde während des Projektes bzw. zu Ende des Preprocessings redefiniert bzw. eingeschränkt auf Tierarten mit mindestens n=500 und ausschließlich den Outcometype Adoption. 
+Vorhersage des Outcome-Types auf Basis der gegebenen Variablen. Die initale Idee war es, die Prädiktoren zu finden, anhand derer eine Rückgabe an den Besitzer, ein Transfer / eine Adoption, Euthanasie, Tod etc. möglichst genau (durch Vorhersage der Klasse) vorhergesagt werden können. Im Zuge des Preprocessings und nach detaillierten Auseinandersetzungen stellte sich heraus, dass für viele der angeführten Outcome-Typen wenige Fälle vorhanden sind, sodass eine Modellierung ohne Overfitting schwierig erscheint. Deshalb wurde während des Projektes bzw. zu Ende des Preprocessings der Datensatz auf Tierarten mit mindestens n=500 eingeschränkt und ausschließlich der Outcome-Type Adoption verwendet. 
 
 ## Motivation
-Es gibt viele Tierheime, durch Hörensagen ist bekannt, dass in vielen davon eine Großzahl der Tiere einen beträchtlichen Teil ihres Lebens verbringen. 
+Es gibt viele Tierheime und durch Hörensagen ist bekannt, dass in vielen davon eine Großzahl der Tiere einen beträchtlichen Teil ihres Lebens verbringen. 
 Es ist interessant für uns, herauszufinden, welche Aspekte ausschlaggebend dafür sind, ob das Tier (vor dem Tod) wieder aus dem Tierheim "entlassen" wird, d.h. einen neuen Besitzer findet. Wir haben einige Hypothesen, welche wir prüfen möchten. Wir gehen davon aus, dass vor allem jüngere, gesunde Tiere eine bessere Chance haben, als ältere, kranke, ggf. auch nicht kastrierte (Streuner-)Tiere, die bereits sehr lange im Tierheim sind.   
 Weiß man, welche Aspekte eine Rolle spielen, könnte man diese gezielt in den Tierheimen in der Kommunikation verwenden, um mehr Tieren (z.B. vor allem jenen, die grundsätzlich eine schlechtere Chance für eine Adoption haben) ein neues zu Hause zu geben.   
 Wir haben uns für dieses Datenset mit dieser Fragestellung entschieden, da einige von uns selbst Haustiere besitzen und wir den Eindruck haben, dass es bereits ausreichend viele Analysen zu ökonomischen Fragestellungen gibt.
@@ -92,15 +92,20 @@ aac_intakes_outcomes = read.csv("aac_intakes_outcomes.csv")
 ```
 
 ## Überprüfung der Datenstruktur
-```{r check structure, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r check structure}
 str(aac_intakes_outcomes)
 # Andrucken der ersten Datensätze
 head(aac_intakes_outcomes)
 ```
-
-```{r summary1, include=FALSE}
+</details>
+<details>
+  <summary>Code Details</summary>
+```{r summary1}
 summary(aac_intakes_outcomes)
 ```
+</details>
 
 ### Datenbereinigung I - Konvertieren der Datentypen
 ```{r datatypes}
@@ -141,31 +146,35 @@ aac_intakes_outcomes$intake_hour <- as.factor(hour(aac_intakes_outcomes$intake_d
 ### Anmerkungen für weitere Preprocessing Schritte
 
 Folgende Animal-Types sind vorhanden:
-Unter Other verbergen sich großteils unterschiedliche Nage- und Säugetiere bzw. Kleintiere, die in einem folgenden Datenaufbereitungsschritt feingliedriger aufgedrosselt werden.
-
 ```{r table animals, echo=FALSE}
 table(aac_intakes_outcomes$animal_type)
 ```
 
-Folgende Kombinationen sind bei der Zeugungsfähigkeit des Geschlechts möglich, wobei in den Zeilen der Zustand bei Aufnahme im Tierheim dargestellt wird, in den Spalten bei Verlassen:
+Unter Other verbergen sich großteils unterschiedliche Nage- und Säugetiere bzw. Kleintiere, die in einem folgenden Datenaufbereitungsschritt feingliedriger aufgedrosselt werden.
+
+Folgende Kombinationen sind bei der Zeugungsfähigkeit des Geschlechts möglich, wobei in den Zeilen der Zustand bei Aufnahme im Tierheim dargestellt wird, in den Spalten der Zustand beim Verlassen:
 
 ```{r crosstable1, echo=FALSE}
 table(aac_intakes_outcomes$sex_upon_intake_first, aac_intakes_outcomes$sex_upon_outcome_first) 
 
 ```
-Unplausible Fälle (Kastrierter Income, Nichtkastrierter Outcome) werden im Zuge der Datenaufbereitung zu Unknown rekategorisiert.
+Unplausible Fälle (kastrierter Income, nichtkastrierter Outcome) werden im Zuge der Datenaufbereitung zu Unknown rekategorisiert.
 
 
 ### Erstellung eines neuen Datasets und Entfernung von Variablen
-Dieses enthält nicht alle Variablen. Im Folgenden findet sich eine Auflistung der entfernten Variablen, sowie eine Begründung, weshalb einige Daten nicht für die Analyse miteinbezogen werden. 
+Das neue Dataset enthält nicht alle Variablen. 
 
-```{r create new dataframe, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r create new dataframe}
 aac_intakes_outcomes2 <- aac_intakes_outcomes[c(5, 22:24, 26, 27, 43, 42, 44, 3, 17, 18, 33:35, 39, 10:12, 30, 7, 40, 41)]
 ```
+</details>
 
+Im Folgenden findet sich eine Auflistung der entfernten Variablen, sowie eine Begründung, weshalb einige Daten nicht für die Analyse miteinbezogen werden. 
 Folgende Variablen wurden für das neue Dataset nicht verwendet:
 
-* `found_location` - Diese Variable bietet keine gute Datenqualität, es sind nicht immer gleiche Daten erfasst (z.B. manchmal Ortsname, manchmal komplette Adresse). Eine Bereinigung bzw. Kürzung auf den Ortsnamen bringt keinen Erkenntnisgewinn für das Modell, da alle Aufnahmen in derselben Region stattfanden und einzig über die Adressangabe Subregionen miteinander vergleichbar würden. 
+* `found_location` - Diese Variable bietet keine gute Datenqualität, es sind nicht immer gleiche Daten erfasst (z.B. manchmal Ortsname, manchmal komplette Adresse). Eine Bereinigung bzw. Kürzung auf den Ortsnamen bringt keinen Erkenntnisgewinn für das Modell, da alle Aufnahmen in derselben Region stattfanden und einzig über die Adressangabe Subregionen miteinander vergleichbar wären. 
 * `sex_open_intake` - Diese Variable enthält die selben Daten wie `sex_open_outcome`, ist daher redundant.
 
 ```{r crosstable2, echo=FALSE}
@@ -226,7 +235,7 @@ summary(aac_intakes_outcomes2)
 ```
 
 Für die Prüfung werden zuerst alle Ausprägungen der Response `outcome_type` angesehen und bereinigt. 
-```{r check uniques, results='hide'}
+```{r check uniques}
 unique(aac_intakes_outcomes2$outcome_type)
 table(aac_intakes_outcomes2$outcome_type)
 ```
@@ -240,18 +249,22 @@ aac_intakes_outcomes2$outcome_type <- factor(aac_intakes_outcomes2$outcome_type)
 
 ## Anpassen des Animal Types Other
 
-Auf Basis der Breed Variable wird die fehlende Information der Tierrasse aufgefüllt. 
+Auf Basis der Breed Variable wird die fehlende Information der Tierrasse (Ausprägung Other) aufgefüllt. 
 
-```{r, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r}
 others = aac_intakes_outcomes2[aac_intakes_outcomes2$animal_type  == "Other", ] 
 ```
+</details>
 
 ```{r count others, echo=FALSE, fig.cap = "Anzahl der Tiere, deren Animaltype Information fehlt"}
 count(others)
 ```
 
-
-```{r recode animal_type, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r recode animal_type}
 
 # Erstellen eines csv files um die verschiedenen Rassen Tieren zuordnen zu können 
 # write.csv(count(others$breed), file = "breed.csv", append = FALSE, quote = TRUE, sep = " ",
@@ -307,6 +320,7 @@ aac_intakes_outcomes2 = tmp_aac
 aac_intakes_outcomes2$animal_type <- as.factor(aac_intakes_outcomes2$animal_type)
 
 ```
+</details>
 
 Nach Bereinigung der Variable liegt folgende Verteilung vor:
 ```{r after cleaning animaltype, echo=FALSE}
@@ -322,7 +336,9 @@ Um die Anzahl der Ausprägungen, welche im Originaldatenset hoch ist (knapp 100 
 sort(table(aac_intakes_outcomes2$color),decreasing=T)
 ```
 
-```{r clean color, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r clean color}
 #Zusammenfassen der Farben 
 aac_intakes_outcomes2$color_new <-
 gsub("Brown/Brown|Sable|Chocolate|Agouti|Liver", "Brown", aac_intakes_outcomes2$color)
@@ -349,6 +365,7 @@ aac_intakes_outcomes2$color_new <- as.factor(aac_intakes_outcomes2$color_new)
 aac_intakes_outcomes2 <- aac_intakes_outcomes2[,-4]
 
 ```
+</details>
 
 Nach Bereinigung der Variable konnte die Anzahl an Farben extrem reduziert werden:
 ```{r table5, echo= FALSE}
@@ -360,7 +377,9 @@ table(aac_intakes_outcomes2$color_new)
 Da die bestehenden Alters-/Zeitangaben teilweise nicht mit den Datumsangaben übereingestimmt haben, werden diese neu berechnet bzw. überprüft.
 Beim Alter bei Intake bzw. Outcome kommen dabei auch negative Werte vor. Zum Teil kann darauf geschlossen werden, dass das trächtige Muttertier vor der Geburt eingeliefert wurde und somit das Alter des Nachwuchs beim Intake im Minusbereich lag. In diesen Fällen wird es auf 0 gesetzt. Andere unschlüssige Fälle werden exkludiert.
 
-```{r calculate age, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r calculate age}
 # Age upon intake
 dtime <- round(difftime(aac_intakes_outcomes2$intake_datetime, aac_intakes_outcomes2$date_of_birth,
          units = c("days")))
@@ -398,21 +417,26 @@ aac_intakes_outcomes2$age_upon_intake_.days.[aac_intakes_outcomes2$age_upon_inta
 aac_intakes_outcomes2$time_in_shelter <- NULL
 
 ```
+</details>
 
-```{r check recodings2, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r check recodings2}
 # Kontrolle, dass Alter bei Outcome immer höher ist als bei Intake
 aac_intakes_outcomes_temp2 <- 
   aac_intakes_outcomes2[aac_intakes_outcomes2$age_upon_intake_.days. >
                         aac_intakes_outcomes2$age_upon_outcome_.days., ]
 ```
-
+</details>
 
 ## Anpassen der Zeugungsfähigkeit
 
 Bei Analyse der Daten wurde bemerkt, dass 3 Beobachtungen bei den Geschlechtsmerkmalen fehlerhaft sein müssen, da Intake und Outcome-Wert nicht zusammengepasst haben (siehe oben bei Anmerkungen zu Datenset). Bei diesen Beobachtungen war das Merkmal bei Intake Neutered/Spayed und bei Outcome Intact. Es wurde daher entschieden, dass diese Datensätze behalten werden und die Werte durch "Unknown" ersetzt werden.   
 Da Neutered und Spayed unterschiedliche Wordings für die Sterilisation der weiblichen bzw. männlichen Tiere sind, wurden diese vereinheitlicht in der Ausprägung "Sterilized" zusammengefasst.
 
-```{r recode sterilized, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r recode sterilized}
 detectwrong <- function(v1,c1,v2,c2,x) {ifelse((v1==c1)&(v2==c2),"Unknown",x)}
 
 aac_intakes_outcomes2$sex_upon_intake_first_new <- detectwrong(
@@ -462,6 +486,7 @@ aac_intakes_outcomes2$sex_upon_outcome_first <- NULL
 names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_intake_first_new"] <- "sex_upon_intake_first"
 names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_outcome_first_new"] <- "sex_upon_outcome_first"
 ```
+</details>
 
 
 ## Einschränkung der Tierarten 
@@ -501,10 +526,13 @@ a+geom_bar(aes(fill = outcome_type))
 
 ```
 
-```{r check numerics, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r check numerics}
 types <- table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type)
 types[order(types[,1], decreasing=T),]
 ```
+</details>
 
 ## Einschränkung des OutcomeTypes
 
@@ -516,7 +544,9 @@ Da der Anteil bei Wildtieren, die eingeschläfert werden, sehr hoch ist, liegen 
 
 Im Folgenden wird deshalb der Datensatz weiter reduziert (durch Entfernung der Wildtiere), es sollen ausschließlich Hunde, Katzen und Hasen verbleiben. Es wird eine neue Variable erstellt, die binär codiert angibt, ob das jeweilige Tier adoptiert wurde. 
 
-```{r remove wild animals and dummycode adoption, warning=FALSE, message=FALSE, include = FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r remove wild animals and dummycode adoption, warning=FALSE, message=FALSE}
 #entferne wildtiere
 
 aac_intakes_outcomes_3 <- subset(aac_intakes_outcomes2, animal_type  == "Dog" | animal_type == "Cat" | aac_intakes_outcomes2$animal_type  == "Rabbit")
@@ -530,16 +560,17 @@ dummies_outcometype <- dummy.data.frame(dummies_outcometype)
 aac_intakes_outcomes_3$outcome_type_adopt <- dummies_outcometype[,1]
 
 ```
+</details>
 
-```{r check recoding2, include=FALSE, message=FALSE, warning=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r check recoding2 and merge datasets, message=FALSE, warning=FALSE}
 aac_intakes_outcomes_3$outcome_type <- factor(aac_intakes_outcomes_3$outcome_type)
 table(aac_intakes_outcomes_3$outcome_type, aac_intakes_outcomes_3$outcome_type_adopt)
-```
 
-```{r merge datasets, include=FALSE}
 aac_intakes_outcomes2 <- aac_intakes_outcomes_3
 ```
-
+</details>
 
 ### Adoptionen nach Tieren
 
@@ -551,18 +582,25 @@ b<- ggplot(aac_intakes_outcomes2, aes(animal_type))+geom_bar(fill = "#0073C2FF")
 b+geom_bar(aes(fill = outcome_type_adopt))
 
 ```
-
 ```{r table6, include=FALSE}
 t<-table(aac_intakes_outcomes2$outcome_type_adopt, aac_intakes_outcomes2$animal_type)
 t
 
 #Relative Anteile der Outcometypes
 table<- prop.table(t,2)
+
+<details>
+  <summary>Code Details</summary>
+```{r table6}
+table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adopt)
 ```
+</details>
 
 Da ein erster Testlauf/Fitting des Datensatzes mit einem Decision Tree aufgrund der Datenstrukturen wenig performant ist, wurden die Daten überwiegend Dummycodiert um ein schnelleres Training zu erzielen. 
 
-```{r recode dummies, warning=FALSE, message=FALSE, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r recode dummies, warning=FALSE, message=FALSE}
 #Löschung unbenötigter Spalten: outcometype (alle types) &date_of_birth_month & year
 
 aac_intakes_outcomes2 <- aac_intakes_outcomes2[,c(2:6,9:20)]
@@ -678,6 +716,7 @@ aac_intakes_outcomes2[ ,c('intake_condition', 'intake_type', 'sex_upon_outcome_s
 
 
 ```
+</details>
 
 # Finale Datensätze zur Modellierung
 
@@ -713,7 +752,9 @@ cats <- cats[,-c(1)]
 ```
 
 ### Train Test Split - alle Tierarten
-```{r, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r}
 
 train_function <- createDataPartition(
   y = allanimals$outcome_type_adopt,
@@ -723,8 +764,8 @@ train_function <- createDataPartition(
 
 training <- allanimals[ train_function,]
 testing  <- allanimals[-train_function,]
-
 ```
+</details>
 
 ### Train/Test Split für Hunde
 
@@ -742,7 +783,9 @@ testing_dog  <- dogs[-train_function,]
 ```
 
 ### Train/Test Split für Katzen
-```{r, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r}
 train_function <- createDataPartition(
   y = cats$outcome_type_adopt,
   p = .70,
@@ -752,9 +795,12 @@ train_function <- createDataPartition(
 training_cat <- cats[ train_function,]
 testing_cat  <- cats[-train_function,]
 ```
+</details>
 
 ### Train/Test Split für Hasen
-```{r, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r}
 train_function <- createDataPartition(
   y = rabbits$outcome_type_adopt,
   p = .70,
@@ -764,6 +810,7 @@ train_function <- createDataPartition(
 training_rabbit <- rabbits[ train_function,]
 testing_rabbit  <- rabbits[-train_function,]
 ```
+</details>
 
 ***
 
@@ -798,7 +845,6 @@ if (!exists("tree_dog1"))
     data = training_dog,
     trControl = cv_5,
     method = "rpart")
-
 ```
 
 Das gefittete Modell: 
@@ -811,7 +857,6 @@ print(tree_dog1)
 pred_tree_dog1 <- predict(tree_dog1, testing_dog)
 conf_matrix_tree_dog1 <- confusionMatrix(pred_tree_dog1, testing_dog$outcome_type)
 conf_matrix_tree_dog1
-
 ```
 
 ```{r model plot, echo=FALSE}
@@ -825,8 +870,9 @@ Wenn der Hund weniger als 4 Tage im Tierheim ist, scheint eine Adoption auf Basi
 Die Specificity ist mit 87% um fast 20% höher als die Sensitivity, d.h. die Vorhersage von Hunden, die *nicht* adoptiert werden, ist genauer, als die für Hunde, die adoptiert werden. Gleichzeitig muss festgehalten werden, dass das Modell nur eine Accuracy von 76% hat, weshalb eine weitere Optimierung besonders sinnvoll erscheint. 
 
 ### Decision Tree für Katzen
-
-```{r cats tree1, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r cats tree1}
 set.seed(seed_val)
 if (!exists("tree_cat1"))
   tree_cat1 <- train(
@@ -834,9 +880,8 @@ if (!exists("tree_cat1"))
     data = training_cat,
     trControl = cv_5,
     method = "rpart")
-
-
 ```
+</details>
 
 Das gefittete Modell: 
 
@@ -848,7 +893,6 @@ print(tree_cat1)
 pred_tree_cat1 <- predict(tree_cat1, testing_cat)
 conf_matrix_tree_cat1 <- confusionMatrix(pred_tree_cat1, testing_cat$outcome_type)
 conf_matrix_tree_cat1
-
 ```
 
 ```{r plot model cats, echo=FALSE}
@@ -864,7 +908,9 @@ Dies könnte daran liegen, dass Jungtiere erst ab einem bestimmten Alter adoptie
 Im Vergleich zum ersten Tree für die Vorhersage einer Adoption eines Hundes, zeigt sich beim Entscheidungsbaum für Katzen ohne Optimierung bereits eine bessere bzw. höhere Accuracy von über 80%. Auffallend ist im direkten Vergleich der Modelle vor allem auch, dass bei Katzen (umgekehrt als bei Hunden), die Adoption besser vorhergesagt werden kann (Sensitivity = 88%), als Fälle, in denen Katzen nicht adoptiert werden (Specificity = 81,5%). 
 
 ### Decision Tree für Hasen
-```{r model fitting rabbits, include= FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r model fitting rabbits}
 set.seed(seed_val)
 
 if (!exists("tree_rabbit1"))
@@ -874,6 +920,7 @@ if (!exists("tree_rabbit1"))
     trControl = cv_5,
     method = "rpart")
 ```
+</details>
 
 Das gefittete Modell: 
 
@@ -896,12 +943,14 @@ rpart.plot(tree_rabbit1$finalModel)
 Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0. Daher erfolgt die Vorhersage einer Adoption eines Hasens ausschließlich auf Basis der Information, ob das Tier sterilisiert ist. Wie auch bei den anderen Tieren ist die Adoptionswahrscheinlichkeit dann deutlich höher, wenn das Tier bereits sterilisiert ist.
 Die Accuracy ist mit 88% noch besser als jene der anderen beiden Trees (Hunde und Katzen). 
 
-
-```{r save decision trees, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r save decision trees}
 if (!file.exists("decision_trees.RData"))
   save(tree_dog1, tree_cat1, tree_rabbit1, file = "decision_trees.RData")
 
 ```
+</details>
 
 ## Variable Importance
 
@@ -916,6 +965,7 @@ imp_dog_tab = tibble(Variable = imp_dog$Variable, Importance = imp_dog$Importanc
 imp_dog_tab
 vip(tree_dog1, width = 0.5, fill = "green3")
 ```
+
 Die einfachen Klassifikationsbäume geben bereits einen guten ersten Einblick darin, welche Variablen für die Klassifikation bzw Splitpunkte vorrangig herangezogen werden. 
 Da sich zeigt, dass über die Tierarten hinweg die Hauptsplitpunkte auf ähnlichen Variablen basieren, soll mithilfe der Variable Importance ermittelt werden, ob noch weitere Zusatzinformationen aus den Modellen gewonnen werden können, die für das Tierheim für das bessere Verständnis von Adoptionsgründen genutzt werden kann. 
 Dafür wird die Variable Importance aus den obig erstellten Bäumen (je Tier) erstellt und beschrieben. 
@@ -1015,11 +1065,13 @@ Es werden für jede Tierart jeweils zwei neuronale Netze erstellt, einmal mit al
 Es wird erwartet, dass das Modell, das alle Variablen inkludiert, eine höhere Accuracy erzielt als jenes, das nur eine Teilmenge der Variablen enthält (weil die Mustererkennung unter Berücksichtigung von mehr Variablen genauer sein müsste). Andererseits soll auch getestet werden, ob ausschließlich unter Verwendung der (auf Basis der Variable Importance) wichtigsten Prädiktoren ein gleich gutes Ergebnis erzielt werden kann, wie mit dem gefitteten einfachen Baummodell.
 
 
-
-```{r load model, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r load model}
 if (file.exists("neuronale_netze.RData"))
   load("neuronale_netze.RData")
 ```
+</details>
 
 Definition von allgemeinen Funktionen
 ```{r, output='hide'}
@@ -1040,9 +1092,13 @@ Modellfitting unter Verwendung aller Variablen (normalisiert) außer Breed:
 ```{r NN dogs, output='hide'}
 set.seed(seed_val)
 
-#Normalisierung der Daten
+#Normalisierung der numerischen Variablen (Spalten 2-5)
 training_dog_norm = training_dog
 training_dog_norm[c(2:5)] <- as.data.frame(lapply(training_dog_norm[c(2:5)], normalize))
+
+testing_dog_norm = testing_dog
+testing_dog_norm[c(2:5)] <- as.data.frame(lapply(testing_dog_norm[c(2:5)], normalize))
+
 
 #'Fullmodel' Fitting
 
@@ -1054,14 +1110,6 @@ if (!exists("net_model_dog"))
                   threshold = 1, 
                   linear.output=T,
                   act.fct = "logistic")
-```
-
-```{r}
-imp_nn = vi(net_model_dog)
-imp_nn = imp_nn[imp_nn$Importance>5,]
-imp_nn_tab = tibble(Variable = imp_nn$Variable, Importance = imp_nn$Importance)
-imp_nn_tab
-vip(net_model_dog, width = 0.5, fill = "green3")
 ```
 
 Modellfitting mit einer Teilmenge/ Auswahl von Variablen (Auswahl auf Basis der Feature Importance): 
@@ -1079,14 +1127,6 @@ if (!exists("net_model_dog_selected"))
                   act.fct = "logistic")
 ```
 
-```{r}
-imp_nn_s = vi(net_model_dog_selected)
-imp_nn_s = imp_nn_s[imp_nn_s$Importance>5,]
-imp_nn_s_tab = tibble(Variable = imp_nn_s$Variable, Importance = imp_nn_s$Importance)
-imp_nn_s_tab
-vip(net_model_dog_selected, width = 0.5, fill = "green3")
-```
-
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
 ```{r plot NN selected, echo=FALSE}
 plot(net_model_dog_selected , rep="best")
@@ -1095,18 +1135,18 @@ plot(net_model_dog_selected , rep="best")
 Verlgeich der Accuracy der Modelle
 ```{r model accuracy1 }
 #Vorhersage und De-Normalisierung für Modell mit allen Variablen 
-pred_net_dog <- predict(net_model_dog,testing_dog[c(2:5,7:78)])
+pred_net_dog <- predict(net_model_dog,testing_dog_norm[c(2:5,7:78)])
 idx <- apply(pred_net_dog, c(1), maxidx)
 pred_net_dog <-as.factor(c('0', '1')[idx])
 
 #Vorhersage und De-Normalisierung für Modell mit Teilmenge von Variablen 
-pred_net_dog_selected <- predict(net_model_dog_selected,testing_dog[c(2:5,7:78)])
+pred_net_dog_selected <- predict(net_model_dog_selected,testing_dog_norm[c(2:5,7:78)])
 idx <- apply(pred_net_dog_selected, c(1), maxidx)
 pred_net_dog_selected <-as.factor(c('0', '1')[idx])
 
 #Confusion Matrizen für beide Modelle 
-cf_net_dog <- confusionMatrix(pred_net_dog,testing_dog$outcome_type_adopt)
-cf_net_dog_selected <- confusionMatrix(pred_net_dog_selected,testing_dog$outcome_type_adopt)
+cf_net_dog <- confusionMatrix(pred_net_dog,testing_dog_norm$outcome_type_adopt)
+cf_net_dog_selected <- confusionMatrix(pred_net_dog_selected,testing_dog_norm$outcome_type_adopt)
 
 cat("All Variables: Accuracy", cf_net_dog$overall["Accuracy"], "\n")
 cat("Selected Variables: Accuracy", cf_net_dog_selected$overall["Accuracy"], "\n")
@@ -1118,13 +1158,18 @@ Die Accuracy
 
 
 ### Neuronales Netz für Katzen
-
-```{r model fitting cats, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r model fitting cats}
 
 set.seed(seed_val)
 
 training_cat_norm = training_cat
 training_cat_norm[c(2:5)] <- as.data.frame(lapply(training_cat_norm[c(2:5)], normalize))
+
+testing_cat_norm = testing_cat
+testing_cat_norm[c(2:5)] <- as.data.frame(lapply(testing_cat_norm[c(2:5)], normalize))
+
 
 if (!exists("net_model_cat"))
   net_model_cat <- neuralnet(outcome_type_adopt ~ .,
@@ -1134,17 +1179,11 @@ if (!exists("net_model_cat"))
                   threshold = 1, 
                   act.fct = "logistic")
 ```
+</details>
 
-```{r}
-imp_nn_cat = vi(net_model_cat)
-imp_nn_cat = imp_nn_cat[imp_nn_cat$Importance>5,]
-imp_nn_cat_tab = tibble(Variable = imp_nn_cat$Variable, Importance = imp_nn_cat$Importance)
-imp_nn_cat_tab
-vip(net_model_cat, width = 0.5, fill = "green3")
-```
-
-
-```{r model fitting selected vars1, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r model fitting selected vars1}
 set.seed(seed_val)
 
 if (!exists("net_model_cat_selected"))
@@ -1155,15 +1194,7 @@ if (!exists("net_model_cat_selected"))
                   threshold = 1, 
                   act.fct = "logistic")
 ```
-
-```{r}
-imp_nn_s_cat = vi(net_model_cat_selected)
-imp_nn_s_cat = imp_nn_s_cat[imp_nn_s_cat$Importance>5,]
-imp_nn_s_cat_tab = tibble(Variable = imp_nn_s_cat$Variable, Importance = imp_nn_s_cat$Importance)
-imp_nn_s_cat_tab
-vip(net_model_cat_selected, width = 0.5, fill = "green3")
-```
-
+</details>
 
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
 ```{r plot cats model, echo=FALSE}
@@ -1172,30 +1203,35 @@ plot(net_model_cat_selected , rep="best")
 
 Verlgeich der Accuracy der Modelle
 ```{r, echo=FALSE}
-pred_net_cat <- predict(net_model_cat,testing_cat[,-6] )
+pred_net_cat <- predict(net_model_cat,testing_cat_norm[c(2:5,7:78)] )
 idx <- apply(pred_net_cat, c(1), maxidx)
 pred_net_cat <-as.factor(c('0', '1')[idx])
 
-cf_net_cat <- confusionMatrix(pred_net_cat,testing_cat$outcome_type_adopt)
+cf_net_cat <- confusionMatrix(pred_net_cat,testing_cat_norm$outcome_type_adopt)
 
-pred_net_cat_selected <- predict(net_model_cat_selected,testing_cat[,-6] )
+pred_net_cat_selected <- predict(net_model_cat_selected,testing_cat_norm[c(2:5,7:78)] )
 idx <- apply(pred_net_cat_selected, c(1), maxidx)
 pred_net_cat_selected <-as.factor(c('0', '1')[idx])
 
-cf_net_cat_selected  <- confusionMatrix(pred_net_cat_selected,testing_cat$outcome_type_adopt)
+cf_net_cat_selected  <- confusionMatrix(pred_net_cat_selected,testing_cat_norm$outcome_type_adopt)
 
 cat("All Variables: Accuracy", cf_net_cat$overall["Accuracy"], "\n")
 cat("Selected Variables: Accuracy", cf_net_cat_selected$overall["Accuracy"], "\n")
 ```
-
 *Interpretation*
 
 ### Neuronales Netz für Hasen
 
-```{r modell fitting rabbits all vars, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r modell fitting rabbits all vars}
 set.seed(seed_val)
 training_rabbit_norm = training_rabbit
 training_rabbit_norm[c(2:5)] <- as.data.frame(lapply(training_rabbit_norm[c(2:5)], normalize))
+
+testing_rabbit_norm = testing_rabbit
+testing_rabbit_norm[c(2:5)] <- as.data.frame(lapply(testing_rabbit_norm[c(2:5)], normalize))
+
 
 if (!exists("net_model_rabbit"))
   net_model_rabbit <- neuralnet(outcome_type_adopt ~ .,
@@ -1205,17 +1241,11 @@ if (!exists("net_model_rabbit"))
                   threshold = 1, 
                   act.fct = "logistic")
 ```
+</details>
 
-```{r}
-imp_nn_rab = vi(net_model_rabbit)
-imp_nn_rab = imp_nn_rab[imp_nn_rab$Importance>5,]
-imp_nn_rab_tab = tibble(Variable = imp_nn_rab$Variable, Importance = imp_nn_rab$Importance)
-imp_nn_rab_tab
-vip(net_model_rabbit, width = 0.5, fill = "green3")
-```
-
-
-```{r model fitting selected vars2, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r model fitting selected vars2}
 set.seed(seed_val)
 if (!exists("net_model_rabbit_selected"))
   net_model_rabbit_selected <- neuralnet(outcome_type_adopt ~ sex_upon_outcome_first_Sterilized,
@@ -1225,14 +1255,7 @@ if (!exists("net_model_rabbit_selected"))
                   threshold = 1, 
                   act.fct = "logistic")
 ```
-
-```{r}
-imp_nn_s_rab = vi(net_model_rabbit_selected)
-imp_nn_s_rab = imp_nn_s_rab[imp_nn_s_rab$Importance>5,]
-imp_nn_s_rab_tab = tibble(Variable = imp_nn_s_rab$Variable, Importance = imp_nn_s_rab$Importance)
-imp_nn_s_rab_tab
-vip(net_model_rabbit_selected, width = 0.5, fill = "green3")
-```
+</details>
 
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
 ```{r model plot3, echo=FALSE}
@@ -1241,18 +1264,37 @@ plot(net_model_rabbit_selected , rep="best")
 
 Verlgeich der Accuracy der Modelle
 ```{r compare models, echo=FALSE}
-pred_net_rabbit <- predict(net_model_rabbit,testing_rabbit[c(2:5,7:78)])
+pred_net_rabbit <- predict(net_model_rabbit,testing_rabbit_norm[c(2:5,7:78)])
 idx <- apply(pred_net_rabbit, c(1), maxidx)
 pred_net_rabbit <-as.factor(c('0', '1')[idx])
 
-pred_net_rabbit_selected <- predict(net_model_rabbit_selected,testing_rabbit[c(2:5,7:78)])
+pred_net_rabbit_selected <- predict(net_model_rabbit_selected,testing_rabbit_norm[c(2:5,7:78)])
 idx <- apply(pred_net_rabbit_selected, c(1), maxidx)
 pred_net_rabbit_selected <-as.factor(c('0', '1')[idx])
 
-cf_net_rabbit <- confusionMatrix(pred_net_rabbit,testing_rabbit$outcome_type_adopt)
-cf_net_rabbit_selected <- confusionMatrix(pred_net_rabbit_selected,testing_rabbit$outcome_type_adopt)
+cf_net_rabbit <- confusionMatrix(pred_net_rabbit,testing_rabbit_norm$outcome_type_adopt)
+cf_net_rabbit_selected <- confusionMatrix(pred_net_rabbit_selected,testing_rabbit_norm$outcome_type_adopt)
 cat("All Variables: Accuracy", cf_net_rabbit$overall["Accuracy"], "\n")
 cat("Selected Variables: Accuracy", cf_net_rabbit_selected$overall["Accuracy"], "\n")
+```
+
+
+```{r}
+set.seed(123)
+
+nnet_model_rabbit <- train(outcome_type_adopt ~., data = training_rabbit_norm[2:78], method = 'nnet', trControl = numFolds, tuneGrid=expand.grid(size=c(10), decay=c(0.1)), maxi = 100000 )
+
+pred_nnet_rabbit <- predict(nnet_model_rabbit,testing_rabbit_norm[c(2:5,7:78)])
+cf_nnet_rabbit <- confusionMatrix(pred_nnet_rabbit,testing_rabbit_norm$outcome_type_adopt)
+cat("All Variables: Accuracy", cf_nnet_rabbit$overall["Accuracy"], "\n")
+```
+
+```{r}
+imp_nn_s_rab = vi(class_model_nnet)
+imp_nn_s_rab = imp_nn_s_rab[imp_nn_s_rab$Importance>5,]
+imp_nn_s_rab_tab = tibble(Variable = imp_nn_s_rab$Variable, Importance = imp_nn_s_rab$Importance)
+imp_nn_s_rab_tab
+vip(class_model_nnet, width = 0.5, fill = "green3")
 ```
 
 ### Vergleich aller Neuronalen Netzwerke 
@@ -1269,36 +1311,34 @@ kable(accuracyTable, align = "l") %>%
 
 ```
 
-```{r save NN models, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r save NN models}
 if (!file.exists("neuronale_netze.RData"))
   save(net_model_dog, net_model_dog_selected, net_model_cat, net_model_cat_selected, net_model_rabbit,net_model_rabbit_selected, file = "neuronale_netze.RData")
 ```
+</details>
 
 #Conclusion
 
 Das Vorgehen bei der Prädiktion hat zufriedenstellende Ergebnisse geliefert. Es konnten einerseits relevante Faktoren für die Adoption der am häufigsten im Tierheim vorhandenen Tierarten eruiert werden, andererseits konnten Neuronale Netze mit guter Accuracy (über 80%) gefittet werden. 
+
+```{r}
+accuracy_compare_table = tibble(Modell="Decision Tree", Hunde=conf_matrix_tree_dog1$overall["Accuracy"], Katzen=conf_matrix_tree_cat1$overall["Accuracy"], Hasen=conf_matrix_tree_rabbit1$overall["Accuracy"])
+
+accuracy_compare_table = add_row(accuracy_compare_table, Modell="Neuronales Netz", Hunde=cf_net_dog$overall["Accuracy"], Katzen=cf_net_cat$overall["Accuracy"], Hasen=cf_net_rabbit$overall["Accuracy"])
+```
+
+```{r}
+kable(accuracy_compare_table, align = "l") %>%
+  kable_styling(bootstrap_options = "striped") %>%
+  footnote(general = "", general_title = "Tabelle 2: Test Accuracies der Modelle")
+```
+
 Die anfangs formulierte Hypothese, dass die Adoption vor allem vom Alter und Gesundheitszustand abhängig ist, konnte nur teilweise verifiziert werden. Außerdem stellte sich heraus, dass für unterschiedliche Tierarten unterschiedliche Faktoren und in unterschiedlichem Ausmaß einen Einfluss auf die Adoptionswahrscheinlichkeit nehmen. Bei Hunden sind die Sterilisation, die Zeitdauer im Tierheim, das Alter und ob es sich um einen Streuner handelt die wichtigsten Kriterien. Für das Tierheim bedeutet das, dass durch eine Sterilization die Adoption wahrscheinlich am stärksten beeinflusst werden kann. 
 Bei Katzen ist das Alter für die Adoption relevanter als bei Hunden, aber auch bei dieser Tierart spielt die Sterilization eine bedeutende Rolle, wie auch ob es sich um ein Streunertier handelt. 
 Überraschend ist, dass der Gesundheitszustand in keinem der Modelle als relevant für eine Adoption bewertet wurde. 
 Bei den Vorhersagen der Adoption von Hasen zeigte sich ein extremer Unterschied der relevanten Faktoren im Vergleich zu den Hunden und Katzen. Es scheint, als gäbe es eine "saisonale" Abhängigkeit für die Adoption, wir vermuten, dass z.B. um Feiertage (Ostern, Weihnachten), die Adoptionszahl für Hasen ansteigt. Das Tierheim könnte diese Information z.B. dazu nutzen, um die Auslastung/Belegung im Tierheim zu optimieren, da entweder in Zeiten, wo weniger Adoptionen eintreten, die Plätze kurzzeitig ausgebaut werden, da absehbar ist, wann diese wieder reduziert werden können. 
 
-d
-* `sex_upon_outcome_first_Sterilized`
-* `sex_upon_outcome_first_Intact`
-* `time_in_shelter_days`
-* `intake_typePublic Assist`
-* `age_upon_intake_.days.`
-* `intake_typeStray`
-Cats
-* `age_upon_outcome_.days.`
-* `sex_upon_intake_first_Sterilized`
-* `sex_upon_intake_first_Intact`
-* `sexuponoutcomesecond_unknown`
-* `intake_typeStray`
-rabbits
-* `intake_year2016`
-* `outcome_year2016`
-* `intake_year2015`
-* `outcome_month9`
-* `outcome_year2014`
+
 ![](snoopy.png)
