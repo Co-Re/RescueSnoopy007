@@ -591,7 +591,7 @@ table<- prop.table(t,2)
 ```
 <details>
   <summary>Code Details</summary>
-```{r table6}
+```{r table7}
 table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adopt)
 ```
 </details>
