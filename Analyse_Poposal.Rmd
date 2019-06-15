@@ -828,7 +828,7 @@ seed_val = 123
 
 Laden der gespeicherten Decision Tree Modelle
 ```{r load RData, results='hide'}
-if (file.exists("decision_trees.RData"))
+if (file.exists("decision_trees.RData") && !exists("tree_dog1") && !exists("tree_cat1") && !exists("tree_rabbit1"))
   load("decision_trees.RData")
 ```
 
