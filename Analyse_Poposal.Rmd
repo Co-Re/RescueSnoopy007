@@ -91,11 +91,14 @@ aac_intakes_outcomes = read.csv("aac_intakes_outcomes.csv")
 ```
 
 ## Überprüfung der Datenstruktur
-```{r check structure, include=FALSE}
+<details>
+  <summaryToggle answer</summary>
+```{r check structure}
 str(aac_intakes_outcomes)
 # Andrucken der ersten Datensätze
 head(aac_intakes_outcomes)
 ```
+</details>
 
 ```{r summary1, include=FALSE}
 summary(aac_intakes_outcomes)
