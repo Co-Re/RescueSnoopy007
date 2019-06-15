@@ -1061,7 +1061,7 @@ Modellfitting unter Verwendung aller Variablen (normalisiert) außer Breed:
 ```{r NN dogs, output='hide'}
 set.seed(seed_val)
 
-#Normalisierung der Daten
+#Normalisierung der numerischen Variablen (Spalten 2-5)
 training_dog_norm = training_dog
 training_dog_norm[c(2:5)] <- as.data.frame(lapply(training_dog_norm[c(2:5)], normalize))
 
