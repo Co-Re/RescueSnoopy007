@@ -92,17 +92,19 @@ aac_intakes_outcomes = read.csv("aac_intakes_outcomes.csv")
 
 ## Überprüfung der Datenstruktur
 <details>
-  <summaryToggle answer</summary>
+  <summary>Code Details</summary>
 ```{r check structure}
 str(aac_intakes_outcomes)
 # Andrucken der ersten Datensätze
 head(aac_intakes_outcomes)
 ```
 </details>
-
-```{r summary1, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r summary1}
 summary(aac_intakes_outcomes)
 ```
+</details>
 
 ### Datenbereinigung I - Konvertieren der Datentypen
 ```{r datatypes}
@@ -161,9 +163,12 @@ Unplausible Fälle (Kastrierter Income, Nichtkastrierter Outcome) werden im Zuge
 ### Erstellung eines neuen Datasets und Entfernung von Variablen
 Dieses enthält nicht alle Variablen. Im Folgenden findet sich eine Auflistung der entfernten Variablen, sowie eine Begründung, weshalb einige Daten nicht für die Analyse miteinbezogen werden. 
 
-```{r create new dataframe, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r create new dataframe}
 aac_intakes_outcomes2 <- aac_intakes_outcomes[c(5, 22:24, 26, 27, 43, 42, 44, 3, 17, 18, 33:35, 39, 10:12, 30, 7, 40, 41)]
 ```
+</details>
 
 Folgende Variablen wurden für das neue Dataset nicht verwendet:
 
@@ -244,16 +249,20 @@ aac_intakes_outcomes2$outcome_type <- factor(aac_intakes_outcomes2$outcome_type)
 
 Auf Basis der Breed Variable wird die fehlende Information der Tierrasse aufgefüllt. 
 
-```{r, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r}
 others = aac_intakes_outcomes2[aac_intakes_outcomes2$animal_type  == "Other", ] 
 ```
+</details>
 
 ```{r count others, echo=FALSE, fig.cap = "Anzahl der Tiere, deren Animaltype Information fehlt"}
 count(others)
 ```
 
-
-```{r recode animal_type, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r recode animal_type}
 
 # Erstellen eines csv files um die verschiedenen Rassen Tieren zuordnen zu können 
 # write.csv(count(others$breed), file = "breed.csv", append = FALSE, quote = TRUE, sep = " ",
@@ -309,6 +318,7 @@ aac_intakes_outcomes2 = tmp_aac
 aac_intakes_outcomes2$animal_type <- as.factor(aac_intakes_outcomes2$animal_type)
 
 ```
+</details>
 
 Nach Bereinigung der Variable liegt folgende Verteilung vor:
 ```{r after cleaning animaltype, echo=FALSE}
@@ -324,7 +334,9 @@ Um die Anzahl der Ausprägungen, welche im Originaldatenset hoch ist (knapp 100 
 sort(table(aac_intakes_outcomes2$color),decreasing=T)
 ```
 
-```{r clean color, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r clean color}
 #Zusammenfassen der Farben 
 aac_intakes_outcomes2$color_new <-
 gsub("Brown/Brown|Sable|Chocolate|Agouti|Liver", "Brown", aac_intakes_outcomes2$color)
@@ -351,6 +363,7 @@ aac_intakes_outcomes2$color_new <- as.factor(aac_intakes_outcomes2$color_new)
 aac_intakes_outcomes2 <- aac_intakes_outcomes2[,-4]
 
 ```
+</details>
 
 Nach Bereinigung der Variable konnte die Anzahl an Farben extrem reduziert werden:
 ```{r table5, echo= FALSE}
@@ -362,7 +375,9 @@ table(aac_intakes_outcomes2$color_new)
 Da die bestehenden Alters-/Zeitangaben teilweise nicht mit den Datumsangaben übereingestimmt haben, werden diese neu berechnet bzw. überprüft.
 Beim Alter bei Intake bzw. Outcome kommen dabei auch negative Werte vor. Zum Teil kann darauf geschlossen werden, dass das trächtige Muttertier vor der Geburt eingeliefert wurde und somit das Alter des Nachwuchs beim Intake im Minusbereich lag. In diesen Fällen wird es auf 0 gesetzt. Andere unschlüssige Fälle werden exkludiert.
 
-```{r calculate age, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r calculate age}
 # Age upon intake
 dtime <- round(difftime(aac_intakes_outcomes2$intake_datetime, aac_intakes_outcomes2$date_of_birth,
          units = c("days")))
@@ -405,21 +420,26 @@ aac_intakes_outcomes2$age_upon_intake_.days.[aac_intakes_outcomes2$age_upon_inta
 aac_intakes_outcomes2$time_in_shelter <- NULL
 
 ```
+</details>
 
-```{r check recodings2, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r check recodings2}
 # Kontrolle, dass Alter bei Outcome immer höher ist als bei Intake
 aac_intakes_outcomes_temp2 <- 
   aac_intakes_outcomes2[aac_intakes_outcomes2$age_upon_intake_.days. >
                         aac_intakes_outcomes2$age_upon_outcome_.days., ]
 ```
-
+</details>
 
 ## Anpassen der Zeugungsfähigkeit
 
 Bei Analyse der Daten wurde bemerkt, dass 3 Beobachtungen bei den Geschlechtsmerkmalen fehlerhaft sein müssen, da Intake und Outcome-Wert nicht zusammengepasst haben (siehe oben bei Anmerkungen zu Datenset). Bei diesen Beobachtungen war das Merkmal bei Intake Neutered/Spayed und bei Outcome Intact. Es wurde daher entschieden, dass diese Datensätze behalten werden und die Werte durch "Unknown" ersetzt werden.   
 Da Neutered und Spayed unterschiedliche Wordings für die Sterilisation der weiblichen bzw. männlichen Tiere sind, wurden diese vereinheitlicht in der Ausprägung "Sterilized" zusammengefasst.
 
-```{r recode sterilized, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r recode sterilized}
 detectwrong <- function(v1,c1,v2,c2,x) {ifelse((v1==c1)&(v2==c2),"Unknown",x)}
 
 aac_intakes_outcomes2$sex_upon_intake_first_new <- detectwrong(
@@ -469,6 +489,7 @@ aac_intakes_outcomes2$sex_upon_outcome_first <- NULL
 names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_intake_first_new"] <- "sex_upon_intake_first"
 names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_outcome_first_new"] <- "sex_upon_outcome_first"
 ```
+</details>
 
 ## Prüfung ob statistische Modellierung möglich ist
 
@@ -527,10 +548,13 @@ a+geom_bar(aes(fill = outcome_type))
 
 ```
 
-```{r check numerics, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r check numerics}
 types <- table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type)
 types[order(types[,1], decreasing=T),]
 ```
+</details>
 
 ## Einschränkung des OutcomeTypes
 
@@ -542,7 +566,9 @@ Da der Anteil bei Wildtieren, die eingeschläfert werden, sehr hoch ist, liegen 
 
 Im Folgenden wird deshalb der Datensatz weiter reduziert (durch Entfernung der Wildtiere), es sollen ausschließlich Hunde, Katzen und Hasen verbleiben. Es wird eine neue Variable erstellt, die binär codiert angibt, ob das jeweilige Tier adoptiert wurde. 
 
-```{r remove wild animals and dummycode adoption, warning=FALSE, message=FALSE, include = FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r remove wild animals and dummycode adoption, warning=FALSE, message=FALSE}
 #entferne wildtiere
 
 aac_intakes_outcomes_3 <- subset(aac_intakes_outcomes2, animal_type  == "Dog" | animal_type == "Cat" | aac_intakes_outcomes2$animal_type  == "Rabbit")
@@ -556,16 +582,17 @@ dummies_outcometype <- dummy.data.frame(dummies_outcometype)
 aac_intakes_outcomes_3$outcome_type_adopt <- dummies_outcometype[,1]
 
 ```
+</details>
 
-```{r check recoding2, include=FALSE, message=FALSE, warning=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r check recoding2 and merge datasets, message=FALSE, warning=FALSE}
 aac_intakes_outcomes_3$outcome_type <- factor(aac_intakes_outcomes_3$outcome_type)
 table(aac_intakes_outcomes_3$outcome_type, aac_intakes_outcomes_3$outcome_type_adopt)
-```
 
-```{r merge datasets, include=FALSE}
 aac_intakes_outcomes2 <- aac_intakes_outcomes_3
 ```
-
+</details>
 
 ### Adoptionen nach Tieren
 
@@ -579,13 +606,18 @@ b+geom_bar(aes(fill = outcome_type_adopt))
 
 ```
 
-```{r table6, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r table6}
 table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adopt)
 ```
+</details>
 
 Da ein erster Testlauf/Fitting des Datensatzes mit einem Decision Tree aufgrund der Datenstrukturen wenig performant ist, wurden die Daten überwiegend Dummycodiert um ein schnelleres Training zu erzielen. 
 
-```{r recode dummies, warning=FALSE, message=FALSE, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r recode dummies, warning=FALSE, message=FALSE}
 #Löschung unbenötigter Spalten: outcometype (alle types) &date_of_birth_month & year
 
 aac_intakes_outcomes2 <- aac_intakes_outcomes2[,c(2:6,9:20)]
@@ -701,6 +733,7 @@ aac_intakes_outcomes2[ ,c('intake_condition', 'intake_type', 'sex_upon_outcome_s
 
 
 ```
+</details>
 
 # Finale Datensätze zur Modellierung
 
@@ -736,7 +769,9 @@ cats <- cats[,-c(1)]
 ```
 
 ### Train Test Split - alle Tierarten
-```{r, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r}
 
 train_function <- createDataPartition(
   y = allanimals$outcome_type_adopt,
@@ -746,8 +781,8 @@ train_function <- createDataPartition(
 
 training <- allanimals[ train_function,]
 testing  <- allanimals[-train_function,]
-
 ```
+</details>
 
 ### Train/Test Split für Hunde
 
@@ -765,7 +800,9 @@ testing_dog  <- dogs[-train_function,]
 ```
 
 ### Train/Test Split für Katzen
-```{r, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r}
 train_function <- createDataPartition(
   y = cats$outcome_type_adopt,
   p = .70,
@@ -775,9 +812,12 @@ train_function <- createDataPartition(
 training_cat <- cats[ train_function,]
 testing_cat  <- cats[-train_function,]
 ```
+</details>
 
 ### Train/Test Split für Hasen
-```{r, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r}
 train_function <- createDataPartition(
   y = rabbits$outcome_type_adopt,
   p = .70,
@@ -787,6 +827,7 @@ train_function <- createDataPartition(
 training_rabbit <- rabbits[ train_function,]
 testing_rabbit  <- rabbits[-train_function,]
 ```
+</details>
 
 ***
 
@@ -821,7 +862,6 @@ if (!exists("tree_dog1"))
     data = training_dog,
     trControl = cv_5,
     method = "rpart")
-
 ```
 
 Das gefittete Modell: 
@@ -834,7 +874,6 @@ print(tree_dog1)
 pred_tree_dog1 <- predict(tree_dog1, testing_dog)
 conf_matrix_tree_dog1 <- confusionMatrix(pred_tree_dog1, testing_dog$outcome_type)
 conf_matrix_tree_dog1
-
 ```
 
 ```{r model plot, echo=FALSE}
@@ -848,8 +887,9 @@ Wenn der Hund weniger als 4 Tage im Tierheim ist, scheint eine Adoption auf Basi
 Die Specificity ist mit 87% um fast 20% höher als die Sensitivity, d.h. die Vorhersage von Hunden, die *nicht* adoptiert werden, ist genauer, als die für Hunde, die adoptiert werden. Gleichzeitig muss festgehalten werden, dass das Modell nur eine Accuracy von 76% hat, weshalb eine weitere Optimierung besonders sinnvoll erscheint. 
 
 ### Decision Tree für Katzen
-
-```{r cats tree1, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r cats tree1}
 set.seed(seed_val)
 if (!exists("tree_cat1"))
   tree_cat1 <- train(
@@ -857,9 +897,8 @@ if (!exists("tree_cat1"))
     data = training_cat,
     trControl = cv_5,
     method = "rpart")
-
-
 ```
+</details>
 
 Das gefittete Modell: 
 
@@ -871,7 +910,6 @@ print(tree_cat1)
 pred_tree_cat1 <- predict(tree_cat1, testing_cat)
 conf_matrix_tree_cat1 <- confusionMatrix(pred_tree_cat1, testing_cat$outcome_type)
 conf_matrix_tree_cat1
-
 ```
 
 ```{r plot model cats, echo=FALSE}
@@ -887,7 +925,9 @@ Dies könnte daran liegen, dass Jungtiere erst ab einem bestimmten Alter adoptie
 Im Vergleich zum ersten Tree für die Vorhersage einer Adoption eines Hundes, zeigt sich beim Entscheidungsbaum für Katzen ohne Optimierung bereits eine bessere bzw. höhere Accuracy von über 80%. Auffallend ist im direkten Vergleich der Modelle vor allem auch, dass bei Katzen (umgekehrt als bei Hunden), die Adoption besser vorhergesagt werden kann (Sensitivity = 88%), als Fälle, in denen Katzen nicht adoptiert werden (Specificity = 81,5%). 
 
 ### Decision Tree für Hasen
-```{r model fitting rabbits, include= FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r model fitting rabbits}
 set.seed(seed_val)
 
 if (!exists("tree_rabbit1"))
@@ -897,6 +937,7 @@ if (!exists("tree_rabbit1"))
     trControl = cv_5,
     method = "rpart")
 ```
+</details>
 
 Das gefittete Modell: 
 
@@ -919,12 +960,14 @@ rpart.plot(tree_rabbit1$finalModel)
 Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0. Daher erfolgt die Vorhersage einer Adoption eines Hasens ausschließlich auf Basis der Information, ob das Tier sterilisiert ist. Wie auch bei den anderen Tieren ist die Adoptionswahrscheinlichkeit dann deutlich höher, wenn das Tier bereits sterilisiert ist.
 Die Accuracy ist mit 88% noch besser als jene der anderen beiden Trees (Hunde und Katzen). 
 
-
-```{r save decision trees, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r save decision trees}
 if (!file.exists("decision_trees.RData"))
   save(tree_dog1, tree_cat1, tree_rabbit1, file = "decision_trees.RData")
 
 ```
+</details>
 
 ## Variable Importance
 
@@ -939,6 +982,7 @@ imp_dog_tab = tibble(Variable = imp_dog$Variable, Importance = imp_dog$Importanc
 imp_dog_tab
 vip(tree_dog1, width = 0.5, fill = "green3")
 ```
+
 Die einfachen Klassifikationsbäume geben bereits einen guten ersten Einblick darin, welche Variablen für die Klassifikation bzw Splitpunkte vorrangig herangezogen werden. 
 Da sich zeigt, dass über die Tierarten hinweg die Hauptsplitpunkte auf ähnlichen Variablen basieren, soll mithilfe der Variable Importance ermittelt werden, ob noch weitere Zusatzinformationen aus den Modellen gewonnen werden können, die für das Tierheim für das bessere Verständnis von Adoptionsgründen genutzt werden kann. 
 Dafür wird die Variable Importance aus den obig erstellten Bäumen (je Tier) erstellt und beschrieben. 
@@ -1038,11 +1082,13 @@ Es werden für jede Tierart jeweils zwei neuronale Netze erstellt, einmal mit al
 Es wird erwartet, dass das Modell, das alle Variablen inkludiert, eine höhere Accuracy erzielt als jenes, das nur eine Teilmenge der Variablen enthält (weil die Mustererkennung unter Berücksichtigung von mehr Variablen genauer sein müsste). Andererseits soll auch getestet werden, ob ausschließlich unter Verwendung der (auf Basis der Variable Importance) wichtigsten Prädiktoren ein gleich gutes Ergebnis erzielt werden kann, wie mit dem gefitteten einfachen Baummodell.
 
 
-
-```{r load model, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r load model}
 if (file.exists("neuronale_netze.RData"))
   load("neuronale_netze.RData")
 ```
+</details>
 
 Definition von allgemeinen Funktionen
 ```{r, output='hide'}
@@ -1124,8 +1170,9 @@ cat("Selected Variables: Accuracy", cf_net_dog_selected$overall["Accuracy"], "\n
 
 
 ### Neuronales Netz für Katzen
-
-```{r model fitting cats, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r model fitting cats}
 
 set.seed(seed_val)
 
@@ -1140,9 +1187,11 @@ if (!exists("net_model_cat"))
                   threshold = 1, 
                   act.fct = "logistic")
 ```
+</details>
 
-
-```{r model fitting selected vars1, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r model fitting selected vars1}
 set.seed(seed_val)
 
 if (!exists("net_model_cat_selected"))
@@ -1153,6 +1202,7 @@ if (!exists("net_model_cat_selected"))
                   threshold = 1, 
                   act.fct = "logistic")
 ```
+</details>
 
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
 ```{r plot cats model, echo=FALSE}
@@ -1181,7 +1231,9 @@ cat("Selected Variables: Accuracy", cf_net_cat_selected$overall["Accuracy"], "\n
 
 ### Neuronales Netz für Hasen
 
-```{r modell fitting rabbits all vars, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r modell fitting rabbits all vars}
 set.seed(seed_val)
 training_rabbit_norm = training_rabbit
 training_rabbit_norm[c(2:5)] <- as.data.frame(lapply(training_rabbit_norm[c(2:5)], normalize))
@@ -1194,8 +1246,11 @@ if (!exists("net_model_rabbit"))
                   threshold = 1, 
                   act.fct = "logistic")
 ```
+</details>
 
-```{r model fitting selected vars2, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r model fitting selected vars2}
 set.seed(seed_val)
 if (!exists("net_model_rabbit_selected"))
   net_model_rabbit_selected <- neuralnet(outcome_type_adopt ~ sex_upon_outcome_first_Sterilized,
@@ -1205,6 +1260,7 @@ if (!exists("net_model_rabbit_selected"))
                   threshold = 1, 
                   act.fct = "logistic")
 ```
+</details>
 
 Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision Tree
 ```{r model plot3, echo=FALSE}
@@ -1241,10 +1297,13 @@ kable(accuracyTable, align = "l") %>%
 
 ```
 
-```{r save NN models, include=FALSE}
+<details>
+  <summary>Code Details</summary>
+```{r save NN models}
 if (!file.exists("neuronale_netze.RData"))
   save(net_model_dog, net_model_dog_selected, net_model_cat, net_model_cat_selected, net_model_rabbit,net_model_rabbit_selected, file = "neuronale_netze.RData")
 ```
+</details>
 
 #Conclusion
 
