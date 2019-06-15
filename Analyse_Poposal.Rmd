@@ -1,14 +1,14 @@
 ---
-title: "Algorithmik & Statistik Lab 2: Analyse Proposal - 'Rescue Snoopy'"
+title: "Algorithmik & Statistik Lab 2: Finaler Bericht - 'Rescue Snoopy'"
 author: "Lara Knapwost - 1810837601, Cornelia Reithmeier - 1810837362, Isabelle Veitl - 1810837521, Anna Weber - 1810837818"
-date: '9. April 2019'
+date: '15. Juni 2019'
 output: 
   html_document:
     toc: TRUE
 urlcolor: cyan
 ---
 ***
-Unter dem Arbeitstitel "Rescue Snoopy" wurden in einem ersten Schritt folgende Daten ausgewählt, analysiert und das statistische Analyse-Interesse dargelegt.
+Unter dem Arbeitstitel "Rescue Snoopy" wurden in einem ersten Schritt die unten beschriebenen Daten ausgewählt, analysiert und das statistische Analyse-Interesse dargelegt.
 Die gemeinsame Arbeit an diesem Projekt wird über Github abgewickelt und dokumentiert: https://github.com/Co-Re/RescueSnoopy007
  
 
@@ -45,7 +45,7 @@ Neben diesen Variablen existierten weitere, die beispielsweise Zeiträume in ein
 
 ## Hintergrundinformationen zum Datenset
 Die Daten wurden vom [Austin Animal Center](http://www.austintexas.gov/department/aac) erhoben. Dieses Animal Center ist das größte Tierheim in den USA, in dem keine Tiere getötet werden und kann bis zu 18.000 Tiere pro Jahr aufnehmen. Es werden alle Arten von Tieren aufgenommen. Das Tierheim befindet sich im Travis County im US-Bundesstaat Texas.
-Die Daten werden im Rahmen der Austin's Open Data Intitiative online bereitgestellt.  
+Die Daten werden im Rahmen der Austin Open Data Intitiative online bereitgestellt.  
 
 Das Datenset enthält n = 79.672 Observationen und 41 Variablen.   
 Die Daten stammen aus der Zeit zwischen Oktober 2013 bis April 2018 (Outcomes).  
@@ -56,10 +56,10 @@ Knapp die Hälfte der im Datenset enthaltenen Tiere wurde adoptiert.
 ## Statistische Lernaufgabe
 Im Rahmen der Gruppenarbeit soll folgendes Klassifikationsproblem betrachtet werden:
 
-Vorhersage des Outcome-Types auf Basis der gegebenen Variablen. Die initale Idee war es, die Prädiktoren zu finden, anhand derer eine Rückgabe an den Besitzer, ein Transfer / eine Adoption, Euthanasie, Tod etc. möglichst genau (durch Vorhersage der Klasse) vorhergesagt werden können. Eine detaillierte Auseinandersetzung bzw. im Zuge des Preprocessings stellte sich heraus, dass für viele der angeführten Outcome-Types wenige Fälle vorhanden sind, sodass eine Modellierung ohne Overfitting schwierig erscheint. Deshalb wurde während des Projektes bzw. zu Ende des Preprocessings redefiniert bzw. eingeschränkt auf Tierarten mit mindestens n=500 und ausschließlich den Outcometype Adoption. 
+Vorhersage des Outcome-Types auf Basis der gegebenen Variablen. Die initale Idee war es, die Prädiktoren zu finden, anhand derer eine Rückgabe an den Besitzer, ein Transfer / eine Adoption, Euthanasie, Tod etc. möglichst genau (durch Vorhersage der Klasse) vorhergesagt werden können. Im Zuge des Preprocessings und nach detaillierten Auseinandersetzungen stellte sich heraus, dass für viele der angeführten Outcome-Typen wenige Fälle vorhanden sind, sodass eine Modellierung ohne Overfitting schwierig erscheint. Deshalb wurde während des Projektes bzw. zu Ende des Preprocessings der Datensatz auf Tierarten mit mindestens n=500 eingeschränkt und ausschließlich der Outcome-Type Adoption verwendet. 
 
 ## Motivation
-Es gibt viele Tierheime, durch Hörensagen ist bekannt, dass in vielen davon eine Großzahl der Tiere einen beträchtlichen Teil ihres Lebens verbringen. 
+Es gibt viele Tierheime und durch Hörensagen ist bekannt, dass in vielen davon eine Großzahl der Tiere einen beträchtlichen Teil ihres Lebens verbringen. 
 Es ist interessant für uns, herauszufinden, welche Aspekte ausschlaggebend dafür sind, ob das Tier (vor dem Tod) wieder aus dem Tierheim "entlassen" wird, d.h. einen neuen Besitzer findet. Wir haben einige Hypothesen, welche wir prüfen möchten. Wir gehen davon aus, dass vor allem jüngere, gesunde Tiere eine bessere Chance haben, als ältere, kranke, ggf. auch nicht kastrierte (Streuner-)Tiere, die bereits sehr lange im Tierheim sind.   
 Weiß man, welche Aspekte eine Rolle spielen, könnte man diese gezielt in den Tierheimen in der Kommunikation verwenden, um mehr Tieren (z.B. vor allem jenen, die grundsätzlich eine schlechtere Chance für eine Adoption haben) ein neues zu Hause zu geben.   
 Wir haben uns für dieses Datenset mit dieser Fragestellung entschieden, da einige von uns selbst Haustiere besitzen und wir den Eindruck haben, dass es bereits ausreichend viele Analysen zu ökonomischen Fragestellungen gibt.
