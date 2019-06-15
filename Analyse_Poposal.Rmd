@@ -838,7 +838,7 @@ if (file.exists("decision_trees.RData") && !exists("tree_dog1") && !exists("tree
 
 ### Decision Tree für Hunde
 
-Wie auch bei der Datensatzerstellung je Tierart werden im Folgenden pro Tierart Klassifikationsbäume mit 5-fold crossvalidation gefittet. Dafür werden alle Variablen im Datensatz und die Methode 'rpart' aus dem Caret Package verwendet, um eine Adoption vorherzusagen. 
+Wie auch bei der Datensatzerstellung je Tierart werden im Folgenden pro Tierart Klassifikationsbäume mit 5-fold Cross-Validation gefittet. Dafür werden alle Variablen im Datensatz und die Methode 'rpart' aus dem Caret Package verwendet, um eine Adoption vorherzusagen. 
 ```{r tree dogs, results='hide'}
 set.seed(seed_val)
 
@@ -904,11 +904,11 @@ rpart.plot(tree_cat1$finalModel)
 
 *Interpretation*
 
-Bei Katzen ist `sex_upon_outcome_first_Sterilized` = 0 die erste Split Variable des Baumes, gefolgt von dem Alter der Katze beim Income.
-Daher scheinen für die Adoption einer Katze ähnliche Kriterien eine Rolle zu spielen, wie bei Hunden. Im Gegensatz zur Wahrscheinlichkeit einer Adoption eines Hundes spielt diesem Klassifikationsbaum zufolge auch das Alter der Katze eine Rolle: Wenn die Katze sterilisiert, und älter als ein halbes Jahr alt ist, ist eine Adoption wahrscheinlich. Ist die Katze jünger als ein halbes Jahr, hängt die Adoption davon ab, wie lange die Katze bereits im Tierheim war (Wahrscheinlich ist eine Adoption nämlich nur dann, wenn sie bereits länger als 12 Tage dort war).
-Dies könnte daran liegen, dass Jungtiere erst ab einem bestimmten Alter adoptiert (und sterilisiert) werden können. 
+Bei Katzen ist `sex_upon_outcome_first_Sterilized` = 0 die erste Split Variable des Baumes, gefolgt von dem Alter der Katze bei Intake.
+Daher scheinen für die Adoption einer Katze ähnliche Kriterien eine Rolle zu spielen, wie bei Hunden. Im Gegensatz zur Wahrscheinlichkeit einer Adoption eines Hundes spielt diesem Klassifikationsbaum zufolge aber das Alter der Katze eine Rolle: Wenn die Katze sterilisiert, und jünger als ein halbes Jahr ist, ist eine Adoption wahrscheinlicher. Ist die Katze älter als ein halbes Jahr, wird sie eher nicht adoptiert (Wahrscheinlich ist eine Adoption nämlich nur dann, wenn sie bereits länger als 12 Tage dort war).
+Dies könnte daran liegen, dass Jungtiere bevorzugt adoptiert werden. 
 
-Im Vergleich zum ersten Tree für die Vorhersage einer Adoption eines Hundes, zeigt sich beim Entscheidungsbaum für Katzen ohne Optimierung bereits eine bessere bzw. höhere Accuracy von über 80%. Auffallend ist im direkten Vergleich der Modelle vor allem auch, dass bei Katzen (umgekehrt als bei Hunden), die Adoption besser vorhergesagt werden kann (Sensitivity = 88%), als Fälle, in denen Katzen nicht adoptiert werden (Specificity = 81,5%). 
+Im Vergleich zum ersten Tree für die Vorhersage einer Adoption eines Hundes, zeigt sich beim Entscheidungsbaum für Katzen ohne Optimierung bereits eine bessere bzw. höhere Accuracy von über 80%. Auffallend ist im direkten Vergleich der Modelle vor allem auch, dass bei Katzen (umgekehrt als bei Hunden), die Adoption besser vorhergesagt werden kann (Sensitivity = 94%), als Fälle, in denen Katzen nicht adoptiert werden (Specificity = 62%). 
 
 ### Decision Tree für Hasen
 <details>
@@ -942,9 +942,9 @@ rpart.plot(tree_rabbit1$finalModel)
 ```
 
 *Interpretation*
-
-Bei Hasen ist der einzige Splitpunkt `sex_upon_outcome_first_Sterilized` = 0. Daher erfolgt die Vorhersage einer Adoption eines Hasens ausschließlich auf Basis der Information, ob das Tier sterilisiert ist. Wie auch bei den anderen Tieren ist die Adoptionswahrscheinlichkeit dann deutlich höher, wenn das Tier bereits sterilisiert ist.
-Die Accuracy ist mit 88% noch besser als jene der anderen beiden Trees (Hunde und Katzen). 
+Bei Hasen gibt es 4 Splits: `sex_upon_outcome_first_Sterilized` = 0, `outcome_month9` = 0, `time_in_shelter_days` < 4.5, `age_upon_outcom_.days.` >= 405.
+Daher erfolgt die erste Vorhersage einer Adoption eines Hasens auf Basis der Information, ob das Tier sterilisiert ist. Wie auch bei den anderen Tieren ist die Adoptionswahrscheinlichkeit dann deutlich höher, wenn das Tier bereits sterilisiert ist. Bei nicht sterilisierten Hasen, werden im Monat September jene, die länger als 4 Tage im Tierheim waren und jünger als 13 Monate sind eher adoptiert. 
+Die Accuracy ist mit 91% noch besser als jene der anderen beiden Trees (Hunde und Katzen). 
 
 <details>
   <summary>Code Details</summary>
@@ -1023,13 +1023,12 @@ Neben den bekannten Prädiktoren sind u.a. noch die Prädiktoren
 
 von Bedeutung.
 
-Die Relevanz der Jahreszeiten lässt darauf schließen, dass die Adoptionen von Hasen sich über die Jahre hinweg unterscheiden. Was Grund für das Ausreißerjahr 2016 war, müsste anhand von Brancheninformationen ermittelt werden, es könnt z.B. sein, dass es vermehrte mediale Aufmerksamkeit (z.B. durch Kampagnen / Testimonials) oder eine Art "Haustiertrend-Boost" für Hasen in diesem Jahr gab. 
-Die Outcome-Zeitdaten wurden bewusst in die Modellierung miteinbezogen, um zB vorzusagen ob ein Tier im aktuellen Monat adoptiert werden wird.
-
+Die Relevanz der Jahreszeiten lässt darauf schließen, dass die Adoptionen von Hasen sich über die Jahre hinweg unterscheiden. Was Grund für das Ausreißerjahr 2016 war, müsste anhand von Brancheninformationen ermittelt werden, es könnt z.B. sein, dass es vermehrte mediale Aufmerksamkeit (z.B. durch Kampagnen / Testimonials) oder eine Art "Haustiertrend-Boost" für Hasen in diesem Jahr gab. Sollten sich die besonderen outcome_come Jahre und Monate auf ein außergewöhnliches Ereignis zurückführen lassen, muss bewertet werden ob diese Daten im Model berücksichtigt werden sollen.
+Die Outcome-Zeitdaten wurden in diesem Projekt bewusst in die Modellierung miteinbezogen, um zB vorzusagen ob ein Tier im aktuellen Monat adoptiert werden wird.
 
 
 ## Tree Tuning (Bagging, Boosting, Random Forest)
-Es wurde versucht, noch weitere Trees, getunt mit Bagging, Boosting bzw Random Forest, aufzustellen. Aufgrund der Datenmenge und Rechenkapaziätsgrenzen konnten diese nicht ausgeführt werden und es ist hier nur ein Beispielcode bzw. ein gespeichertes Beispielmodel angeführt. In einem weiteren Schritt werden daher weitere Modelle mit Neuronalen Netzen auf.
+Es wurde versucht, noch weitere Trees, getunt mit Bagging, Boosting bzw Random Forest, aufzustellen. Aufgrund der Datenmenge und Rechenkapaziätsgrenzen konnten diese nicht ausgeführt werden und es ist hier nur ein Beispielcode bzw. ein gespeichertes Beispielmodel angeführt. In einem weiteren Schritt werden daher weitere Modelle mit Neuronalen Netzen berechnet.
 ### Auswahl Daten 
 Bei der Auswahl der Daten wurde auch versucht, die nummerischen Variablen bzw. die Breed auszuschließen, dies hat allerdings auch zu keinem erfolgreich gefitteten Modell geführt.
 ```{r eval=FALSE}
@@ -1227,7 +1226,7 @@ cat("Selected Variables: Accuracy", cf_net_cat_selected$overall["Accuracy"], "\n
 ```
 *Interpretation*
 
-Die Accuracy des NNs für Katzen ist unter Berücksichtigung aller Variablen deutlich besser als unter Verwendung eines Subsets. Die Accuracy des Treemodels kann mit dem Neuronalen Netz nicht verbessert werden. 
+Die Accuracy des NNs für Katzen ist unter Berücksichtigung aller Variablen deutlich besser als unter Verwendung eines Subsets. Die Accuracy des Treemodels kann mit dem Neuronalen Netz durchaus um etwa 5% verbessert werden. 
 
 ### Neuronales Netz für Hasen
 
@@ -1301,14 +1300,14 @@ cat("All Variables: Accuracy", cf_nnet_rabbit$overall["Accuracy"], "\n")
 
 *Interpretation*
 
-Die Accuracy des NNs für Hasen ist unter Berücksichtigung aller Variablen deutlich besser als unter Verwendung eines Subsets. Die Accuracy des Treemodels kann, wie auch bei den Katzen, mit dem Neuronalen Netz nicht mehr verbessert werden. 
+Die Accuracy des NNs für Hasen ist unter Berücksichtigung aller Variablen deutlich besser als unter Verwendung eines Subsets. Die Accuracy des Treemodels kann, wie auch bei den Katzen, mit dem Neuronalen Netz nicht bzw. nur gering verbessert werden. 
 
 
 ####Variablen Importance im NN
 
 Da die in den Bäumen ermittelten Variablen mit hoher Wichtigkeit für das Modell stark von jenen für Hunde und Katzen abweichen, wurde noch ein weiteres Neuronales Net (andere Library, die auch Einsicht der Variablen Importance des NNs ermöglicht) gefittet, um zu prüfen, inwiefern die Relevanz der Variablen im Neuronalen Netz von jenen abweicht, die im Tree ermittelt wurden.
 
-Neben der Sterilisation, die auch im Tree  eine der wichtigsten Variable darstellt, spielten vorrangig Monate und Jahre, in denen das Tier ins Tierheim gekommen ist bzw. das Tierheim verlassen hat, eine Rolle. Diese weichen leicht von den wichtigen Variablen ab, die im Tree als wichtig erachtet werden. Die Darstellung bestätigt aber jedenfalls nochmals, dass bei Hasen tatsächlich Saisoninformationen hilfreich dafür sind, die Adoption vorherzusagen.
+Neben der Sterilisation, die auch im Tree eine der wichtigsten Variable darstellt, spielten beim Neuralen Net vorrangig Monate und Jahre, in denen das Tier ins Tierheim gekommen ist bzw. das Tierheim verlassen hat, eine Rolle. Diese weichen leicht von den wichtigen Variablen ab, die im Tree als wichtig erachtet werden. Die Darstellung bestätigt aber jedenfalls nochmals, dass bei Hasen tatsächlich Saisoninformationen hilfreich dafür sind, die Adoption vorherzusagen.
 
 ```{r}
 imp_nn_s_rab = vi(nnet_model_rabbit)
@@ -1331,7 +1330,7 @@ kable(accuracyTable, align = "l") %>%
   footnote(general = "", general_title = "Tabelle 1: Accuracies der Neuronalen Netze")
 
 ```
-Bei allen Netzen ist die Accuracy unter Verwendung aller Features höher, als unter Verwendung eines Subsets, obwohl bei den Modellen für Katzen kaum ein Unterschied merkbar ist. 
+Bei allen Netzen ist die Accuracy unter Verwendung aller Features höher, als unter Verwendung eines Subsets, obwohl bei den Modellen für Hasen kaum ein Unterschied merkbar ist. 
 Wie auch bei den Bäumen ist die Accuracy für Hunde weiterhin am geringsten, konnte jedoch deutlich verbessert werden mit dem NN. 
 
 <details>
@@ -1344,7 +1343,7 @@ if (!file.exists("neuronale_netze.RData"))
 
 #Conclusion
 
-Das Vorgehen bei der Prädiktion hat zufriedenstellende Ergebnisse geliefert. Es konnten einerseits relevante Faktoren für die Adoption der am häufigsten im Tierheim vorhandenen Tierarten eruiert werden, andererseits konnten Neuronale Netze mit guter Accuracy (über 80%) gefittet werden. 
+Das Vorgehen bei der Prädiktion hat zufriedenstellende Ergebnisse geliefert. Es konnten einerseits relevante Faktoren für die Adoption der am häufigsten im Tierheim vorhandenen Tierarten eruiert werden, andererseits konnten Neuronale Netze mit guter Accuracy (über 80%) gefittet werden.
 
 ```{r}
 accuracy_compare_table = tibble(Modell="Decision Tree", Hunde=conf_matrix_tree_dog1$overall["Accuracy"], Katzen=conf_matrix_tree_cat1$overall["Accuracy"], Hasen=conf_matrix_tree_rabbit1$overall["Accuracy"])
@@ -1359,9 +1358,10 @@ kable(accuracy_compare_table, align = "l") %>%
 ```
 
 Die anfangs formulierte Hypothese, dass die Adoption vor allem vom Alter und Gesundheitszustand abhängig ist, konnte nur teilweise verifiziert werden. Außerdem stellte sich heraus, dass für unterschiedliche Tierarten unterschiedliche Faktoren und in unterschiedlichem Ausmaß einen Einfluss auf die Adoptionswahrscheinlichkeit nehmen. Bei Hunden sind die Sterilisation, die Zeitdauer im Tierheim, das Alter und ob es sich um einen Streuner handelt die wichtigsten Kriterien. Für das Tierheim bedeutet das, dass durch eine Sterilization die Adoption wahrscheinlich am stärksten beeinflusst werden kann. 
-Bei Katzen ist das Alter für die Adoption relevanter als bei Hunden, aber auch bei dieser Tierart spielt die Sterilization eine bedeutende Rolle, wie auch ob es sich um ein Streunertier handelt. 
+Bei Katzen ist das Alter für die Adoption relevanter als bei Hunden, aber auch bei dieser Tierart spielt die Sterilisation eine bedeutende Rolle. 
 Überraschend ist, dass der Gesundheitszustand in keinem der Modelle als relevant für eine Adoption bewertet wurde. 
 Bei den Vorhersagen der Adoption von Hasen zeigte sich ein extremer Unterschied der relevanten Faktoren im Vergleich zu den Hunden und Katzen. Es scheint, als gäbe es eine "saisonale" Abhängigkeit für die Adoption, wir vermuten, dass z.B. um Feiertage (Ostern, Weihnachten), die Adoptionszahl für Hasen ansteigt. Das Tierheim könnte diese Information z.B. dazu nutzen, um die Auslastung/Belegung im Tierheim zu optimieren, da entweder in Zeiten, wo weniger Adoptionen eintreten, die Plätze kurzzeitig ausgebaut werden, da absehbar ist, wann diese wieder reduziert werden können. 
+Das Tierheim könnte mit diesen Modellen besser einschätzen, ob und unter welchen Bedingungen gewisse Hunde, Katzen und Hasen eher adoptiert werden. Außerdem können für jene, die eher nicht adoptiert werden, gegebenfalls zusätzliche Maßnahmen (Sterilisation, Marketing, ...) getroffen werden um auch ihre Chance auf eine Adoption zu erhöhen.
 
 
 ![](snoopy.png)
