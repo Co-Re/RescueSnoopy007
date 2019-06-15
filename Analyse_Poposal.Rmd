@@ -588,7 +588,7 @@ t
 
 #Relative Anteile der Outcometypes
 table<- prop.table(t,2)
-
+```
 <details>
   <summary>Code Details</summary>
 ```{r table6}
