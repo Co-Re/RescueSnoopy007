@@ -1125,7 +1125,7 @@ Modellfitting mit einer Teilmenge/ Auswahl von Variablen (Auswahl auf Basis der 
 set.seed(seed_val)
 
 if (!exists("net_model_dog_selected"))
-  net_model_dog_selected <- neuralnet(outcome_type_adopt ~ time_in_shelter_days+sex_upon_intake_first_Sterilized,
+  net_model_dog_selected <- neuralnet(outcome_type_adopt ~ time_in_shelter_days+sex_upon_outcome_first_Sterilized,
                   data=training_dog_norm[c(2:78)], 
                   hidden=c(3),
                   stepmax = 1000000,
@@ -1194,7 +1194,7 @@ if (!exists("net_model_cat"))
 set.seed(seed_val)
 
 if (!exists("net_model_cat_selected"))
-  net_model_cat_selected <- neuralnet(outcome_type_adopt ~ sex_upon_outcome_first_Sterilized+age_upon_outcome_.days.+time_in_shelter_days,
+  net_model_cat_selected <- neuralnet(outcome_type_adopt ~ sex_upon_outcome_first_Sterilized+age_upon_intake_.days.,
                   data=training_cat_norm[c(2:78)], 
                   hidden=c(3),
                   stepmax = 1000000,
@@ -1208,7 +1208,7 @@ Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision
 plot(net_model_cat_selected , rep="best")
 ```
 
-Verlgeich der Accuracy der Modelle
+Vergleich der Accuracy der Modelle
 ```{r, echo=FALSE}
 pred_net_cat <- predict(net_model_cat,testing_cat_norm[c(2:5,7:78)] )
 idx <- apply(pred_net_cat, c(1), maxidx)
@@ -1257,7 +1257,7 @@ if (!exists("net_model_rabbit"))
 ```{r model fitting selected vars2}
 set.seed(seed_val)
 if (!exists("net_model_rabbit_selected"))
-  net_model_rabbit_selected <- neuralnet(outcome_type_adopt ~ sex_upon_outcome_first_Sterilized,
+  net_model_rabbit_selected <- neuralnet(outcome_type_adopt ~ sex_upon_outcome_first_Sterilized+outcome_month9+time_in_shelter_days+age_upon_outcome_.days.,
                   data=training_rabbit[c(2:78)], 
                   hidden=c(3),
                   stepmax = 1000000,
@@ -1271,7 +1271,7 @@ Visualisierung des neuronalen Netzes mit den wichtigen Features aus dem Decision
 plot(net_model_rabbit_selected , rep="best")
 ```
 
-Verlgeich der Accuracy der Modelle
+Vergleich der Accuracy der Modelle
 ```{r compare models, echo=FALSE}
 pred_net_rabbit <- predict(net_model_rabbit,testing_rabbit_norm[c(2:5,7:78)])
 idx <- apply(pred_net_rabbit, c(1), maxidx)
@@ -1287,7 +1287,7 @@ cat("All Variables: Accuracy", cf_net_rabbit$overall["Accuracy"], "\n")
 cat("Selected Variables: Accuracy", cf_net_rabbit_selected$overall["Accuracy"], "\n")
 ```
 
-
+Zur Ermittlung der Variable Importance wurde ein weiteres NN für Hasen mit allen Prädiktoren gefittet.
 ```{r nnet, results='hide'}
 set.seed(123)
 control <- trainControl(method = 'cv', number = 10)
