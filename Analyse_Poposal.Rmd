@@ -867,7 +867,7 @@ rpart.plot(tree_dog1$finalModel)
 ```
 
 *Interpretation*
-Der Tree zeigt, dass zuerst `time_in_shelter` eine Rolle spielt und somit die erste Abzweigung im Baum ist. Als weitere Variable verwendet der Baum `sex_upon_outcome_first_ Sterilized` = 0.
+Der Tree zeigt, dass zuerst `time_in_shelter_days` eine Rolle spielt und somit die erste Abzweigung im Baum ist. Als weitere Variable verwendet der Baum `sex_upon_outcome_first_ Sterilized` = 0.
 Wenn der Hund weniger als 4 Tage im Tierheim ist, scheint eine Adoption auf Basis des Modells also als unwahrscheinlich (vermutlich handelt es sich dabei um entlaufene Tiere die bereits innerhalb der ersten 4 Tage wieder vom Besitzer abgeholt werden), wohingegen bei Hunden, die länger als 4 Tage im Tierheim verbleiben, die Wahrscheinlichkeit einer Adoption dann hoch ist, wenn der Hund sterilisiert ist. 
 
 Die Specificity ist mit 87% um fast 20% höher als die Sensitivity, d.h. die Vorhersage von Hunden, die *nicht* adoptiert werden, ist genauer, als die für Hunde, die adoptiert werden. Gleichzeitig muss festgehalten werden, dass das Modell nur eine Accuracy von 76% hat, weshalb eine weitere Optimierung besonders sinnvoll erscheint. 
@@ -904,7 +904,7 @@ rpart.plot(tree_cat1$finalModel)
 
 *Interpretation*
 
-Bei Katzen ist `sex_upon_outcome_first_Sterilized` = 0 die erste Split Variable des Baumes, gefolgt von dem Alter und der Zeit, die die Katze im Tierheim verbracht hat.
+Bei Katzen ist `sex_upon_outcome_first_Sterilized` = 0 die erste Split Variable des Baumes, gefolgt von dem Alter der Katze beim Income.
 Daher scheinen für die Adoption einer Katze ähnliche Kriterien eine Rolle zu spielen, wie bei Hunden. Im Gegensatz zur Wahrscheinlichkeit einer Adoption eines Hundes spielt diesem Klassifikationsbaum zufolge auch das Alter der Katze eine Rolle: Wenn die Katze sterilisiert, und älter als ein halbes Jahr alt ist, ist eine Adoption wahrscheinlich. Ist die Katze jünger als ein halbes Jahr, hängt die Adoption davon ab, wie lange die Katze bereits im Tierheim war (Wahrscheinlich ist eine Adoption nämlich nur dann, wenn sie bereits länger als 12 Tage dort war).
 Dies könnte daran liegen, dass Jungtiere erst ab einem bestimmten Alter adoptiert (und sterilisiert) werden können. 
 
@@ -966,7 +966,7 @@ imp_dog = vi(tree_dog1)
 imp_dog = imp_dog[imp_dog$Importance>0,]
 imp_dog_tab = tibble(Variable = imp_dog$Variable, Importance = imp_dog$Importance)
 imp_dog_tab
-vip(tree_dog1, width = 0.5, fill = "green3")
+vip(tree_dog1, width = 0.5, fill = "green3", num_features = 6)
 ```
 
 Die einfachen Klassifikationsbäume geben bereits einen guten ersten Einblick darin, welche Variablen für die Klassifikation bzw Splitpunkte vorrangig herangezogen werden. 
@@ -991,7 +991,7 @@ imp_cat = vi(tree_cat1)
 imp_cat = imp_cat[imp_cat$Importance>0,]
 imp_cat_tab = tibble(Variable = imp_cat$Variable, Importance = imp_cat$Importance)
 imp_cat_tab
-vip(tree_cat1, width = 0.5, fill = "green3")
+vip(tree_cat1, width = 0.5, fill = "green3", num_features = 8)
 ```
 
 Im Modell der Katzen finden sich ähnliche Prädiktoren wieder, hinzugekommen ist hier:
@@ -1000,7 +1000,6 @@ Im Modell der Katzen finden sich ähnliche Prädiktoren wieder, hinzugekommen is
 * `sex_upon_intake_first_Sterilized`
 * `sex_upon_intake_first_Intact`
 * `sexuponoutcomesecond_unknown`
-* `intake_typeStray`
 
 Hier ist im Gegensatz zu den Hunden das Alter der Tiere und die `time_in_shelter` am wichtigsten.
 
@@ -1010,20 +1009,22 @@ imp_rab= vi(tree_rabbit1)
 imp_rab = imp_rab[imp_rab$Importance>0,]
 imp_rab_tab = tibble(Variable = imp_rab$Variable, Importance = imp_rab$Importance)
 imp_rab_tab
-vip(tree_rabbit1, width = 0.5, fill = "green3")
+vip(tree_rabbit1, width = 0.5, fill = "green3", num_features = 13)
 ```
 
 Hier ist wie im Modell der Hunde die Variable `sex_upon_outcome_first_Sterilized` am wichtigsten.
 Neben den bekannten Prädiktoren sind u.a. noch die Prädiktoren
 
+* `outcome_month9`
 * `intake_year2016`
 * `outcome_year2016`
+* `intake_month9`
 * `intake_year2015`
-* `outcome_month9`
-* `outcome_year2014`
+
 von Bedeutung.
 
 Die Relevanz der Jahreszeiten lässt darauf schließen, dass die Adoptionen von Hasen sich über die Jahre hinweg unterscheiden. Was Grund für das Ausreißerjahr 2016 war, müsste anhand von Brancheninformationen ermittelt werden, es könnt z.B. sein, dass es vermehrte mediale Aufmerksamkeit (z.B. durch Kampagnen / Testimonials) oder eine Art "Haustiertrend-Boost" für Hasen in diesem Jahr gab. 
+Die Outcome-Zeitdaten wurden bewusst in die Modellierung miteinbezogen, um zB vorzusagen ob ein Tier im aktuellen Monat adoptiert werden wird.
 
 
 
@@ -1051,17 +1052,16 @@ randomforest_OOB <- train(
   trControl = trcOOB
 )
 ```
-
+```{r eval=FALSE}
+RF_OOB_predict = predict(randomforest_OOB, data_test_model)
+conf_matrix_RF_OOB <- confusionMatrix(RF_OOB_predict, data_test_model$outcome_type)
+```
 ### Modell für Katzen
 Der Random Forest mit OOB konnte beispielhaft für ein reduziertes Subsample mit 1000 Cat-Datensätzen gespeichert werden.
 ```{r eval=FALSE}
 load("randomforestOOB_cats_n=1000.Rdata")
 ```
 
-```{r eval=FALSE}
-RF_OOB_predict = predict(randomforest_OOB, data_test_model)
-conf_matrix_RF_OOB <- confusionMatrix(RF_OOB_predict, data_test_model$outcome_type)
-```
 
 ## Neuronales Netzwerk
 
@@ -1332,7 +1332,7 @@ kable(accuracyTable, align = "l") %>%
 
 ```
 Bei allen Netzen ist die Accuracy unter Verwendung aller Features höher, als unter Verwendung eines Subsets, obwohl bei den Modellen für Katzen kaum ein Unterschied merkbar ist. 
-Wie auch bei den Bäumen ist die Accuracy für HUnde weiterhin am geringsten, konnte jedoch deutlich verbessert werden mit dem NN. 
+Wie auch bei den Bäumen ist die Accuracy für Hunde weiterhin am geringsten, konnte jedoch deutlich verbessert werden mit dem NN. 
 
 <details>
   <summary>Code Details</summary>
