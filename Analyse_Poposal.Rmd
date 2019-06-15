@@ -1298,8 +1298,9 @@ cat("Selected Variables: Accuracy", cf_net_rabbit_selected$overall["Accuracy"], 
 
 ```{r}
 set.seed(123)
+control <- trainControl(method = 'cv', number = 10)
 
-nnet_model_rabbit <- train(outcome_type_adopt ~., data = training_rabbit_norm[2:78], method = 'nnet', trControl = numFolds, tuneGrid=expand.grid(size=c(10), decay=c(0.1)), maxi = 100000 )
+nnet_model_rabbit <- train(outcome_type_adopt ~., data = training_rabbit_norm[2:78], method = 'nnet', trControl = control, tuneGrid=expand.grid(size=c(10), decay=c(0.1)), maxi = 100000 )
 
 pred_nnet_rabbit <- predict(nnet_model_rabbit,testing_rabbit_norm[c(2:5,7:78)])
 cf_nnet_rabbit <- confusionMatrix(pred_nnet_rabbit,testing_rabbit_norm$outcome_type_adopt)
