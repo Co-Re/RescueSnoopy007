@@ -175,7 +175,7 @@ Im Folgenden findet sich eine Auflistung der entfernten Variablen, sowie eine Be
 Folgende Variablen wurden für das neue Dataset nicht verwendet:
 
 * `found_location` - Diese Variable bietet keine gute Datenqualität, es sind nicht immer gleiche Daten erfasst (z.B. manchmal Ortsname, manchmal komplette Adresse). Eine Bereinigung bzw. Kürzung auf den Ortsnamen bringt keinen Erkenntnisgewinn für das Modell, da alle Aufnahmen in derselben Region stattfanden und einzig über die Adressangabe Subregionen miteinander vergleichbar wären. 
-* `sex_open_intake` - Diese Variable enthält die selben Daten wie `sex_open_outcome`, ist daher redundant.
+* `sex_upon_intake` - Diese Variable enthält die selben Daten wie `sex_upon_outcome`, ist daher redundant.
 
 ```{r crosstable2, echo=FALSE}
 table(aac_intakes_outcomes$sex_upon_intake_second, aac_intakes_outcomes$sex_upon_outcome_second)
@@ -198,7 +198,6 @@ table(aac_intakes_outcomes$outcome_hour)
 
 * `dob_monthyear` - Geburtsdatum. Der Monat und das Jahr werden als einzelne Variablen verwendet. Diese Ursprungsvariable wird damit nicht mehr benötigt.
 * `animal_id_intake` - ID kann nicht für Klassifikation verwendet werden
-* `sex_upon_intake` - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet
 * `count` - alle Werte sind 1 (Aushilfsspalte) d.h. kein Informationsgewinn durch diese Variable
 
 ```{r table1, echo=FALSE}
@@ -538,7 +537,7 @@ types[order(types[,1], decreasing=T),]
 
 Da das Interesse des Tierheims vorallem darin liegt, dass Hunde, Katzen und Hasen *adoptiert* werden, und dieser Anteil auch bei den beiden Tierarten relativ hoch ist, d.h. ausreichend Daten zum trainieren des Modells vorhanden sind, soll für diese Tierarten dieser *Outcometype* vorhergesagt werden. 
 
-### weitere Einschränkung nach Outcome Type und Tierart
+### Weitere Einschränkung nach Outcome Type und Tierart
 
 Da der Anteil bei Wildtieren, die eingeschläfert werden, sehr hoch ist, liegen nur wenige Fälle für andere Outcome types vor, weshalb an dieser Stelle davon abgesehen wird, Modelle für Racoons und Bats aufzustellen.  
 
@@ -864,6 +863,7 @@ rpart.plot(tree_dog1$finalModel)
 ```
 
 *Interpretation*
+
 Der Tree zeigt, dass zuerst `time_in_shelter` eine Rolle spielt und somit die erste Abzweigung im Baum ist. Als weitere Variable verwendet der Baum `sex_upon_outcome_first_ Sterilized` = 0.
 Wenn der Hund weniger als 4 Tage im Tierheim ist, scheint eine Adoption auf Basis des Modells also als unwahrscheinlich (vermutlich handelt es sich dabei um entlaufene Tiere die bereits innerhalb der ersten 4 Tage wieder vom Besitzer abgeholt werden), wohingegen bei Hunden, die länger als 4 Tage im Tierheim verbleiben, die Wahrscheinlichkeit einer Adoption dann hoch ist, wenn der Hund sterilisiert ist. 
 
@@ -967,7 +967,7 @@ vip(tree_dog1, width = 0.5, fill = "green3")
 ```
 
 Die einfachen Klassifikationsbäume geben bereits einen guten ersten Einblick darin, welche Variablen für die Klassifikation bzw Splitpunkte vorrangig herangezogen werden. 
-Da sich zeigt, dass über die Tierarten hinweg die Hauptsplitpunkte auf ähnlichen Variablen basieren, soll mithilfe der Variable Importance ermittelt werden, ob noch weitere Zusatzinformationen aus den Modellen gewonnen werden können, die für das Tierheim für das bessere Verständnis von Adoptionsgründen genutzt werden kann. 
+Da sich zeigt, dass über die Tierarten hinweg die Hauptsplitpunkte auf ähnlichen Variablen basieren, soll mithilfe der Variable Importance ermittelt werden, ob noch weitere Zusatzinformationen aus den Modellen gewonnen werden können, die für das Tierheim für das bessere Verständnis von Adoptionsgründen genutzt werden können. 
 Dafür wird die Variable Importance aus den obig erstellten Bäumen (je Tier) erstellt und beschrieben. 
 
 Es ist ersichtlich, dass für den Decision Tree der Hunde 6 Prädiktoren eine Rolle spielen:
@@ -1026,6 +1026,7 @@ Die Relevanz der Jahreszeiten lässt darauf schließen, dass die Adoptionen von 
 
 ## Tree Tuning (Bagging, Boosting, Random Forest)
 Es wurde versucht, noch weitere Trees, getunt mit Bagging, Boosting bzw Random Forest, aufzustellen. Aufgrund der Datenmenge und Rechenkapaziätsgrenzen konnten diese nicht ausgeführt werden und es ist hier nur ein Beispielcode bzw. ein gespeichertes Beispielmodel angeführt. In einem weiteren Schritt werden daher weitere Modelle mit Neuronalen Netzen auf.
+
 ### Auswahl Daten 
 Bei der Auswahl der Daten wurde auch versucht, die nummerischen Variablen bzw. die Breed auszuschließen, dies hat allerdings auch zu keinem erfolgreich gefitteten Modell geführt.
 ```{r eval=FALSE}
@@ -1138,12 +1139,12 @@ plot(net_model_dog_selected , rep="best")
 
 Verlgeich der Accuracy der Modelle
 ```{r model accuracy1 }
-#Vorhersage und De-Normalisierung für Modell mit allen Variablen 
+#Vorhersage für Modell mit allen Variablen 
 pred_net_dog <- predict(net_model_dog,testing_dog_norm[c(2:5,7:78)])
 idx <- apply(pred_net_dog, c(1), maxidx)
 pred_net_dog <-as.factor(c('0', '1')[idx])
 
-#Vorhersage und De-Normalisierung für Modell mit Teilmenge von Variablen 
+#Vorhersage für Modell mit Teilmenge von Variablen 
 pred_net_dog_selected <- predict(net_model_dog_selected,testing_dog_norm[c(2:5,7:78)])
 idx <- apply(pred_net_dog_selected, c(1), maxidx)
 pred_net_dog_selected <-as.factor(c('0', '1')[idx])
@@ -1285,6 +1286,16 @@ cat("Selected Variables: Accuracy", cf_net_rabbit_selected$overall["Accuracy"], 
 ```
 
 
+*Interpretation*
+
+Die Accuracy des NNs für Hasen ist unter Berücksichtigung aller Variablen ist etwas besser als unter Verwendung eines Subsets. Die Accuracy des Treemodels kann, wie auch bei den Katzen, mit dem Neuronalen Netz nicht mehr verbessert werden. 
+
+
+
+####Variablen Importance im NN
+
+Da die in den Bäumen ermittelten Variablen mit hoher Wichtigkeit für das Modell stark von jenen für Hunde und Katzen abweichen, wurde noch ein weiteres Neuronales Net (andere Library, die auch Einsicht der Variablen Importance des NNs ermöglicht) gefittet, um zu prüfen, inwiefern die Relevanz der Variablen im Neuronalen Netz von jenen abweicht, die im Tree ermittelt wurden.
+
 ```{r nnet, results='hide'}
 set.seed(123)
 control <- trainControl(method = 'cv', number = 10)
@@ -1296,17 +1307,6 @@ cf_nnet_rabbit <- confusionMatrix(pred_nnet_rabbit,testing_rabbit_norm$outcome_t
 cat("All Variables: Accuracy", cf_nnet_rabbit$overall["Accuracy"], "\n")
 ```
 
-*Interpretation*
-
-Die Accuracy des NNs für Hasen ist unter Berücksichtigung aller Variablen deutlich besser als unter Verwendung eines Subsets. Die Accuracy des Treemodels kann, wie auch bei den Katzen, mit dem Neuronalen Netz nicht mehr verbessert werden. 
-
-
-####Variablen Importance im NN
-
-Da die in den Bäumen ermittelten Variablen mit hoher Wichtigkeit für das Modell stark von jenen für Hunde und Katzen abweichen, wurde noch ein weiteres Neuronales Net (andere Library, die auch Einsicht der Variablen Importance des NNs ermöglicht) gefittet, um zu prüfen, inwiefern die Relevanz der Variablen im Neuronalen Netz von jenen abweicht, die im Tree ermittelt wurden.
-
-Neben der Sterilisation, die auch im Tree  eine der wichtigsten Variable darstellt, spielten vorrangig Monate und Jahre, in denen das Tier ins Tierheim gekommen ist bzw. das Tierheim verlassen hat, eine Rolle. Diese weichen leicht von den wichtigen Variablen ab, die im Tree als wichtig erachtet werden. Die Darstellung bestätigt aber jedenfalls nochmals, dass bei Hasen tatsächlich Saisoninformationen hilfreich dafür sind, die Adoption vorherzusagen.
-
 ```{r}
 imp_nn_s_rab = vi(nnet_model_rabbit)
 imp_nn_s_rab = imp_nn_s_rab[imp_nn_s_rab$Importance>5,]
@@ -1314,6 +1314,9 @@ imp_nn_s_rab_tab = tibble(Variable = imp_nn_s_rab$Variable, Importance = imp_nn_
 imp_nn_s_rab_tab
 vip(nnet_model_rabbit, width = 0.5, fill = "green3")
 ```
+
+Neben der Sterilisation, die auch im Tree  eine der wichtigsten Variable darstellt, spielten vorrangig Monate und Jahre, in denen das Tier ins Tierheim gekommen ist bzw. das Tierheim verlassen hat, eine Rolle. Diese weichen leicht von den wichtigen Variablen ab, die im Tree als wichtig erachtet werden. Die Darstellung bestätigt aber jedenfalls nochmals, dass bei Hasen tatsächlich Saisoninformationen hilfreich dafür sind, die Adoption vorherzusagen.
+
 
 ### Vergleich aller Neuronalen Netzwerke 
 
