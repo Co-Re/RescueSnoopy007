@@ -1279,7 +1279,7 @@ cat("Selected Variables: Accuracy", cf_net_rabbit_selected$overall["Accuracy"], 
 ```
 
 
-```{r}
+```{r nnet, results='hide'}
 set.seed(123)
 control <- trainControl(method = 'cv', number = 10)
 
