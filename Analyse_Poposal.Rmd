@@ -1291,11 +1291,11 @@ cat("All Variables: Accuracy", cf_nnet_rabbit$overall["Accuracy"], "\n")
 ```
 
 ```{r}
-imp_nn_s_rab = vi(class_model_nnet)
+imp_nn_s_rab = vi(nnet_model_rabbit)
 imp_nn_s_rab = imp_nn_s_rab[imp_nn_s_rab$Importance>5,]
 imp_nn_s_rab_tab = tibble(Variable = imp_nn_s_rab$Variable, Importance = imp_nn_s_rab$Importance)
 imp_nn_s_rab_tab
-vip(class_model_nnet, width = 0.5, fill = "green3")
+vip(nnet_model_rabbit, width = 0.5, fill = "green3")
 ```
 
 ### Vergleich aller Neuronalen Netzwerke 
