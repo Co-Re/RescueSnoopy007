@@ -815,7 +815,7 @@ testing_rabbit  <- rabbits[-train_function,]
 ***
 
 # Aufstellen der Modelle
-Zuerst werden Modell mithilfe von Decisoin Trees aufgestellt, da diese gut interpretierbar sind. Danach wird untersucht, ob andere Methoden wie neuronale Netze ein ähnliches oder sogar besseres Ergebnis hinsichtlich Accuracy liefern.
+Zuerst werden Modelle mithilfe von Decision Trees aufgestellt, da diese gut interpretierbar sind. Danach wird untersucht, ob andere Methoden wie neuronale Netze ein ähnliches oder sogar besseres Ergebnis hinsichtlich Accuracy liefern.
 
 ## Decision Trees
 
@@ -864,7 +864,7 @@ rpart.plot(tree_dog1$finalModel)
 ```
 
 *Interpretation*
-Der Tree zeigt, dass zuerst time_in_shelter eine Rolle spielt und somit die erste Abzweigung im Baum ist. Als weitere Variable verwendet der Baum sex_upon_outcome_first_ Sterilized = 0.
+Der Tree zeigt, dass zuerst `time_in_shelter` eine Rolle spielt und somit die erste Abzweigung im Baum ist. Als weitere Variable verwendet der Baum `sex_upon_outcome_first_ Sterilized` = 0.
 Wenn der Hund weniger als 4 Tage im Tierheim ist, scheint eine Adoption auf Basis des Modells also als unwahrscheinlich (vermutlich handelt es sich dabei um entlaufene Tiere die bereits innerhalb der ersten 4 Tage wieder vom Besitzer abgeholt werden), wohingegen bei Hunden, die länger als 4 Tage im Tierheim verbleiben, die Wahrscheinlichkeit einer Adoption dann hoch ist, wenn der Hund sterilisiert ist. 
 
 Die Specificity ist mit 87% um fast 20% höher als die Sensitivity, d.h. die Vorhersage von Hunden, die *nicht* adoptiert werden, ist genauer, als die für Hunde, die adoptiert werden. Gleichzeitig muss festgehalten werden, dass das Modell nur eine Accuracy von 76% hat, weshalb eine weitere Optimierung besonders sinnvoll erscheint. 
@@ -901,7 +901,7 @@ rpart.plot(tree_cat1$finalModel)
 
 *Interpretation*
 
-Bei Katzen ist sex_upon_outcome_first_Sterilized = 0 die erste Split Variable des Baumes, gefolgt von dem Alter und der Zeit, die die Katze im Tierheim verbracht hat.
+Bei Katzen ist `sex_upon_outcome_first_Sterilized` = 0 die erste Split Variable des Baumes, gefolgt von dem Alter und der Zeit, die die Katze im Tierheim verbracht hat.
 Daher scheinen für die Adoption einer Katze ähnliche Kriterien eine Rolle zu spielen, wie bei Hunden. Im Gegensatz zur Wahrscheinlichkeit einer Adoption eines Hundes spielt diesem Klassifikationsbaum zufolge auch das Alter der Katze eine Rolle: Wenn die Katze sterilisiert, und älter als ein halbes Jahr alt ist, ist eine Adoption wahrscheinlich. Ist die Katze jünger als ein halbes Jahr, hängt die Adoption davon ab, wie lange die Katze bereits im Tierheim war (Wahrscheinlich ist eine Adoption nämlich nur dann, wenn sie bereits länger als 12 Tage dort war).
 Dies könnte daran liegen, dass Jungtiere erst ab einem bestimmten Alter adoptiert (und sterilisiert) werden können. 
 
@@ -940,7 +940,7 @@ rpart.plot(tree_rabbit1$finalModel)
 
 *Interpretation*
 
-Bei Hasen ist der einzige Splitpunkt sex_upon_outcome_first_Sterilized = 0. Daher erfolgt die Vorhersage einer Adoption eines Hasens ausschließlich auf Basis der Information, ob das Tier sterilisiert ist. Wie auch bei den anderen Tieren ist die Adoptionswahrscheinlichkeit dann deutlich höher, wenn das Tier bereits sterilisiert ist.
+Bei Hasen ist der einzige Splitpunkt `sex_upon_outcome_first_Sterilized` = 0. Daher erfolgt die Vorhersage einer Adoption eines Hasens ausschließlich auf Basis der Information, ob das Tier sterilisiert ist. Wie auch bei den anderen Tieren ist die Adoptionswahrscheinlichkeit dann deutlich höher, wenn das Tier bereits sterilisiert ist.
 Die Accuracy ist mit 88% noch besser als jene der anderen beiden Trees (Hunde und Katzen). 
 
 <details>
@@ -971,6 +971,7 @@ Da sich zeigt, dass über die Tierarten hinweg die Hauptsplitpunkte auf ähnlich
 Dafür wird die Variable Importance aus den obig erstellten Bäumen (je Tier) erstellt und beschrieben. 
 
 Es ist ersichtlich, dass für den Decision Tree der Hunde 6 Prädiktoren eine Rolle spielen:
+
 * `sex_upon_outcome_first_Sterilized`
 * `sex_upon_outcome_first_Intact`
 * `time_in_shelter_days`
@@ -991,6 +992,7 @@ vip(tree_cat1, width = 0.5, fill = "green3")
 ```
 
 Im Modell der Katzen finden sich ähnliche Prädiktoren wieder, hinzugekommen ist hier:
+
 * `age_upon_outcome_.days.`
 * `sex_upon_intake_first_Sterilized`
 * `sex_upon_intake_first_Intact`
@@ -1010,6 +1012,7 @@ vip(tree_rabbit1, width = 0.5, fill = "green3")
 
 Hier ist wie im Modell der Hunde die Variable `sex_upon_outcome_first_Sterilized` am wichtigsten.
 Neben den bekannten Prädiktoren sind u.a. noch die Prädiktoren
+
 * `intake_year2016`
 * `outcome_year2016`
 * `intake_year2015`
@@ -1024,11 +1027,12 @@ Die Relevanz der Jahreszeiten lässt darauf schließen, dass die Adoptionen von 
 ## Tree Tuning (Bagging, Boosting, Random Forest)
 Es wurde versucht, noch weitere Trees, getunt mit Bagging, Boosting bzw Random Forest, aufzustellen. Aufgrund der Datenmenge und Rechenkapaziätsgrenzen konnten diese nicht ausgeführt werden und es ist hier nur ein Beispielcode bzw. ein gespeichertes Beispielmodel angeführt. In einem weiteren Schritt werden daher weitere Modelle mit Neuronalen Netzen auf.
 ### Auswahl Daten 
+Bei der Auswahl der Daten wurde auch versucht, die nummerischen Variablen bzw. die Breed auszuschließen, dies hat allerdings auch zu keinem erfolgreich gefitteten Modell geführt.
 ```{r eval=FALSE}
 
 
 data_train_model <- training_cat[,-c(1:5)]
-data_test_model <- testing_cat[,-c(1)]
+data_test_model <- testing_cat[,-c(1:5)]
 ```
 
 ### Random Forrest mit OOB 
@@ -1059,7 +1063,7 @@ conf_matrix_RF_OOB <- confusionMatrix(RF_OOB_predict, data_test_model$outcome_ty
 ## Neuronales Netzwerk
 
 Die Bäume dienen als gut interpretierbare Modelle für ein besseres Verständnis der Adoptionsgründe, nun soll noch getestet werden, ob ein Modell, dass primär auf Vorhersage, als auf Interpretierbarket abzielt, helfen kann, die Modellaccuracy noch weiter zu steigern. 
-Bei den neuronalen Netzen wird die Breed Variable ausgeschlossen, da sie  bei den Bäumen als nicht relevant identifiziert wurde. Außerdem werden die numerischen Variablen intake_number, age_upon_intake_.days, age_upon_outcome_.days und time_in_shelter_days vorab min-max normalisiert, um die Geschwindigkeit der Berechnung zu erhöhen (für das Hundedatenset konnte ohne Normalisierung aus Computer Performance technischen Gründen gar keine Berechnung  durchgeführt werden). Die Normalisierung ermöglichte dann eine (schnellere) Berechnung.
+Bei den neuronalen Netzen wird die Breed Variable ausgeschlossen, da sie  bei den Bäumen als nicht relevant identifiziert wurde. Außerdem werden die numerischen Variablen `intake_number`, `age_upon_intake_.days.`, `age_upon_outcome_.days.` und `time_in_shelter_days` vorab min-max normalisiert, um die Geschwindigkeit der Berechnung zu erhöhen (für das Hundedatenset konnte ohne Normalisierung aus Computer Performance technischen Gründen gar keine Berechnung  durchgeführt werden). Die Normalisierung ermöglichte dann eine (schnellere) Berechnung.
 Es werden für jede Tierart jeweils zwei neuronale Netze erstellt, einmal mit allen Variablen und einmal mit den Variablen, die im Decision Tree schon als wichtig festgestellt wurden. 
 
 Es wird erwartet, dass das Modell, das alle Variablen inkludiert, eine höhere Accuracy erzielt als jenes, das nur eine Teilmenge der Variablen enthält (weil die Mustererkennung unter Berücksichtigung von mehr Variablen genauer sein müsste). Andererseits soll auch getestet werden, ob ausschließlich unter Verwendung der (auf Basis der Variable Importance) wichtigsten Prädiktoren ein gleich gutes Ergebnis erzielt werden kann, wie mit dem gefitteten einfachen Baummodell.
