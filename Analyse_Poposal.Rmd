@@ -145,23 +145,23 @@ aac_intakes_outcomes$intake_hour <- as.factor(hour(aac_intakes_outcomes$intake_d
 ### Anmerkungen für weitere Preprocessing Schritte
 
 Folgende Animal-Types sind vorhanden:
-Unter Other verbergen sich großteils unterschiedliche Nage- und Säugetiere bzw. Kleintiere, die in einem folgenden Datenaufbereitungsschritt feingliedriger aufgedrosselt werden.
-
 ```{r table animals, echo=FALSE}
 table(aac_intakes_outcomes$animal_type)
 ```
 
-Folgende Kombinationen sind bei der Zeugungsfähigkeit des Geschlechts möglich, wobei in den Zeilen der Zustand bei Aufnahme im Tierheim dargestellt wird, in den Spalten bei Verlassen:
+Unter Other verbergen sich großteils unterschiedliche Nage- und Säugetiere bzw. Kleintiere, die in einem folgenden Datenaufbereitungsschritt feingliedriger aufgedrosselt werden.
+
+Folgende Kombinationen sind bei der Zeugungsfähigkeit des Geschlechts möglich, wobei in den Zeilen der Zustand bei Aufnahme im Tierheim dargestellt wird, in den Spalten der Zustand beim Verlassen:
 
 ```{r crosstable1, echo=FALSE}
 table(aac_intakes_outcomes$sex_upon_intake_first, aac_intakes_outcomes$sex_upon_outcome_first) 
 
 ```
-Unplausible Fälle (Kastrierter Income, Nichtkastrierter Outcome) werden im Zuge der Datenaufbereitung zu Unknown rekategorisiert.
+Unplausible Fälle (kastrierter Income, nichtkastrierter Outcome) werden im Zuge der Datenaufbereitung zu Unknown rekategorisiert.
 
 
 ### Erstellung eines neuen Datasets und Entfernung von Variablen
-Dieses enthält nicht alle Variablen. Im Folgenden findet sich eine Auflistung der entfernten Variablen, sowie eine Begründung, weshalb einige Daten nicht für die Analyse miteinbezogen werden. 
+Das neue Dataset enthält nicht alle Variablen. 
 
 <details>
   <summary>Code Details</summary>
@@ -170,9 +170,10 @@ aac_intakes_outcomes2 <- aac_intakes_outcomes[c(5, 22:24, 26, 27, 43, 42, 44, 3,
 ```
 </details>
 
+Im Folgenden findet sich eine Auflistung der entfernten Variablen, sowie eine Begründung, weshalb einige Daten nicht für die Analyse miteinbezogen werden. 
 Folgende Variablen wurden für das neue Dataset nicht verwendet:
 
-* `found_location` - Diese Variable bietet keine gute Datenqualität, es sind nicht immer gleiche Daten erfasst (z.B. manchmal Ortsname, manchmal komplette Adresse). Eine Bereinigung bzw. Kürzung auf den Ortsnamen bringt keinen Erkenntnisgewinn für das Modell, da alle Aufnahmen in derselben Region stattfanden und einzig über die Adressangabe Subregionen miteinander vergleichbar würden. 
+* `found_location` - Diese Variable bietet keine gute Datenqualität, es sind nicht immer gleiche Daten erfasst (z.B. manchmal Ortsname, manchmal komplette Adresse). Eine Bereinigung bzw. Kürzung auf den Ortsnamen bringt keinen Erkenntnisgewinn für das Modell, da alle Aufnahmen in derselben Region stattfanden und einzig über die Adressangabe Subregionen miteinander vergleichbar wären. 
 * `sex_open_intake` - Diese Variable enthält die selben Daten wie `sex_open_outcome`, ist daher redundant.
 
 ```{r crosstable2, echo=FALSE}
@@ -233,7 +234,7 @@ summary(aac_intakes_outcomes2)
 ```
 
 Für die Prüfung werden zuerst alle Ausprägungen der Response `outcome_type` angesehen und bereinigt. 
-```{r check uniques, results='hide'}
+```{r check uniques}
 unique(aac_intakes_outcomes2$outcome_type)
 table(aac_intakes_outcomes2$outcome_type)
 ```
@@ -247,7 +248,7 @@ aac_intakes_outcomes2$outcome_type <- factor(aac_intakes_outcomes2$outcome_type)
 
 ## Anpassen des Animal Types Other
 
-Auf Basis der Breed Variable wird die fehlende Information der Tierrasse aufgefüllt. 
+Auf Basis der Breed Variable wird die fehlende Information der Tierrasse (Ausprägung Other) aufgefüllt. 
 
 <details>
   <summary>Code Details</summary>
