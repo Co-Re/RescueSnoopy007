@@ -999,6 +999,7 @@ Es wurde versucht, noch weitere Trees, getunt mit Bagging, Boosting bzw Random F
 
 data_train_model <- training_cat[,-c(1:5)]
 data_test_model <- testing_cat[,-c(1)]
+```
 
 # Random Forrest mit OOB 
 Max. Zahl für das tuneGrid (für die Metry) wurde mit 9 gewählt, da üblicherweise das Optimum von m= Wurzel aus p, d.h. Wurzel aus 78=9 (gerundet)
@@ -1012,22 +1013,17 @@ randomforest_OOB <- train(
   tuneGrid = expand.grid(mtry=seq(1,10,1)),
   trControl = trcOOB
 )
-
-
 ```
 
 # Modell für Katzen
 Der Random Forest mit OOB konnte beispielhaft für ein reduziertes Subsample mit 1000 Cat-Datensätzen gespeichert werden.
 ```{r eval=FALSE}
 load("randomforestOOB_cats_n=1000.Rdata")
-
 ```
-
 
 ```{r eval=FALSE}
 RF_OOB_predict = predict(randomforest_OOB, data_test_model)
 conf_matrix_RF_OOB <- confusionMatrix(RF_OOB_predict, data_test_model$outcome_type)
-
 ```
 
 ## Neuronales Netzwerk
