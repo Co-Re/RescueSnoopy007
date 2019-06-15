@@ -70,19 +70,20 @@ Wir haben uns für dieses Datenset mit dieser Fragestellung entschieden, da eini
 
 
 ```{r load packages, include=F, message=FALSE, warning = FALSE}
-library("plyr")
-library("anytime")
-library("lubridate")
-library("kableExtra")
-library(caret)
-library(rpart.plot)
-library(dummies)
-library(dplyr)
-library(neuralnet)
-library(tibble)
-library(vip)
-library(labeling)
-library(e1071)
+pacman::p_load(
+plyr, 
+anytime,
+lubridate,
+kableExtra, 
+caret,
+rpart.plot,
+dummies,
+dplyr,
+neuralnet,
+tibble,
+vip,
+labeling,
+e1071)
 ```
 
 ## Laden der Daten
@@ -395,12 +396,7 @@ dtime3 <- round(difftime(aac_intakes_outcomes2$outcome_datetime, aac_intakes_out
 aac_intakes_outcomes2$time_in_shelter_days_calc <- dtime3
 
 # Alle überflüssigen Features entfernen, die nun nicht mehr benötigt werden
-aac_intakes_outcomes2$age_upon_intake_.days. <- NULL
-aac_intakes_outcomes2$age_upon_outcome_.days. <- NULL
-aac_intakes_outcomes2$time_in_shelter_days <- NULL
-aac_intakes_outcomes2$date_of_birth <- NULL
-aac_intakes_outcomes2$intake_datetime <- NULL
-aac_intakes_outcomes2$outcome_datetime <- NULL
+aac_intakes_outcomes2[ ,c('age_upon_intake_.days.', 'age_upon_outcome_.days.', 'time_in_shelter_days', 'date_of_birth', 'intake_datetime', 'outcome_datetime')] <- list(NULL)
 
 # Spalten umbennen
 names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "age_upon_outcome_days_calc"] <- "age_upon_outcome_.days."
@@ -491,25 +487,6 @@ names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_intake_fi
 names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_outcome_first_new"] <- "sex_upon_outcome_first"
 ```
 </details>
-
-## Prüfung ob statistische Modellierung möglich ist
-
-###glm Modell
-
-Es wird ein GLM Modell am Beispiel von 3 Prädiktoren aufgestellt, um die grundsätzliche Modellierbarkeit darzustellen.
-```{r glm model}
-glm.fit = glm(outcome_type~animal_type+intake_condition+intake_type, data = aac_intakes_outcomes2, family = binomial)
-summary(glm.fit)
-```
-
-**Prediction**  
-```{r pred glm, echo=FALSE}
-glm.prob = predict(glm.fit, type = "response")
-glm.prob[1:10]
-```
-
-**Erläuterung**   
-Eine Prediction wie sie hier dargestellt ist, ist noch nicht sinnvoll, da mehrere Klassen in der Response vorhanden sind. Für mehrere Klassen sollte eine andere Funktion bzw. ein anderes Modell verwendet werden. Auf Basis der obenstehenden Analysen und Erkenntnisse halten wir Tree Modelle für die Vorhersage des `outcome_type` für geeignet.
 
 
 ## Einschränkung der Tierarten 
@@ -604,8 +581,13 @@ b<- ggplot(aac_intakes_outcomes2, aes(animal_type))+geom_bar(fill = "#0073C2FF")
 
 b+geom_bar(aes(fill = outcome_type_adopt))
 
-
 ```
+```{r table6, include=FALSE}
+t<-table(aac_intakes_outcomes2$outcome_type_adopt, aac_intakes_outcomes2$animal_type)
+t
+
+#Relative Anteile der Outcometypes
+table<- prop.table(t,2)
 
 <details>
   <summary>Code Details</summary>
@@ -972,7 +954,7 @@ if (!file.exists("decision_trees.RData"))
 
 ## Variable Importance
 
-Je Modell ist eine Tabelle der Wichtigkeit einer Variable sowie eine Grafik dargestellt. Die Tabelle enthält lediglich Variablen, bei denen die Importance größer 0.
+Je Modell ist eine Tabelle der Wichtigkeit einer Variable sowie eine Grafik dargestellt. Die Tabelle enthält lediglich Variablen, bei denen die Importance größer 0 ist.
 
 ### Variable Importance des Hundemodells
 
@@ -1039,9 +1021,9 @@ Die Relevanz der Jahreszeiten lässt darauf schließen, dass die Adoptionen von 
 
 
 
-# Tree Tuning (Bagging, Boosting, Random Forest)
+## Tree Tuning (Bagging, Boosting, Random Forest)
 Es wurde versucht, noch weitere Trees, getunt mit Bagging, Boosting bzw Random Forest, aufzustellen. Aufgrund der Datenmenge und Rechenkapaziätsgrenzen konnten diese nicht ausgeführt werden und es ist hier nur ein Beispielcode bzw. ein gespeichertes Beispielmodel angeführt. In einem weiteren Schritt werden daher weitere Modelle mit Neuronalen Netzen auf.
-# Auswahl Daten 
+### Auswahl Daten 
 ```{r eval=FALSE}
 
 
@@ -1049,7 +1031,7 @@ data_train_model <- training_cat[,-c(1:5)]
 data_test_model <- testing_cat[,-c(1)]
 ```
 
-# Random Forrest mit OOB 
+### Random Forrest mit OOB 
 Max. Zahl für das tuneGrid (für die Metry) wurde mit 9 gewählt, da üblicherweise das Optimum von m= Wurzel aus p, d.h. Wurzel aus 78=9 (gerundet)
 ```{r eval=FALSE}
 trcOOB <- trainControl(method="oob")
@@ -1063,7 +1045,7 @@ randomforest_OOB <- train(
 )
 ```
 
-# Modell für Katzen
+### Modell für Katzen
 Der Random Forest mit OOB konnte beispielhaft für ein reduziertes Subsample mit 1000 Cat-Datensätzen gespeichert werden.
 ```{r eval=FALSE}
 load("randomforestOOB_cats_n=1000.Rdata")
@@ -1100,7 +1082,6 @@ maxidx <- function(arr) {
 normalize <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
-
 ```
 
 ### Neuronales Netz für Hunde
@@ -1172,6 +1153,8 @@ cat("Selected Variables: Accuracy", cf_net_dog_selected$overall["Accuracy"], "\n
 ```
 
 *Interpretation*
+
+Die Accuracy 
 
 
 ### Neuronales Netz für Katzen
@@ -1337,13 +1320,25 @@ if (!file.exists("neuronale_netze.RData"))
 </details>
 
 #Conclusion
+
+Das Vorgehen bei der Prädiktion hat zufriedenstellende Ergebnisse geliefert. Es konnten einerseits relevante Faktoren für die Adoption der am häufigsten im Tierheim vorhandenen Tierarten eruiert werden, andererseits konnten Neuronale Netze mit guter Accuracy (über 80%) gefittet werden. 
+
 ```{r}
 accuracy_compare_table = tibble(Modell="Decision Tree", Hunde=conf_matrix_tree_dog1$overall["Accuracy"], Katzen=conf_matrix_tree_cat1$overall["Accuracy"], Hasen=conf_matrix_tree_rabbit1$overall["Accuracy"])
 
 accuracy_compare_table = add_row(accuracy_compare_table, Modell="Neuronales Netz", Hunde=cf_net_dog$overall["Accuracy"], Katzen=cf_net_cat$overall["Accuracy"], Hasen=cf_net_rabbit$overall["Accuracy"])
+```
 
+```{r}
 kable(accuracy_compare_table, align = "l") %>%
   kable_styling(bootstrap_options = "striped") %>%
   footnote(general = "", general_title = "Tabelle 2: Test Accuracies der Modelle")
 ```
+
+Die anfangs formulierte Hypothese, dass die Adoption vor allem vom Alter und Gesundheitszustand abhängig ist, konnte nur teilweise verifiziert werden. Außerdem stellte sich heraus, dass für unterschiedliche Tierarten unterschiedliche Faktoren und in unterschiedlichem Ausmaß einen Einfluss auf die Adoptionswahrscheinlichkeit nehmen. Bei Hunden sind die Sterilisation, die Zeitdauer im Tierheim, das Alter und ob es sich um einen Streuner handelt die wichtigsten Kriterien. Für das Tierheim bedeutet das, dass durch eine Sterilization die Adoption wahrscheinlich am stärksten beeinflusst werden kann. 
+Bei Katzen ist das Alter für die Adoption relevanter als bei Hunden, aber auch bei dieser Tierart spielt die Sterilization eine bedeutende Rolle, wie auch ob es sich um ein Streunertier handelt. 
+Überraschend ist, dass der Gesundheitszustand in keinem der Modelle als relevant für eine Adoption bewertet wurde. 
+Bei den Vorhersagen der Adoption von Hasen zeigte sich ein extremer Unterschied der relevanten Faktoren im Vergleich zu den Hunden und Katzen. Es scheint, als gäbe es eine "saisonale" Abhängigkeit für die Adoption, wir vermuten, dass z.B. um Feiertage (Ostern, Weihnachten), die Adoptionszahl für Hasen ansteigt. Das Tierheim könnte diese Information z.B. dazu nutzen, um die Auslastung/Belegung im Tierheim zu optimieren, da entweder in Zeiten, wo weniger Adoptionen eintreten, die Plätze kurzzeitig ausgebaut werden, da absehbar ist, wann diese wieder reduziert werden können. 
+
+
 ![](snoopy.png)
