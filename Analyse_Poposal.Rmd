@@ -82,6 +82,7 @@ library(neuralnet)
 library(tibble)
 library(vip)
 library(labeling)
+library(e1071)
 ```
 
 ## Laden der Daten
@@ -990,78 +991,19 @@ Die Relevanz der Jahreszeiten lässt darauf schließen, dass die Adoptionen von 
 
 
 
-# Tree Tuning (Bagging, Boosting, Random Forrest)
-
+# Tree Tuning (Bagging, Boosting, Random Forest)
+Es wurde versucht, noch weitere Trees, getunt mit Bagging, Boosting bzw Random Forest, aufzustellen. Aufgrund der Datenmenge und Rechenkapaziätsgrenzen konnten diese nicht ausgeführt werden und es ist hier nur ein Beispielcode bzw. ein gespeichertes Beispielmodel angeführt. In einem weiteren Schritt werden daher weitere Modelle mit Neuronalen Netzen auf.
 # Auswahl Daten 
-```{r}
+```{r eval=FALSE}
 
-data_train_model <- training_cat
-data_test_model <- testing_cat
 
-```
-
-# Bagged Tree mit Bootstrapping
-
-```{r}
-trcBootstr <- trainControl(method="boot")
-
-baggedtree <- train(
-  outcome_type_adopt ~ .,
-  data = data_train_model,
-  method = "treebag",
-  trControl = trcBootstr
-)
-
-```
-
-```{r}
-baggedT_predict = predict(baggedtree, data_test_model)
-conf_matrix_tree_bagged <- confusionMatrix(baggedT_predict, data_test_model$outcome_type)
-
-```
-
-```{r}
-imp_bag = vi(baggedtree)
-imp_bag = imp_bag[imp_bag$Importance>5,]
-imp_bag_tab = tibble(Variable = imp_bag$Variable, Importance = imp_bag$Importance)
-imp_bag_tab
-vip(baggedtree, width = 0.5, fill = "green3")
-```
-
-# Random Forrest mit CV 
-
-## Max. Zahl für das tuneGrid (für die Metry) wurde mit 9 gewählt, da üblicherweise das Optimum von m= Wurzel aus p, d.h. Wurzel aus 78=9 (gerundet)
-
-```{r}
-trnCntrl <- trainControl(method = "cv", number=5)
-
-randomforest_CV <- train(
-  outcome_type_adopt ~ .,
-  data = data_train_model,
-  method = "rf",
-  tuneGrid = expand.grid(mtry=seq(1,10,1)),
-  trControl = trnCntrl
-)
-
-```
-
-```{r}
-RF_CV_predict = predict(randomforest_CV, data_test_model)
-conf_matrix_RF_CV <- confusionMatrix(RF_CV_predict, data_test_model$outcome_type)
-
-```
-
-```{r}
-imp_rfcv = vi(randomforest_CV)
-imp_rfcv = imp_rfcv[imp_rfcv$Importance>5,]
-imp_rfcv_tab = tibble(Variable = imp_rfcv$Variable, Importance = imp_rfcv$Importance)
-imp_rfcv_tab
-vip(randomforest_CV, width = 0.5, fill = "green3")
+data_train_model <- training_cat[,-c(1:5)]
+data_test_model <- testing_cat[,-c(1)]
 ```
 
 # Random Forrest mit OOB 
-
-```{r}
+Max. Zahl für das tuneGrid (für die Metry) wurde mit 9 gewählt, da üblicherweise das Optimum von m= Wurzel aus p, d.h. Wurzel aus 78=9 (gerundet)
+```{r eval=FALSE}
 trcOOB <- trainControl(method="oob")
 
 randomforest_OOB <- train(
@@ -1071,68 +1013,24 @@ randomforest_OOB <- train(
   tuneGrid = expand.grid(mtry=seq(1,10,1)),
   trControl = trcOOB
 )
-
 ```
 
-# Modell für Katzen (Achtung, nur mit einem Subsample von n=1000!)
-```{r}
+# Modell für Katzen
+Der Random Forest mit OOB konnte beispielhaft für ein reduziertes Subsample mit 1000 Cat-Datensätzen gespeichert werden.
+```{r eval=FALSE}
 load("randomforestOOB_cats_n=1000.Rdata")
-
 ```
 
-
-```{r}
+```{r eval=FALSE}
 RF_OOB_predict = predict(randomforest_OOB, data_test_model)
 conf_matrix_RF_OOB <- confusionMatrix(RF_OOB_predict, data_test_model$outcome_type)
-
 ```
-
-```{r}
-imp_rfoob = vi(randomforest_OOB)
-imp_rfoob = imp_rfoob[imp_rfoob$Importance>5,]
-imp_rfoob_tab = tibble(Variable = imp_rfoob$Variable, Importance = imp_rfoob$Importance)
-imp_rfoob_tab
-vip(randomforest_OOB, width = 0.5, fill = "green3")
-```
-
-
-# Modellvergleich
-## Tree1 Modelmetrics muss noch befüllt werden! 
-```{r}
-tree1 = tibble(
-  Model = "Einfacher Tree mit CV",
-  TrainAccuracy = 0,
-  TestAccuracy = 0)
-
-
-tree2 = tibble(
-  Model = "Bagged Model",
-  TrainAccuracy = baggedtree$results$Accuracy,
-  TestAccuracy = conf_matrix_tree_bagged$overall[1])
-
-tree3 = tibble(
-  Model = "Random Forrest CV",
-  TrainAccuracy = max(randomforest_CV$results$Accuracy),
-  TestAccuracy = conf_matrix_RF_CV$overall[1])
-
-tree4 = tibble(
-  Model = "Random Forrest OOB",
-  TrainAccuracy = max(randomforest_OOB$results$Accuracy),
-  TestAccuracy = conf_matrix_RF_OOB$overall[1])
-
-comp_table_trees= bind_rows(tree1, tree2, tree3, tree4)
-
-print(comp_table_trees)
-
-
-```
-
 
 ## Neuronales Netzwerk
 
 Die Bäume dienen als gut interpretierbare Modelle für ein besseres Verständnis der Adoptionsgründe, nun soll noch getestet werden, ob ein Modell, dass primär auf Vorhersage, als auf Interpretierbarket abzielt, helfen kann, die Modellaccuracy noch weiter zu steigern. 
 Bei den neuronalen Netzen wird die Breed Variable ausgeschlossen, da sie  bei den Bäumen als nicht relevant identifiziert wurde. Außerdem werden die numerischen Variablen intake_number, age_upon_intake_.days, age_upon_outcome_.days und time_in_shelter_days vorab min-max normalisiert, um die Geschwindigkeit der Berechnung zu erhöhen (für das Hundedatenset konnte ohne Normalisierung aus Computer Performance technischen Gründen gar keine Berechnung  durchgeführt werden). Die Normalisierung ermöglichte dann eine (schnellere) Berechnung.
-Es werden für jede Tierart jeweil zwei neuronale Netze erstellt, einmal mit allen Variabeln und einmal mit den Variablen die im Decision Tree schon als wichtig festgestellt wurden. 
+Es werden für jede Tierart jeweils zwei neuronale Netze erstellt, einmal mit allen Variablen und einmal mit den Variablen, die im Decision Tree schon als wichtig festgestellt wurden. 
 
 Es wird erwartet, dass das Modell, das alle Variablen inkludiert, eine höhere Accuracy erzielt als jenes, das nur eine Teilmenge der Variablen enthält (weil die Mustererkennung unter Berücksichtigung von mehr Variablen genauer sein müsste). Andererseits soll auch getestet werden, ob ausschließlich unter Verwendung der (auf Basis der Variable Importance) wichtigsten Prädiktoren ein gleich gutes Ergebnis erzielt werden kann, wie mit dem gefitteten einfachen Baummodell.
 
@@ -1235,7 +1133,7 @@ cat("All Variables: Accuracy", cf_net_dog$overall["Accuracy"], "\n")
 cat("Selected Variables: Accuracy", cf_net_dog_selected$overall["Accuracy"], "\n")
 ```
 
-*Interpreation*
+*Interpretation*
 
 
 ### Neuronales Netz für Katzen
@@ -1395,6 +1293,6 @@ if (!file.exists("neuronale_netze.RData"))
   save(net_model_dog, net_model_dog_selected, net_model_cat, net_model_cat_selected, net_model_rabbit,net_model_rabbit_selected, file = "neuronale_netze.RData")
 ```
 
-#Conclusio
+#Conclusion
 
 ![](snoopy.png)
