@@ -742,12 +742,15 @@ Da für jede Tierart ein eigenes Modell gefittet wird, wird die Tierartvariable 
 
 rabbits <- subset(aac_intakes_outcomes2, animal_type == "Rabbit")
 rabbits <- rabbits[,-c(1)]
+rabbits$ breed <- as.factor(rabbits$breed)
 
 dogs <- subset(aac_intakes_outcomes2, animal_type == "Dog")
 dogs <- dogs[,-c(1)]
+dogs$breed <- as.factor(dogs$breed)
 
 cats <- subset(aac_intakes_outcomes2, animal_type == "Cat")
 cats <- cats[,-c(1)]
+cats$breed <- as.factor(cats$breed)
 
 ```
 
