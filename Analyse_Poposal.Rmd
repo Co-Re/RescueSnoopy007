@@ -582,13 +582,17 @@ b<- ggplot(aac_intakes_outcomes2, aes(animal_type))+geom_bar(fill = "#0073C2FF")
 b+geom_bar(aes(fill = outcome_type_adopt))
 
 ```
-```{r table6, include=FALSE}
+
+<details>
+  <summary>Code Details</summary>
+```{r table6}
 t<-table(aac_intakes_outcomes2$outcome_type_adopt, aac_intakes_outcomes2$animal_type)
 t
 
 #Relative Anteile der Outcometypes
 table<- prop.table(t,2)
 ```
+</details>
 <details>
   <summary>Code Details</summary>
 ```{r table7}
@@ -1361,7 +1365,7 @@ Die anfangs formulierte Hypothese, dass die Adoption vor allem vom Alter und Ges
 Bei Katzen ist das Alter für die Adoption relevanter als bei Hunden, aber auch bei dieser Tierart spielt die Sterilisation eine bedeutende Rolle. 
 Überraschend ist, dass der Gesundheitszustand in keinem der Modelle als relevant für eine Adoption bewertet wurde. 
 Bei den Vorhersagen der Adoption von Hasen zeigte sich ein extremer Unterschied der relevanten Faktoren im Vergleich zu den Hunden und Katzen. Es scheint, als gäbe es eine "saisonale" Abhängigkeit für die Adoption, wir vermuten, dass z.B. um Feiertage (Ostern, Weihnachten), die Adoptionszahl für Hasen ansteigt. Das Tierheim könnte diese Information z.B. dazu nutzen, um die Auslastung/Belegung im Tierheim zu optimieren, da entweder in Zeiten, wo weniger Adoptionen eintreten, die Plätze kurzzeitig ausgebaut werden, da absehbar ist, wann diese wieder reduziert werden können. 
-Das Tierheim könnte mit diesen Modellen besser einschätzen, ob und unter welchen Bedingungen gewisse Hunde, Katzen und Hasen eher adoptiert werden. Außerdem können für jene, die eher nicht adoptiert werden, gegebenfalls zusätzliche Maßnahmen (Sterilisation, Marketing, ...) getroffen werden um auch ihre Chance auf eine Adoption zu erhöhen.
+Das Tierheim könnte mit diesen Modellen besser einschätzen, ob und unter welchen Bedingungen gewisse Hunde, Katzen und Hasen eher adoptiert werden. Außerdem können für jene, die eher nicht adoptiert werden, gegebenfalls zusätzliche Maßnahmen (Sterilisation, Marketing, ...) getroffen werden, um auch ihre Chance auf eine Adoption zu erhöhen.
 
 
 ![](snoopy.png)
