@@ -1111,9 +1111,13 @@ Modellfitting unter Verwendung aller Variablen (normalisiert) außer Breed:
 ```{r NN dogs, output='hide'}
 set.seed(seed_val)
 
-#Normalisierung der Daten
+#Normalisierung der numerischen Variablen (Spalten 2-5)
 training_dog_norm = training_dog
 training_dog_norm[c(2:5)] <- as.data.frame(lapply(training_dog_norm[c(2:5)], normalize))
+
+testing_dog_norm = testing_dog
+testing_dog_norm[c(2:5)] <- as.data.frame(lapply(testing_dog_norm[c(2:5)], normalize))
+
 
 #'Fullmodel' Fitting
 
@@ -1150,18 +1154,18 @@ plot(net_model_dog_selected , rep="best")
 Verlgeich der Accuracy der Modelle
 ```{r model accuracy1 }
 #Vorhersage und De-Normalisierung für Modell mit allen Variablen 
-pred_net_dog <- predict(net_model_dog,testing_dog[c(2:5,7:78)])
+pred_net_dog <- predict(net_model_dog,testing_dog_norm[c(2:5,7:78)])
 idx <- apply(pred_net_dog, c(1), maxidx)
 pred_net_dog <-as.factor(c('0', '1')[idx])
 
 #Vorhersage und De-Normalisierung für Modell mit Teilmenge von Variablen 
-pred_net_dog_selected <- predict(net_model_dog_selected,testing_dog[c(2:5,7:78)])
+pred_net_dog_selected <- predict(net_model_dog_selected,testing_dog_norm[c(2:5,7:78)])
 idx <- apply(pred_net_dog_selected, c(1), maxidx)
 pred_net_dog_selected <-as.factor(c('0', '1')[idx])
 
 #Confusion Matrizen für beide Modelle 
-cf_net_dog <- confusionMatrix(pred_net_dog,testing_dog$outcome_type_adopt)
-cf_net_dog_selected <- confusionMatrix(pred_net_dog_selected,testing_dog$outcome_type_adopt)
+cf_net_dog <- confusionMatrix(pred_net_dog,testing_dog_norm$outcome_type_adopt)
+cf_net_dog_selected <- confusionMatrix(pred_net_dog_selected,testing_dog_norm$outcome_type_adopt)
 
 cat("All Variables: Accuracy", cf_net_dog$overall["Accuracy"], "\n")
 cat("Selected Variables: Accuracy", cf_net_dog_selected$overall["Accuracy"], "\n")
@@ -1179,6 +1183,10 @@ set.seed(seed_val)
 
 training_cat_norm = training_cat
 training_cat_norm[c(2:5)] <- as.data.frame(lapply(training_cat_norm[c(2:5)], normalize))
+
+testing_cat_norm = testing_cat
+testing_cat_norm[c(2:5)] <- as.data.frame(lapply(testing_cat_norm[c(2:5)], normalize))
+
 
 if (!exists("net_model_cat"))
   net_model_cat <- neuralnet(outcome_type_adopt ~ .,
@@ -1212,22 +1220,21 @@ plot(net_model_cat_selected , rep="best")
 
 Verlgeich der Accuracy der Modelle
 ```{r, echo=FALSE}
-pred_net_cat <- predict(net_model_cat,testing_cat[,-6] )
+pred_net_cat <- predict(net_model_cat,testing_cat_norm[c(2:5,7:78)] )
 idx <- apply(pred_net_cat, c(1), maxidx)
 pred_net_cat <-as.factor(c('0', '1')[idx])
 
-cf_net_cat <- confusionMatrix(pred_net_cat,testing_cat$outcome_type_adopt)
+cf_net_cat <- confusionMatrix(pred_net_cat,testing_cat_norm$outcome_type_adopt)
 
-pred_net_cat_selected <- predict(net_model_cat_selected,testing_cat[,-6] )
+pred_net_cat_selected <- predict(net_model_cat_selected,testing_cat_norm[c(2:5,7:78)] )
 idx <- apply(pred_net_cat_selected, c(1), maxidx)
 pred_net_cat_selected <-as.factor(c('0', '1')[idx])
 
-cf_net_cat_selected  <- confusionMatrix(pred_net_cat_selected,testing_cat$outcome_type_adopt)
+cf_net_cat_selected  <- confusionMatrix(pred_net_cat_selected,testing_cat_norm$outcome_type_adopt)
 
 cat("All Variables: Accuracy", cf_net_cat$overall["Accuracy"], "\n")
 cat("Selected Variables: Accuracy", cf_net_cat_selected$overall["Accuracy"], "\n")
 ```
-
 *Interpretation*
 
 ### Neuronales Netz für Hasen
@@ -1238,6 +1245,10 @@ cat("Selected Variables: Accuracy", cf_net_cat_selected$overall["Accuracy"], "\n
 set.seed(seed_val)
 training_rabbit_norm = training_rabbit
 training_rabbit_norm[c(2:5)] <- as.data.frame(lapply(training_rabbit_norm[c(2:5)], normalize))
+
+testing_rabbit_norm = testing_rabbit
+testing_rabbit_norm[c(2:5)] <- as.data.frame(lapply(testing_rabbit_norm[c(2:5)], normalize))
+
 
 if (!exists("net_model_rabbit"))
   net_model_rabbit <- neuralnet(outcome_type_adopt ~ .,
@@ -1270,18 +1281,37 @@ plot(net_model_rabbit_selected , rep="best")
 
 Verlgeich der Accuracy der Modelle
 ```{r compare models, echo=FALSE}
-pred_net_rabbit <- predict(net_model_rabbit,testing_rabbit[c(2:5,7:78)])
+pred_net_rabbit <- predict(net_model_rabbit,testing_rabbit_norm[c(2:5,7:78)])
 idx <- apply(pred_net_rabbit, c(1), maxidx)
 pred_net_rabbit <-as.factor(c('0', '1')[idx])
 
-pred_net_rabbit_selected <- predict(net_model_rabbit_selected,testing_rabbit[c(2:5,7:78)])
+pred_net_rabbit_selected <- predict(net_model_rabbit_selected,testing_rabbit_norm[c(2:5,7:78)])
 idx <- apply(pred_net_rabbit_selected, c(1), maxidx)
 pred_net_rabbit_selected <-as.factor(c('0', '1')[idx])
 
-cf_net_rabbit <- confusionMatrix(pred_net_rabbit,testing_rabbit$outcome_type_adopt)
-cf_net_rabbit_selected <- confusionMatrix(pred_net_rabbit_selected,testing_rabbit$outcome_type_adopt)
+cf_net_rabbit <- confusionMatrix(pred_net_rabbit,testing_rabbit_norm$outcome_type_adopt)
+cf_net_rabbit_selected <- confusionMatrix(pred_net_rabbit_selected,testing_rabbit_norm$outcome_type_adopt)
 cat("All Variables: Accuracy", cf_net_rabbit$overall["Accuracy"], "\n")
 cat("Selected Variables: Accuracy", cf_net_rabbit_selected$overall["Accuracy"], "\n")
+```
+
+
+```{r}
+set.seed(123)
+
+nnet_model_rabbit <- train(outcome_type_adopt ~., data = training_rabbit_norm[2:78], method = 'nnet', trControl = numFolds, tuneGrid=expand.grid(size=c(10), decay=c(0.1)), maxi = 100000 )
+
+pred_nnet_rabbit <- predict(nnet_model_rabbit,testing_rabbit_norm[c(2:5,7:78)])
+cf_nnet_rabbit <- confusionMatrix(pred_nnet_rabbit,testing_rabbit_norm$outcome_type_adopt)
+cat("All Variables: Accuracy", cf_nnet_rabbit$overall["Accuracy"], "\n")
+```
+
+```{r}
+imp_nn_s_rab = vi(class_model_nnet)
+imp_nn_s_rab = imp_nn_s_rab[imp_nn_s_rab$Importance>5,]
+imp_nn_s_rab_tab = tibble(Variable = imp_nn_s_rab$Variable, Importance = imp_nn_s_rab$Importance)
+imp_nn_s_rab_tab
+vip(class_model_nnet, width = 0.5, fill = "green3")
 ```
 
 ### Vergleich aller Neuronalen Netzwerke 
@@ -1307,5 +1337,13 @@ if (!file.exists("neuronale_netze.RData"))
 </details>
 
 #Conclusion
+```{r}
+accuracy_compare_table = tibble(Modell="Decision Tree", Hunde=conf_matrix_tree_dog1$overall["Accuracy"], Katzen=conf_matrix_tree_cat1$overall["Accuracy"], Hasen=conf_matrix_tree_rabbit1$overall["Accuracy"])
 
+accuracy_compare_table = add_row(accuracy_compare_table, Modell="Neuronales Netz", Hunde=cf_net_dog$overall["Accuracy"], Katzen=cf_net_cat$overall["Accuracy"], Hasen=cf_net_rabbit$overall["Accuracy"])
+
+kable(accuracy_compare_table, align = "l") %>%
+  kable_styling(bootstrap_options = "striped") %>%
+  footnote(general = "", general_title = "Tabelle 2: Test Accuracies der Modelle")
+```
 ![](snoopy.png)
