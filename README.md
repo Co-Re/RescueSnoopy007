@@ -10,4 +10,4 @@ Datensatz von Kaggle: [Austin Animal Center Shelter Intakes and Outcomes](https:
 
 [RMD-FinalReportFile](https://github.com/Co-Re/RescueSnoopy007/blob/master/FinalReport_RescueSnoopy.Rmd)
 
-[HTML-FinalReportFile](https://github.com/Co-Re/RescueSnoopy007/blob/master/FinalReport_RescueSnoopy.html) Das Öffnen des HTML-Files wird aufgrund der bessere Lesbarkeit über RStudio empfohlen, um die volle Funktionalität der eingeklappten Code-Snippets zu nutzen.
+[HTML-FinalReportFile](https://github.com/Co-Re/RescueSnoopy007/blob/master/FinalReport_RescueSnoopy.html)
