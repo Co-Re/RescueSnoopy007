@@ -1151,12 +1151,12 @@ plot(net_model_dog_selected , rep="best")
 Verlgeich der Accuracy der Modelle
 ```{r model accuracy1 }
 #Vorhersage für Modell mit allen Variablen 
-pred_net_dog <- predict(net_model_dog,testing_dog_norm[c(2:5,7:78)])
+pred_net_dog <- predict(net_model_dog,testing_dog_norm[c(2:78)])
 idx <- apply(pred_net_dog, c(1), maxidx)
 pred_net_dog <-as.factor(c('0', '1')[idx])
 
 #Vorhersage für Modell mit Teilmenge von Variablen 
-pred_net_dog_selected <- predict(net_model_dog_selected,testing_dog_norm[c(2:5,7:78)])
+pred_net_dog_selected <- predict(net_model_dog_selected,testing_dog_norm[c(2:78)])
 idx <- apply(pred_net_dog_selected, c(1), maxidx)
 pred_net_dog_selected <-as.factor(c('0', '1')[idx])
 
@@ -1219,13 +1219,13 @@ plot(net_model_cat_selected , rep="best")
 
 Vergleich der Accuracy der Modelle
 ```{r, echo=FALSE}
-pred_net_cat <- predict(net_model_cat,testing_cat_norm[c(2:5,7:78)] )
+pred_net_cat <- predict(net_model_cat,testing_cat_norm[c(2:78)] )
 idx <- apply(pred_net_cat, c(1), maxidx)
 pred_net_cat <-as.factor(c('0', '1')[idx])
 
 cf_net_cat <- confusionMatrix(pred_net_cat,testing_cat_norm$outcome_type_adopt)
 
-pred_net_cat_selected <- predict(net_model_cat_selected,testing_cat_norm[c(2:5,7:78)] )
+pred_net_cat_selected <- predict(net_model_cat_selected,testing_cat_norm[c(2:78)] )
 idx <- apply(pred_net_cat_selected, c(1), maxidx)
 pred_net_cat_selected <-as.factor(c('0', '1')[idx])
 
@@ -1237,7 +1237,7 @@ cat("Selected Variables: Accuracy", cf_net_cat_selected$overall["Accuracy"], "\n
 
 *Interpretation*
 
-Die Accuracy des NNs für Katzen ist unter Berücksichtigung aller Variablen deutlich besser als unter Verwendung eines Subsets. Die Accuracy des Treemodels kann mit dem Neuronalen Netz durchaus um etwa 5% verbessert werden. 
+Die Accuracy des NNs für Katzen ist unter Berücksichtigung aller Variablen deutlich besser als unter Verwendung eines Subsets. Die Accuracy des Treemodels kann mit dem Neuronalen Netz durchaus um etwa `r round(cf_net_cat$overall["Accuracy"]*100,0)-round(conf_matrix_tree_cat1$overall["Accuracy"]*100,0)`% verbessert werden. 
 
 ### Neuronales Netz für Hasen
 
@@ -1283,11 +1283,11 @@ plot(net_model_rabbit_selected , rep="best")
 
 Vergleich der Accuracy der Modelle
 ```{r compare models, echo=FALSE}
-pred_net_rabbit <- predict(net_model_rabbit,testing_rabbit_norm[c(2:5,7:78)])
+pred_net_rabbit <- predict(net_model_rabbit,testing_rabbit_norm[c(2:78)])
 idx <- apply(pred_net_rabbit, c(1), maxidx)
 pred_net_rabbit <-as.factor(c('0', '1')[idx])
 
-pred_net_rabbit_selected <- predict(net_model_rabbit_selected,testing_rabbit_norm[c(2:5,7:78)])
+pred_net_rabbit_selected <- predict(net_model_rabbit_selected,testing_rabbit_norm[c(2:78)])
 idx <- apply(pred_net_rabbit_selected, c(1), maxidx)
 pred_net_rabbit_selected <-as.factor(c('0', '1')[idx])
 
