@@ -1,6 +1,6 @@
 # RescueSnoopy007
-
-## Statistik Projekt
+## Algorithmik & Statistik 2 Gruppenarbeit
+## Gruppenmitglieder: Lara Knapwost - 1810837601, Cornelia Reithmeier - 1810837362, Isabelle Veitl - 1810837521, Anna Weber - 1810837818
 
 Verwendete Programmiersprache: R
 
@@ -8,6 +8,6 @@ Datensatz von Kaggle: [Austin Animal Center Shelter Intakes and Outcomes](https:
 
 [RMD-ProposalFile](https://github.com/Co-Re/RescueSnoopy007/blob/master/Analyse_Poposal.Rmd)
 
-[RMD-FinalReportFile](https://github.com/Co-Re/RescueSnoopy007/blob/master/Analyse_Poposal.Rmd)
+[RMD-FinalReportFile](https://github.com/Co-Re/RescueSnoopy007/blob/master/FinalReport_RescueSnoopy.Rmd)
 
-[HTML-FinalReportFile]() Das Öffnen des HTML-Files wird aufgrund der bessere Lesbarkeit über RStudio empfohlen, um die volle Funktionalität der eingeklappten Code-Snippets zu nutzen.
+[HTML-FinalReportFile](https://github.com/Co-Re/RescueSnoopy007/blob/master/FinalReport_RescueSnoopy.html) Das Öffnen des HTML-Files wird aufgrund der bessere Lesbarkeit über RStudio empfohlen, um die volle Funktionalität der eingeklappten Code-Snippets zu nutzen.
