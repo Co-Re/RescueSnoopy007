@@ -83,7 +83,12 @@ neuralnet,
 tibble,
 vip,
 labeling,
+captioner,
 e1071)
+```
+
+```{r table_caption_init, results='hide', echo=FALSE}
+table_nums <- captioner(prefix = "Tabelle")
 ```
 
 ## Laden der Daten
@@ -1327,18 +1332,21 @@ Neben der Sterilisation, die auch im Tree eine der wichtigsten Variable darstell
 
 ### Vergleich aller Neuronalen Netzwerke 
 
-Tabelle der Accuracies aller neuronalen Netze
-```{r accuracies, echo=FALSE}
+```{r results='hide', echo=FALSE}
+table_nums(name = "accuracies_nn_table", caption = "Accuracies der Neuronalen Netze")
+```
+
+```{r accuracies_nn_table, echo=FALSE}
 accuracyTable = tibble(Tierart="Hunde", Accuracy_All=cf_net_dog$overall["Accuracy"], Accuracy_Selected_Features=cf_net_dog_selected$overall["Accuracy"])
 accuracyTable = add_row(accuracyTable, Tierart="Katzen", Accuracy_All=cf_net_cat$overall["Accuracy"], Accuracy_Selected_Features=cf_net_cat_selected$overall["Accuracy"])
 accuracyTable = add_row(accuracyTable, Tierart="Hasen", Accuracy_All=cf_net_rabbit$overall["Accuracy"], Accuracy_Selected_Features=cf_net_rabbit_selected$overall["Accuracy"])
 
 kable(accuracyTable, align = "l") %>%
   kable_styling(bootstrap_options = "striped") %>%
-  footnote(general = "", general_title = "Tabelle 1: Accuracies der Neuronalen Netze")
+  footnote(general = "", general_title = table_nums("accuracies_nn_table"))
 
 ```
-Bei allen Netzen ist die Accuracy unter Verwendung aller Features höher, als unter Verwendung eines Subsets, obwohl bei den Modellen für Hasen kaum ein Unterschied merkbar ist. Somit konnte unsere Annahme der besseren Accuracy bei Netzen mit allen Variablen bestätigt werden.
+`r table_nums("accuracies_nn_table", display = "cite")` zeigt, dass bei allen Netzen ist die Accuracy unter Verwendung aller Features höher, als unter Verwendung eines Subsets, obwohl bei den Modellen für Hasen kaum ein Unterschied merkbar ist. Somit konnte unsere Annahme der besseren Accuracy bei Netzen mit allen Variablen bestätigt werden.
 Wie auch bei den Bäumen ist die Accuracy für Hunde weiterhin am geringsten, konnte jedoch deutlich von `r round(conf_matrix_tree_dog1$overall["Accuracy"]*100,0)`% auf `r round(cf_net_dog$overall["Accuracy"]*100,0)`% verbessert werden mit dem NN. 
 
 <details>
@@ -1349,18 +1357,22 @@ if (!file.exists("neuronale_netze.RData"))
 ```
 </details>
 
+```{r echo=FALSE, results='hide'}
+table_nums(name = "compare_accuracies", caption = "Test-Accuracies der Modelle")
+```
+
 #Conclusion
 
-Das Vorgehen bei der Prädiktion hat zufriedenstellende Ergebnisse geliefert. Es konnten einerseits relevante Faktoren für die Adoption der am häufigsten im Tierheim vorhandenen Tierarten eruiert werden, andererseits konnten Neuronale Netze mit guter Accuracy (über 80%) gefittet werden.
+Das Vorgehen bei der Prädiktion hat zufriedenstellende Ergebnisse geliefert. Es konnten einerseits relevante Faktoren für die Adoption der am häufigsten im Tierheim vorhandenen Tierarten eruiert werden, andererseits konnten Neuronale Netze mit guter Accuracy (über 80%, siehe `r table_nums("compare_accuracies", display = "cite")`) gefittet werden.
 
-```{r echo=FALSE}
+```{r compare_accuracies, echo=FALSE}
 accuracy_compare_table = tibble(Modell="Decision Tree", Hunde=conf_matrix_tree_dog1$overall["Accuracy"], Katzen=conf_matrix_tree_cat1$overall["Accuracy"], Hasen=conf_matrix_tree_rabbit1$overall["Accuracy"])
 
 accuracy_compare_table = add_row(accuracy_compare_table, Modell="Neuronales Netz", Hunde=cf_net_dog$overall["Accuracy"], Katzen=cf_net_cat$overall["Accuracy"], Hasen=cf_net_rabbit$overall["Accuracy"])
 
 kable(accuracy_compare_table, align = "l") %>%
   kable_styling(bootstrap_options = "striped") %>%
-  footnote(general = "", general_title = "Tabelle 2: Test Accuracies der Modelle")
+  footnote(general = "", general_title = table_nums("compare_accuracies"))
 ```
 
 Die anfangs formulierte Hypothese, dass die Adoption vor allem vom Alter und Gesundheitszustand abhängig ist, konnte nur teilweise verifiziert werden. Außerdem stellte sich heraus, dass für unterschiedliche Tierarten unterschiedliche Faktoren und in unterschiedlichem Ausmaß einen Einfluss auf die Adoptionswahrscheinlichkeit nehmen. Bei Hunden sind die Sterilisation, die Zeitdauer im Tierheim, das Alter und ob es sich um einen Streuner handelt die wichtigsten Kriterien. Für das Tierheim bedeutet das, dass durch eine Sterilization die Adoption wahrscheinlich am stärksten beeinflusst werden kann. 
