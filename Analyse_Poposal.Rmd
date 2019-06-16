@@ -1339,7 +1339,7 @@ kable(accuracyTable, align = "l") %>%
 
 ```
 Bei allen Netzen ist die Accuracy unter Verwendung aller Features höher, als unter Verwendung eines Subsets, obwohl bei den Modellen für Hasen kaum ein Unterschied merkbar ist. Somit konnte unsere Annahme der besseren Accuracy bei Netzen mit allen Variablen bestätigt werden.
-Wie auch bei den Bäumen ist die Accuracy für Hunde weiterhin am geringsten, konnte jedoch deutlich ( von `r round(conf_matrix_tree_dog1$overall["Accuracy"]*100,0)`% auf `r round(cf_net_dog$overall["Accuracy"]*100,0)`% ) verbessert werden mit dem NN. 
+Wie auch bei den Bäumen ist die Accuracy für Hunde weiterhin am geringsten, konnte jedoch deutlich von `r round(conf_matrix_tree_dog1$overall["Accuracy"]*100,0)`% auf `r round(cf_net_dog$overall["Accuracy"]*100,0)`% verbessert werden mit dem NN. 
 
 <details>
   <summary>Code Details</summary>
@@ -1353,13 +1353,11 @@ if (!file.exists("neuronale_netze.RData"))
 
 Das Vorgehen bei der Prädiktion hat zufriedenstellende Ergebnisse geliefert. Es konnten einerseits relevante Faktoren für die Adoption der am häufigsten im Tierheim vorhandenen Tierarten eruiert werden, andererseits konnten Neuronale Netze mit guter Accuracy (über 80%) gefittet werden.
 
-```{r}
+```{r echo=FALSE}
 accuracy_compare_table = tibble(Modell="Decision Tree", Hunde=conf_matrix_tree_dog1$overall["Accuracy"], Katzen=conf_matrix_tree_cat1$overall["Accuracy"], Hasen=conf_matrix_tree_rabbit1$overall["Accuracy"])
 
 accuracy_compare_table = add_row(accuracy_compare_table, Modell="Neuronales Netz", Hunde=cf_net_dog$overall["Accuracy"], Katzen=cf_net_cat$overall["Accuracy"], Hasen=cf_net_rabbit$overall["Accuracy"])
-```
 
-```{r}
 kable(accuracy_compare_table, align = "l") %>%
   kable_styling(bootstrap_options = "striped") %>%
   footnote(general = "", general_title = "Tabelle 2: Test Accuracies der Modelle")
