@@ -1,0 +1,396 @@
+---
+title: "Algorithmik & Statistik Lab 2: Analyse Proposal - 'Rescue Snoopy'"
+author: "Lara Knapwost - 1810837601, Cornelia Reithmeier - 1810837362, Isabelle Veitl - 1810837521, Anna Weber - 1810837818"
+date: '9. April 2019'
+output: 
+  html_document:
+    toc: TRUE
+urlcolor: cyan
+---
+***
+Unter dem Arbeitstitel "Rescue Snoopy" wurden in einem ersten Schritt folgende Daten ausgewählt, analysiert und das statistische Analyse-Interesse dargelegt.
+
+# Ausgewähltes Datenset
+Für die Gruppenarbeit werden Daten von Kaggle verwendet:  
+https://www.kaggle.com/aaronschlegel/austin-animal-center-shelter-intakes-and-outcomes#aac_intakes.csv
+
+Von den dort gesammelten Daten wird folgende Datei verwendet: `aac_intakes_outcomes`
+
+Das Datenset enthält unter anderem folgende Variablen:
+
+* `animal_id` - eindeutige ID des Tieres
+* `age_upon_outcome` - Alter des Tieres bei Outcome
+* `date_of_birth` - Geburtsdatum des Tieres (geschätzt, wenn dieses nicht bekannt war)
+* `outcome_subtype` - spezifische Beschreibung des Outcomes
+* `outcome_type` - Art des Outcomes
+* `datetime` - Datum und Uhrzeit des Outcomes
+* `outcome_number` - Anzahl, wie oft ein Tier das Tierheim schon verlassen hat
+* `sex_upon_outcome` - Geschlecht des Tieres und ob das Tier kastriert wurde
+* `age_upon_intake` - Alter des Tieres bei Aufnahme in String-Format 
+* `animal_type` - Tierart
+* `breed` - Tierrasse
+* `color` - Tierfarbe
+* `datetime` - Datum und Uhrzeit der Aufnahme
+* `found_location` - Adresse oder Bereich, wo das Tier gefunden wurde 
+* `intake_condition` - Zustand des Tieres bei der Aufnahme
+* `intake_type` - kategorisierter Aufnahmetyp
+* `name` - Name des Tieres
+* `sex_upon_intake` - Geschlecht des Tieres und ob das Tier kastriert wurde
+* `intake_number` - Anzahl, wie oft ein Tier schon zum Tierheim gebracht wurde
+* `time_in_shelter` - Zeit im Tierheim
+
+Neben diesen Variablen existierten weitere, die beispielsweise Zeiträume in einem anderen Format darstellen.
+
+# Hintergrundinformationen zum Datenset
+Die Daten wurden vom [Austin Animal Center](http://www.austintexas.gov/department/aac) erhoben. Dieses Animal Center ist das größte Tierheim in den USA, in dem keine Tiere getötet werden und kann bis zu 18.000 Tiere pro Jahr aufnehmen. Es werden alle Arten von Tieren aufgenommen. Das Tierheim befindet sich im Travis County im US-Bundesstaat Texas.
+Die Daten werden im Rahmen der Austin's Open Data Intitiative online bereitgestellt.  
+
+Das Datenset enthält n = 79.672 Observationen und 41 Variablen.   
+Die Daten stammen aus der Zeit zwischen Oktober 2013 bis April 2018 (Outcomes).  
+Die Tiere sind zwischen 0-25 Jahre alt, der Median liegt bei 1 Jahr, die Geschlechtsverteilung männlicher und weiblicher Tiere liegt fast bei 50/50.  
+Mehr als die Hälfte der Tiere sind Hunde, gefolgt von Katzen und einigen Vögeln (<500). Etwa 4.500 Tiere sind keiner Spezies zugeordnet.   
+Knapp die Hälfte der im Datenset enthaltenen Tiere wurde adoptiert.   
+
+# Statistische Lernaufgabe
+Im Rahmen der Gruppenarbeit soll folgendes Klassifikationsproblem betrachtet werden:
+
+Vorhersage des Outcome-Types auf Basis der gegebenen Variablen. Es sollen die Prädiktoren gefunden werden, anhand derer eine Rückgabe an den Besitzer, ein Transfer / eine Adoption, Euthanasie, Tod etc. möglichst genau (durch Vorhersage der Klasse) vorhergesagt werden können. 
+
+# Motivation
+Es gibt viele Tierheime, durch Hörensagen ist bekannt, dass in vielen davon eine Großzahl der Tiere einen beträchtlichen Teil ihres Lebens verbringen. 
+Es ist interessant für uns, herauszufinden, welche Aspekte ausschlaggebend dafür sind, ob das Tier (vor dem Tod) wieder aus dem Tierheim "entlassen" wird, d.h. einen neuen Besitzer findet. Wir haben einige Hypothesen, welche wir prüfen möchten. Wir gehen davon aus, dass vor allem jüngere, gesunde Tiere eine bessere Chance haben, als ältere, kranke, ggf. auch nicht kastrierte (Streuner-)Tiere, die bereits sehr lange im Tierheim sind.   
+Weiß man, welche Aspekte eine Rolle spielen, könnte man diese gezielt in den Tierheimen in der Kommunikation verwenden, um mehr Tieren (z.B. vor allem jenen, die grundsätzlich eine schlechtere Chance für eine Adoption haben) ein neues zu Hause zu geben.   
+Wir haben uns für dieses Datenset mit dieser Fragestellung entschieden, da einige von uns selbst Haustiere besitzen und wir den Eindruck haben, dass es bereits ausreichend viele Analysen zu ökonomischen Fragestellungen gibt.
+
+# Vorbereitung in R
+
+```{r, include=F}
+library("plyr")
+library("anytime")
+library("lubridate")
+library("kableExtra")
+```
+
+## Laden der Daten
+```{r}
+aac_intakes_outcomes = read.csv("aac_intakes_outcomes.csv")
+```
+
+## Überprüfung der Datenstruktur
+```{r}
+str(aac_intakes_outcomes)
+# Andrucken der ersten Datensätze
+head(aac_intakes_outcomes)
+```
+
+```{r}
+summary(aac_intakes_outcomes)
+```
+
+## Erste Datenbereinigung - Konvertieren der Datentypen
+```{r}
+aac_intakes_outcomes$animal_id_outcome <- as.character(aac_intakes_outcomes$animal_id_outcome)
+aac_intakes_outcomes$date_of_birth <- anytime(aac_intakes_outcomes$date_of_birth)
+
+aac_intakes_outcomes$sex_upon_outcome[is.na(aac_intakes_outcomes$sex_upon_outcome)] <- "Unknown"
+aac_intakes_outcomes$sex_upon_outcome[is.element(aac_intakes_outcomes$sex_upon_outcome, "NULL")] <- "Unknown"
+aac_intakes_outcomes$sex_upon_outcome_first <- as.factor(sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_outcome), " "), "[", 1))
+aac_intakes_outcomes$sex_upon_outcome_second <- sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_outcome), " "), "[", 2)
+aac_intakes_outcomes$sex_upon_outcome_second[is.na(aac_intakes_outcomes$sex_upon_outcome_second)] <- "Unknown"
+aac_intakes_outcomes$sex_upon_outcome_second <- as.factor(aac_intakes_outcomes$sex_upon_outcome_second)
+
+aac_intakes_outcomes$age_upon_outcome_.days. <- as.numeric(aac_intakes_outcomes$age_upon_outcome_.days.)
+aac_intakes_outcomes$outcome_datetime <- anytime(aac_intakes_outcomes$outcome_datetime)
+aac_intakes_outcomes$outcome_month <- as.factor(aac_intakes_outcomes$outcome_month)
+aac_intakes_outcomes$outcome_year <- as.factor(aac_intakes_outcomes$outcome_year)
+aac_intakes_outcomes$outcome_hour <- as.factor(hour(aac_intakes_outcomes$outcome_datetime))
+aac_intakes_outcomes$dob_month <- as.factor(aac_intakes_outcomes$dob_month)
+aac_intakes_outcomes$dob_year <- as.factor(aac_intakes_outcomes$dob_year)
+aac_intakes_outcomes$animal_id_intake <- as.character(aac_intakes_outcomes$animal_id_intake)
+
+aac_intakes_outcomes$sex_upon_intake[is.na(aac_intakes_outcomes$sex_upon_intake)] <- "Unknown"
+aac_intakes_outcomes$sex_upon_intake_first <- as.factor(sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_intake), " "), "[", 1))
+aac_intakes_outcomes$sex_upon_intake_second <- sapply(strsplit(as.character(aac_intakes_outcomes$sex_upon_intake), " "), "[", 2)
+aac_intakes_outcomes$sex_upon_intake_second[is.na(aac_intakes_outcomes$sex_upon_intake_second)] <- "Unknown"
+aac_intakes_outcomes$sex_upon_intake_first[is.na(aac_intakes_outcomes$sex_upon_intake_first)] <- "Unknown"
+aac_intakes_outcomes$sex_upon_intake_second <- as.factor(aac_intakes_outcomes$sex_upon_intake_second)
+
+aac_intakes_outcomes$count <- as.numeric(aac_intakes_outcomes$count)
+aac_intakes_outcomes$age_upon_intake_.days. <- as.numeric(aac_intakes_outcomes$age_upon_intake_.days.)
+aac_intakes_outcomes$intake_datetime <- anytime(aac_intakes_outcomes$intake_datetime)
+aac_intakes_outcomes$intake_month <- as.factor(aac_intakes_outcomes$intake_month)
+aac_intakes_outcomes$intake_year <- as.factor(aac_intakes_outcomes$intake_year)
+aac_intakes_outcomes$intake_hour <- as.factor(hour(aac_intakes_outcomes$intake_datetime))
+```
+
+## Anmerkungen zum Datenset
+
+Folgende Animal-Types sind vorhanden:
+Unter Other verbergen sich großteils unterschiedliche Nage- und Säugetiere bzw. Kleintiere, die in einem folgenden Datenaufbereitungsschritt feingliedriger aufgedrosselt werden.
+
+```{r, echo=FALSE}
+table(aac_intakes_outcomes$animal_type)
+```
+
+Folgende Kombinationen sind bei der Zeugungsfähigkeit des Geschlechts möglich, wobei in den Zeilen der Zustand bei Aufnahme im Tierheim dargestellt wird, in den Spalten bei Verlassen:
+
+```{r, echo=FALSE}
+table(aac_intakes_outcomes$sex_upon_intake_first, aac_intakes_outcomes$sex_upon_outcome_first) 
+
+```
+Unplausible Fälle (Kastrierter Income, Nichtkastrierter Outcome) werden im Zuge der Datenaufbereitung zu Unknown rekategorisiert.
+
+
+## Erstellung eines neuen Datasets
+Dieses enthält nicht alle Variablen. Im Folgenden findet sich eine Auflistung der entfernten Variablen, sowie eine Begründung, weshalb einige Daten nicht für die Analyse miteinbezogen werden. 
+
+```{r}
+aac_intakes_outcomes2 <- aac_intakes_outcomes[c(5, 22:24, 26, 27, 43, 42, 44, 3, 17, 18, 33:35, 39, 10:12, 30, 7, 40, 41)]
+```
+
+Folgende Variablen wurden für das neue Dataset nicht verwendet:
+
+* `found_location` - Diese Variable bietet keine gute Datenqualität, es sind nicht immer gleiche Daten erfasst (z.B. manchmal Ortsname, manchmal komplette Adresse). Eine Bereinigung bzw. Kürzung auf den Ortsnamen bringt keinen Erkenntnisgewinn für das Modell, da alle Aufnahmen in derselben Region stattfanden und einzig über die Adressangabe Subregionen miteinander vergleichbar würden. 
+* `sex_open_intake` - Diese Variable enthält die selben Daten wie `sex_open_outcome`, ist daher redundant.
+
+```{r, echo=FALSE}
+table(aac_intakes_outcomes$sex_upon_intake_second, aac_intakes_outcomes$sex_upon_outcome_second)
+```
+
+* `outcome_subtype` - Diese Variable enthält nur für sehr wenige Datensätze zusätzliche Informationen, diese sind nicht durchgängig je `Outcome_type` befüllt. Außerdem ist die Kategorisierung nicht gänzlich diskriminant, da z.B. Aggressive eine Teilkategorie von Behavior wäre, wobei nicht klar ist, welches Verhaltensmuster dann in Behavior erfasst wurde bzw. ob dieses mit aggressivem Verhalten gleichzusetzen ist. 
+
+```{r, echo=FALSE}
+table(aac_intakes_outcomes$outcome_subtype, aac_intakes_outcomes$outcome_type)
+```
+
+* `animal_id_outcome` - ID kann nicht für Klassifikation verwendet werden.
+* `sex_upon_outcome` - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet
+* `outcome_monthyear` - Der Monat und das Jahr werden als einzelne Variablen verwendet. Diese Ursprungsvariable wird damit nicht mehr benötigt.
+* `outcome_hour` - Es werden auch zu ungewöhnlichen Uhrzeiten (z.B. Mitternacht) Geschäftsfälle registriert, welche nicht plausibel erscheinen. 
+
+```{r, echo=FALSE}
+table(aac_intakes_outcomes$outcome_hour)
+```
+
+* `dob_monthyear` - Geburtsdatum. Der Monat und das Jahr werden als einzelne Variablen verwendet. Diese Ursprungsvariable wird damit nicht mehr benötigt.
+* `animal_id_intake` - ID kann nicht für Klassifikation verwendet werden
+* `sex_upon_intake` - Diese Variable wurde gesplittet, die neuen Variablen werden verwendet
+* `count` - alle Werte sind 1 (Aushilfsspalte) d.h. kein Informationsgewinn durch diese Variable
+
+```{r, echo=FALSE}
+table(aac_intakes_outcomes$count)
+```
+
+* `intake_monthyear` - der Monat und das Jahr werden als einzelne Variablen verwendet
+* `intake_hour` - Es werden auch zu ungewöhnlichen Uhrzeiten Geschäftsfälle registriert, welche unplausibel erscheinen.
+
+```{r, echo=FALSE}
+table(aac_intakes_outcomes$intake_hour)
+```
+
+* `outcome_weekday`, `intake_weekday` - es soll keine Klassifikation auf Basis eines Wochentages gemacht werden.
+* `outcome_number` - Diese Variable enthält dieselben Informationen wie `intake_number`, ist daher redundant.
+
+```{r, echo=FALSE}
+table(aac_intakes_outcomes$outcome_number, aac_intakes_outcomes$intake_number)
+```
+
+* `age_upon_intake`, `age_upon_intake_year` - Diese Variablen enthalten dieselben Informationen wie age_upon_intake_days.
+* `age_upon_intake_group` - Die Gruppierung liefert keinen Mehrwert, da darin nicht die extrem variierende Lebenserwartung in Abhängigkeit der Tierart berücksichtigt wird.
+* `age_upon_outcome`, `age_upon_outcome_year` - Diese Variablen enthalten dieselben Informationen wie `age_upon_outcome_days`.
+* `age_upon_outcome_group` - Die Gruppierung liefert keinen Mehrwert, da darin nicht die extrem variierende Lebenserwartung in Abhängigkeit der Tierart berücksichtigt wird.
+
+
+# Weitere Datenbereinigungsschritte
+
+## Prüfung auf fehlende Werte
+Über die Summary wird geprüft, wo fehlende Werte vorkommen.
+```{r results='hide'}
+summary(aac_intakes_outcomes2)
+```
+Für die Prüfung werden zuerst alle Ausprägungen der Response `outcome_type` ausgegeben:
+```{r}
+unique(aac_intakes_outcomes2$outcome_type)
+table(aac_intakes_outcomes2$outcome_type)
+```
+Umwandlung:
+```{r}
+v = as.vector(which(aac_intakes_outcomes2$outcome_type == ""))
+aac_intakes_outcomes2 <- aac_intakes_outcomes2[-v,]
+aac_intakes_outcomes2$outcome_type <- factor(aac_intakes_outcomes2$outcome_type)
+```
+
+
+## Anpassen des Animal Types Other
+```{r}
+others = aac_intakes_outcomes2[aac_intakes_outcomes2$animal_type  == "Other", ] 
+
+
+# Erstellen eines csv files um die verschiedenen Rassen Tieren zuordnen zu können 
+# write.csv(count(others$breed), file = "breed.csv", append = FALSE, quote = TRUE, sep = " ",
+#             eol = "\n", na = "NA", dec = ".", row.names = TRUE,
+#             col.names = TRUE, qmethod = c("escape", "double"),
+#             fileEncoding = "")
+
+# Entfernen von "Mix"
+new_animal_type <- gsub(" Mix","",others$breed)
+
+#Ersetzen aller Rassen die Rabbit enthalten
+new_animal_type <-
+gsub("(.*)?Rabbit(.*)?", "Rabbit", new_animal_type)
+
+# Ersetzen aller Rassen die Rabbit Rassen sind
+rabbit_pattern <-
+"(American Sable|Angora|Belgian Hare|Britannia Petit|Californian|Checkered Giant|Cinnamon|Cottontail|Dutch|English Spot|Flemish Giant|Harlequin|Havana|Himalayan|Hotot|Jersey Wooly|Lionhead|Lop|Netherlnd Dwarf|New Zealand Wht|Rex|Ringtail|Silver|Polish)"
+rabbit_pattern <- paste("(.*)?", rabbit_pattern, "(.*)?", sep = "")
+new_animal_type <- gsub(rabbit_pattern, "Rabbit", new_animal_type)
+
+# Gerbil mit Mouse ersetzen
+new_animal_type <- gsub("(.*)?Gerbil(.*)?", "Mouse", new_animal_type)
+
+# Chinchilla
+new_animal_type <- gsub("(.*)?Chinchilla(.*)?", "Chinchilla", new_animal_type)
+
+# Snake
+new_animal_type <- gsub("(.*)?Snake(.*)?", "Snake", new_animal_type)
+
+# Pig
+new_animal_type <- gsub("(.*)?Pig(.*)?", "Pig", new_animal_type)
+
+# Fish
+new_animal_type <- gsub("(.*)?Cold Water(.*)?", "Fish", new_animal_type)
+
+# Ersetzen von Rassen, die nicht bekannt sind, mit "Other"
+new_animal_type <- gsub("(.*)?(American|Tropical)(.*)?", "Other", new_animal_type)
+
+others$animal_type = new_animal_type
+
+# Ersetzen der Animaltypen für Other in der Original Tabelle
+
+tmp_aac<- aac_intakes_outcomes2
+
+tmp_aac$animal_type = as.character(tmp_aac$animal_type)
+
+typeof(others$animal_type)
+typeof(tmp_aac$animal_type)
+tmp_aac[tmp_aac$animal_type  == "Other", ] = others
+
+aac_intakes_outcomes2 = tmp_aac
+
+kable(count(aac_intakes_outcomes2$animal_type), align = "l") %>%
+  kable_styling(bootstrap_options = "striped")
+
+aac_intakes_outcomes2$animal_type <- as.factor(aac_intakes_outcomes2$animal_type)
+
+```
+
+## Anpassen der Animal Color
+```{r results='hide'}
+sort(table(aac_intakes_outcomes2$color),decreasing=T)
+```
+```{r}
+#Zusammenfassen der Farben 
+aac_intakes_outcomes2$color_new <-
+gsub("Brown/Brown|Sable|Chocolate|Agouti|Liver", "Brown", aac_intakes_outcomes2$color)
+aac_intakes_outcomes2$color_new <- gsub("(Black/Black)", "Black",aac_intakes_outcomes2$color_new)
+aac_intakes_outcomes2$color_new <- gsub("(White/White)", "White",aac_intakes_outcomes2$color_new)
+aac_intakes_outcomes2$color_new <- gsub("(Gold/Gold)", "Gold",aac_intakes_outcomes2$color_new)
+aac_intakes_outcomes2$color_new <- gsub("(Yellow/Yellow)", "Yellow",aac_intakes_outcomes2$color_new)
+aac_intakes_outcomes2$color_new <- gsub("(Cream|Tan|Gold|Lynx|Buff|Fawn)", "Beige",aac_intakes_outcomes2$color_new)
+  
+#Zusammenfassen von Multicolor-Farben
+aac_intakes_outcomes2$color_new <-
+gsub("(.*)?/(.*)?", "Multicolor", aac_intakes_outcomes2$color_new)
+aac_intakes_outcomes2$color_new <- gsub("(Tricolor|Tortie|Calico|Torbie|Seal)", "Multicolor",aac_intakes_outcomes2$color_new)
+
+#Entfernen von  non-color Information
+aac_intakes_outcomes2$color_new <- gsub(" Tabby| Point| Merle| Smoke| Tick| Brindle| Tiger", "", aac_intakes_outcomes2$color_new)
+aac_intakes_outcomes2$color_new <-
+gsub("(.*)? (.*)", "Multicolor", aac_intakes_outcomes2$color_new)
+
+aac_intakes_outcomes2$color_new <-
+gsub("Flame", "Orange", aac_intakes_outcomes2$color_new)
+
+aac_intakes_outcomes2$color_new <- as.factor(aac_intakes_outcomes2$color_new)
+sort(table(aac_intakes_outcomes2$color_new),decreasing=T)
+
+aac_intakes_outcomes2 <- aac_intakes_outcomes2[,-4]
+
+```
+
+
+
+## Anpassen der Zeugungsfähigkeit
+Bei Analyse der Daten wurde bemerkt, dass 3 Beobachtungen bei den Geschlechtsmerkmalen fehlerhaft sein müssen, da Intake und Outcome-Wert nicht zusammengepasst haben (siehe oben bei Anmerkungen zu Datenset). Bei diesen Beobachtungen war das Merkmal bei Intake Neutered/Spayed und bei Outcome Intact. Es wurde daher entschieden, dass diese Datensätze behalten werden und die Werte durch "Unknown" ersetzt werden.   
+Da Neutered und Spayed unterschiedliche Worte für die Sterilisation der weiblichen bzw. männlichen Tiere, wurden diese vereinheitlicht in der Ausprägung "Sterilized" zusammengefasst.
+```{r}
+detectwrong <- function(v1,c1,v2,c2,x) {ifelse((v1==c1)&(v2==c2),"Unknown",x)}
+
+aac_intakes_outcomes2$sex_upon_intake_first_new <- detectwrong(
+  aac_intakes_outcomes2$sex_upon_intake_first,
+  "Neutered",
+  aac_intakes_outcomes2$sex_upon_outcome_first,
+  "Intact",
+  detectwrong(
+    aac_intakes_outcomes2$sex_upon_intake_first,
+    "Spayed", 
+    aac_intakes_outcomes2$sex_upon_outcome_first, 
+    "Intact", 
+    as.character(aac_intakes_outcomes2$sex_upon_intake_first)
+    )
+  )
+
+aac_intakes_outcomes2$sex_upon_outcome_first_new <- detectwrong(
+  aac_intakes_outcomes2$sex_upon_intake_first,
+  "Neutered", 
+  aac_intakes_outcomes2$sex_upon_outcome_first,
+  "Intact", 
+  detectwrong(
+    aac_intakes_outcomes2$sex_upon_intake_first,
+    "Spayed", 
+    aac_intakes_outcomes2$sex_upon_outcome_first, 
+    "Intact", 
+    as.character(aac_intakes_outcomes2$sex_upon_outcome_first)
+    )
+  )
+
+# Zusammenfassung in "Sterilized"
+aac_intakes_outcomes2$sex_upon_intake_first_new[aac_intakes_outcomes2$sex_upon_intake_first_new == "Neutered"] <- "Sterilized"
+aac_intakes_outcomes2$sex_upon_intake_first_new[aac_intakes_outcomes2$sex_upon_intake_first_new == "Spayed"] <- "Sterilized"
+aac_intakes_outcomes2$sex_upon_outcome_first_new[aac_intakes_outcomes2$sex_upon_outcome_first_new == "Neutered"] <- "Sterilized"
+aac_intakes_outcomes2$sex_upon_outcome_first_new[aac_intakes_outcomes2$sex_upon_outcome_first_new == "Spayed"] <- "Sterilized"
+
+# Kontrolle der Änderungen
+table(aac_intakes_outcomes2$sex_upon_intake_first_new,aac_intakes_outcomes2$sex_upon_outcome_first_new)
+
+# Als Faktor formatieren, Entfernen der alten Spalten und Umbenennen
+aac_intakes_outcomes2$sex_upon_intake_first_new <- as.factor(aac_intakes_outcomes2$sex_upon_intake_first_new)
+aac_intakes_outcomes2$sex_upon_outcome_first_new <- as.factor(aac_intakes_outcomes2$sex_upon_outcome_first_new)
+
+aac_intakes_outcomes2$sex_upon_intake_first <- NULL
+aac_intakes_outcomes2$sex_upon_outcome_first <- NULL
+
+names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_intake_first_new"] <- "sex_upon_intake_first"
+names(aac_intakes_outcomes2)[names(aac_intakes_outcomes2) == "sex_upon_outcome_first_new"] <- "sex_upon_outcome_first"
+```
+
+
+# Exemplarisches glm Modell
+Es wird ein GLM Modell am Beispiel von 3 Prädiktoren aufgestellt, um die grundsätzliche Modellierbarkeit darzustellen.
+```{r}
+glm.fit = glm(outcome_type~animal_type+intake_condition+intake_type, data = aac_intakes_outcomes2, family = binomial)
+summary(glm.fit)
+```
+
+**Prediction**  
+```{r}
+glm.prob = predict(glm.fit, type = "response")
+glm.prob[1:10]
+```
+
+**Erläuterung**   
+Eine Prediction wie sie hier dargestellt ist, ist noch nicht sinnvoll, da mehrere Klassen in der Response vorhanden sind. Für mehrere Klassen sollte eine andere Funktion bzw. ein anderes Modell verwendet werden. Auf Basis der obenstehenden Analysen und Erkenntnisse halten wir Tree Modelle für die Vorhersage des `outcome_type` für geeignet.
+
+
+
+![](snoopy.png)
