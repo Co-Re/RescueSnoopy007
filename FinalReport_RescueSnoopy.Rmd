@@ -1485,4 +1485,14 @@ Bei den Vorhersagen der Adoption von Hasen zeigte sich ein extremer Unterschied 
 Das Tierheim könnte mit diesen Modellen besser einschätzen, ob und unter welchen Bedingungen gewisse Hunde, Katzen und Hasen eher adoptiert werden. Außerdem können für jene, die eher nicht adoptiert werden, gegebenfalls zusätzliche Maßnahmen (Sterilisation, Marketing, ...) getroffen werden, um auch ihre Chance auf eine Adoption zu erhöhen.
 
 
+#Diskussion
+Zur Verbesserung der Ergebnisse hätte der `outcome_subtype` miteinbezogen werden können. Hierdurch hätten die verwendeten Outcome-Types genauer aufgeteilt werden können und ggfs. eine bessere Prediction erreicht werden können. Da jedoch die Fachkenntnis in diesem Bereich teilweise zu wenig vorhanden war, wurde diese Variable nicht berücksichtigt. Ferner ist zu beachten, dass je weiter man die Variable aufgeteilt hätte, desto geringer wäre der Datensatz je Outcome gewesen und die Gefahr von Overfitting steigt. 
+Durch die Einschränkung des Outcome-Types auf lediglich adoptiert ja/nein kann ebenfalls die Modellqualität gelitten haben, da möglicherweise nicht alle anderen Outcome-Types bedenkenlos in eine Kategorie gesteckt werden dürfen. Hier sind als Beispiel die Ausprägungen Return to Owner, Rto-Adopt und Transfer zu nennen, die insgesamt - im Vergleich zu bspw. Died und Euthansaia - eher positiv annotiert sind und deshalb möglicherweise andere Einflussfaktoren haben, die vom Modell schwerer zu erlernen und von Adoption zu trennen sind.
+
+Die AUfgabe hätte auch anders angegangen werden können. In der Originalquelle waren auch Datensätze für lediglich Intakes enthalten. Hiermit hätte eine Prediction durchgeführt werden können, die den Outcome ja/nein vorhersagt. Unsere Fragestellung richtete sich jedoch bewusst auf die Adoption sowie die anderen Outcome-Types.  
+
+
+
+
+
 ![](snoopy.png)

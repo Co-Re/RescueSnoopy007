@@ -1,4 +1,0 @@
-### visuelle darstellung der Datenstrukturen (Zeile 116)
-## decision trees (zeile 899) Beschreibung des Modells
-### random forest mit oob (zeile 1107)
-## Neuronales Netzwerk (Zeile 1142)

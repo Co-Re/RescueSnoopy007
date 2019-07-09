@@ -11,3 +11,11 @@ Datensatz von Kaggle: [Austin Animal Center Shelter Intakes and Outcomes](https:
 [RMD-FinalReportFile](https://github.com/Co-Re/RescueSnoopy007/blob/master/FinalReport_RescueSnoopy.Rmd)
 
 [HTML-FinalReportFile](https://github.com/Co-Re/RescueSnoopy007/blob/master/FinalReport_RescueSnoopy.html)
+
+## Änderungen nach Abgabe
+Im Rahmen der Überarbeitung der Gruppenarbeit wurden folgende Änderungen vorgenommen:
+* Einfügung des Kapitels "Visuelle Darstellung der Datenstrukturen" mit Histogrammen, Korrelationen sowie deren Interpretation
+* Im Kapitel "Decision Trees" wurde eine detaillierte Erläuterung zu der angewandten statistischen Methode sowie der konkreten Verwendung eingefügt.
+* Im Kapitel "Random Forest mit OOB" wurde eine Erläuterung eingefügt, warum Random Forests gewählt wurden.
+* Im Kapitel "Neuronales Netz" wurde genauer erläutert, wieso neuronale Netze gewählt wurden, was der Mehrwert für die bearbeitete Problemstellung ist sowie wie die Grafiken zu sehen sind.
+* Am Ende wurde ein Kapitel "Diskussion" eingefügt.
