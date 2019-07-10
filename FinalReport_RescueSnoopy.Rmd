@@ -115,14 +115,14 @@ summary(aac_intakes_outcomes)
 
 ### Visuelle Darstellung der Datenstrukturen
 
-```{r hist,fig.align='center',out.width='\\textwidth', echo=FALSE}
+```{r hist,fig.align='center', fig.width=10,  fig.height = 4, echo=FALSE}
 numeric_values = aac_intakes_outcomes[c(7, 8, 11, 12, 30, 31, 34, 35, 15, 16, 41, 18, 38, 39 ) ]
 
-par(mfrow=c(2, 4))
+par(mfrow=c(2, 4), mar=c(3, 2, 3, 1) + 0.1)
 
 colnames <- dimnames(numeric_values)[[2]]
 for (i in 1:ncol(numeric_values)) {
-    hist(numeric_values[,i], main=colnames[i], probability=TRUE, col="gray", border="white", xlab = "")
+    hist(numeric_values[,i], main=colnames[i], probability=TRUE, col="gray", border="white", xlab = "", cex.main=1.2)
     d <- density(numeric_values[,i])
     lines(d, col="red")
 }
