@@ -115,20 +115,19 @@ summary(aac_intakes_outcomes)
 
 ### Visuelle Darstellung der Datenstrukturen
 
-<details>
-  <summary>Code Details</summary>
-```{r hist}
-numeric_values = aac_intakes_outcomes[c(7, 8, 11, 30, 31, 34, 12, 35,41, 15, 16,17, 38, 39, 18 ) ]
+```{r hist,fig.align='center',out.width='\\textwidth', echo=FALSE}
+numeric_values = aac_intakes_outcomes[c(7, 8, 11, 12, 30, 31, 34, 35, 15, 16, 41, 18, 38, 39 ) ]
 
-par(mfrow=c(3, 3))
+par(mfrow=c(2, 4))
+
 colnames <- dimnames(numeric_values)[[2]]
 for (i in 1:ncol(numeric_values)) {
     hist(numeric_values[,i], main=colnames[i], probability=TRUE, col="gray", border="white", xlab = "")
     d <- density(numeric_values[,i])
     lines(d, col="red")
 }
+par(mfrow = c(1,1))
 ```
-</details>
 
 Interpretation der Daten:
 
@@ -1487,8 +1486,6 @@ Eine weitere Variable die noch genauer betrachtet hätte werden können, ist `br
 
 
 Die Aufgabe hätte auch anders angegangen werden können. In der Originalquelle waren auch Datensätze für lediglich Intakes enthalten. Hiermit hätte eine Prediction durchgeführt werden können, die den Outcome ja/nein vorhersagt. Unsere Fragestellung richtete sich jedoch bewusst auf die Adoption sowie die anderen Outcome-Types.  
-
-
 
 
 
