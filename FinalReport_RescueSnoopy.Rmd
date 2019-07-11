@@ -113,7 +113,7 @@ summary(aac_intakes_outcomes)
 ```
 </details>
 
-### Visuelle Darstellung der Datenstrukturen
+### Visualisierung der Verteilung numerischer Features
 
 ```{r hist,fig.align='center', fig.width=10,  fig.height = 4, echo=FALSE}
 numeric_values = aac_intakes_outcomes[c(7, 8, 11, 12, 30, 31, 34, 35, 15, 16, 41, 18, 38, 39 ) ]
@@ -123,23 +123,21 @@ par(mfrow=c(2, 4), mar=c(3, 2, 3, 1) + 0.1)
 colnames <- dimnames(numeric_values)[[2]]
 for (i in 1:ncol(numeric_values)) {
     hist(numeric_values[,i], main=colnames[i], probability=TRUE, col="gray", border="white", xlab = "", cex.main=1.2)
-    d <- density(numeric_values[,i])
-    lines(d, col="red")
+    
 }
 par(mfrow = c(1,1))
 ```
-
+Darstellung der relativen Verteilung.
 Interpretation der Daten:
 
-* Die Verteilung der Daten in den Variablen `age_upon_outcome` und `age_upon_intake` ist relativ ähnlich. Es werden kaum ältere Tiere ins Tierheim gebracht sowie aus dem Tierheim entnommen. Ein Großteil der Tiere ist sowohl bei der Einlieferung als auch bei der Entlassung jünger als ca. 1 Jahr. Hier ist auch zu sehen, dass es negative Altersangaben gibt (hierauf wird später noch Bezug genommen). Außerdem ist ersichtlich, dass die Altersangabe in Jahren ab einem ALter von ca. 1,5 auf eine Zahl ohne Nachkommazahlen gerundet wird. Bei der Betrachtung der Altersangabe in Tagen ist ersichtlich, dass es sowohl bei den Intakes als auch den Outcomes fehlende Werte an denselben Stellen gibt. Woher dies resultiert, sollte mit dem Tierheim abgeklärt werden.
+* Die Verteilung der Daten in den Variablen `age_upon_outcome` und `age_upon_intake` ist relativ ähnlich. Es werden kaum ältere Tiere (über 2 Jahre) ins Tierheim gebracht sowie aus dem Tierheim entnommen. Ein Großteil der Tiere ist sowohl bei der Einlieferung als auch bei der Entlassung jünger als ca. 1 Jahr. Anhand der Summary ist auch zu sehen, dass es negative Altersangaben gibt (hierauf wird später noch Bezug genommen).  Bei der Betrachtung der Altersangabe in Tagen ist ersichtlich, dass es sowohl bei den Intakes als auch den Outcomes fehlende Werte an denselben Stellen gibt. Woher dies resultiert, sollte mit dem Tierheim abgeklärt werden.
 * Die Verteilung der Daten in der Variable `time_in_shelter` zeigt, dass die meisten Tiere zwischen 0 und 100 Tage im Tierheim verbringen.
-* Die Verteilung über die Monate ist relativ gleichmäßig. 
+* Die Verteilung von `dob_month` ist recht gleichmäßig, es gibt lediglich kleine Ausschläge zwischen März, April und Mai. Der leichte Anstieg im Frühjahr der zu erkennen ist, ist wahrscheinlich darauf zurückzuführen , dass in diese Jareszeit die Hauptpaarungszeit vieler Tierarten fällt. 
 * Die Daten zeigen hauptsächlich Informationen der Jahre 2014 bis 2017. Es würde ggfs. Sinn machen, die Jahre 2013 und 2018 auszuschließen, da hier vergleichsmäßig wenige Daten vorhanden sind.
-* Die Verteilung der Variable `outcome_hour` zeigt, dass ab ca. 6 Uhr Tiere aus dem Tierheim entlassen werden. Diese Zahlen steigen - mit Ausnahme von 9 - 10 Uhr - an, bis der Höhepunkt von 16 bis 17 Uhr erreicht ist. 
-* Die Verteilung der Variable `intake_hour` zeigt eher das Gegenteil von `outcome_hour`. Recht wenig Tiere werden vor 10 Uhr ins Tierheim gebracht, dann erfolgt ein recht rasanter Anstieg auf den Höhepunkt zwischen 10 und 11 Uhr. Anschließend flacht es langsam ab.
-* Sowohl die `outcome_number` als auch die `intake_number` zeigen fast nur Werte unter 4 und hierbei auch nur einen minimalen Anteil größer 1.
+* Die Verteilung der Variable `outcome_hour` zeigt, dass ab ca. 6 Uhr Tiere aus dem Tierheim entlassen werden. Diese Zahlen steigen - mit Ausnahme von 9 - 10 Uhr - an, bis der Höhepunkt von 16 bis 17 Uhr erreicht ist. Dass am Nachmittag die meisten Tiere abgeholt werden, erscheint unter der Berücksichtigung einer normalen Arbeitszeit plausibel. 
+* Die Verteilung der Variable `intake_hour` zeigt eher das Gegenteil von `outcome_hour`. Recht wenig Tiere werden vor 10 Uhr ins Tierheim gebracht, dann erfolgt ein recht rasanter Anstieg auf den Höhepunkt zwischen 10 und 11 Uhr. Nach 11 Uhr nimmt die Anzahl an Tieren, die ins Tierheim gebracht werden, wieder langsam ab. 
+* Sowohl die `outcome_number` als auch die `intake_number`, also die Anzahl, wie häufig ein Tier ins Tierheim gebracht bzw. wieder abgeholt wurde, zeigen fast nur Werte unter 4 und hierbei auch nur einen minimalen Anteil größer 1. Demnach kommt die überwiegende Mehrheit der Tiere nur ein Mal ins Tierheim.
 * Die Verteilung von `dob_year` zeigt, dass die meisten Tiere zwischen ca. 2012 und 2015 geboren sind. Dies steht ein wenig im Gegensatz zu den Altersangaben. Da jedoch Altersangaben teilweise geschätzt werden, können hiermit Abweichungen geklärt werden.
-* Die Verteilung von `dob_month` ist recht gleichmäßig, es gibt lediglich kleine Ausschläge zwischen März, April und Mai.
 
 ```{r corr, echo=FALSE}
 cor_data <- aac_intakes_outcomes[c(7,8,11,12,15:18,30,31,34,35,38,39,41)]
@@ -147,13 +145,12 @@ corr_matrix <- round(cor(cor_data),1)
 ggcorrplot(corr_matrix)
 ```
 
-In der Korrelationsmatrix sind u.a. folgende Korrelationen erkennbar:
+In der Korrelationsmatrix sind u.a. folgende Korrelationen erkennbar, die uns bei der Bewertung der Datenqualität helfen. Obwohl einzelne fehlende Werte erkannt wurden, zeigen die folgenden Korrelationen doch deutlich, dass die Daten grundsätzlich plausible Korrelationen aufweisen:
 
 * `age_upon_intake_years` korreliert stark positiv mit `age_upon_intake_days`. Dies ist offensichtlich, da es sich um dieselben Daten, lediglich in einer anderen Einheit handelt. Dasselbe gilt für `age_upon_outcome_years` und `age_upon_outcome_days`.
 * Der `intake_month` korreliert recht stark positiv mit dem `outcome_month`.
-* Selbiges gilt für das `intake_year` und das `outcome_year`. Hier ist die Korrelation sogar noch stärker. Dies zeigt, dass die meisten Tiere wohl im selben Jahr in das Tierheim kommen sowie wieder aus dem Tierheim kommen.
-* Zwischen den Monat des Intakes sowie Jahres des Outcomes und andersrum scheint es eine leicht negative Korrelation zu geben.
-* Das Geburtsjahr korreliert stark negativ mit dem Alter bei Intake.
+* Selbiges gilt für das `intake_year` und das `outcome_year`. Hier ist die Korrelation sogar noch stärker. Auch dies erscheint logisch, als Dies zeigt, dass die meisten Tiere wohl im selben Jahr in das Tierheim kommen sowie wieder aus dem Tierheim kommen.
+* Das Geburtsjahr korreliert logischerweise stark negativ mit dem Alter bei Intake: umso kleiner das Geburtsjahr, desto älter das Tier und umgekehrt.
 
 Die statistische Analyse der kategorialen Variablen findet im Rahmen der folgenden Datenbereinigungsschritte statt.
 
@@ -643,6 +640,7 @@ t
 table<- prop.table(t,2)
 ```
 </details>
+
 <details>
   <summary>Code Details</summary>
 ```{r table7}
@@ -650,7 +648,7 @@ table(aac_intakes_outcomes2$animal_type, aac_intakes_outcomes2$outcome_type_adop
 ```
 </details>
 
-Da ein erster Testlauf/Fitting des Datensatzes mit einem Decision Tree aufgrund der Datenstrukturen wenig performant ist, wurden die Daten überwiegend Dummycodiert um ein schnelleres Training zu erzielen. 
+Da ein erster Testlauf/Fitting des Datensatzes mit einem Decision Tree aufgrund der Datenstrukturen (viele Variablen mit jeweils einer großen Anzahl an Ausprägungen, die die Berechnung der optimalen Splitpunkte dementsprechend beeinflusst) wenig performant ist, wurden die Daten überwiegend Dummycodiert um ein schnelleres Training zu erzielen. Bei der Dummycodierung wird für jede Ausprägung jeder Variable eine eigene Spalte angelegt, in der durch 0 bzw 1 angegeben wird, ob diese Ausprägung zutrifft oder nicht. Obwohl zwar damit die Anzahl an Features erhöht wird, kann doch die Trainingszeit verkürzt werden, da bei der Berechnung des Performance Indikators, anhand dessen der optimale Splitpunkt definiert wird, nur zwei, statt einer Vielzahl an Ausprägungen vorliegen. Damit kann der optimale Splitpunkt (anhand z.B. Entropy oder Gini Index in einem Kategorisierungsproblem) für jede Variable schneller gefunden werden.  
 
 <details>
   <summary>Code Details</summary>
@@ -791,6 +789,7 @@ allanimals<- allanimals[,-c(1)]
 
 Es werden außerdem Datasets pro Tierart erstellt. 
 Da für jede Tierart ein eigenes Modell gefittet wird, wird die Tierartvariable innerhalb dieser Datensätze nicht benötigt und entfernt.
+Für jedes Modell bzw. jede Tierart wird ein Trainingsdatensatz erstellt, anhand dessen das Modell trainiert werden soll und ein Testdatensatz, der nach dem Fitting des Modells dazu verwendet wird, um zu bewerten, wie gut das Modell generalisiert, d.h. wie gut die Vorhersage für "ungesehene" Daten beim Training funktioniert. Die Aufteilung erfolgt in einem Verhältnis von 70/30. Ziel ist es, ein Modell zu fitten, das komplex genug ist, um die Zusammenhänge des Phänomens abzubilden (deshalb wurde beispielsweise kein zu einfaches Modell, wie etwa k-nearest-neighbor verwendet, um Underfitting zu vermeiden), und andererseits nicht zu stark auf die Trainingsdaten fittet, um ein Overfitting ("Auswendiglernen") zu verhindern. Um die Performance des Modells zu bewerten, werden wir die Confusion Matrix berechnen, in der für jede Vorhersage (Adoption / keine Adoption) die Anteile an richtiger Vorhersage (=Accuracy) und falscher Vorhersage abgebildet werden. 
 
 ```{r dataset split, results='hide'}
 
@@ -892,7 +891,7 @@ if (file.exists("decision_trees.RData") && !exists("tree_dog1") && !exists("tree
 Bei den Decision Trees werden alle Variablen im Datensatz und die Methode 'rpart' aus dem Caret Package verwendet, um eine Adoption vorherzusagen. 
 
 Die Methode „rpart“ kann sowohl für Regressionsprobleme als auch Klassifikationsprobleme verwendet werden. „rpart“ steht in diesem Fall für Rekursive Partitionierung, was eine Methode der Multivariaten Analyse ist. Da bei der gewählten Fragestellung auch die Zusammenhänge und Abhängigkeiten zwischen den einzelnen Variablen in die Analyse einbezogen werden sollen, wurde eine multivariate Analysemethode bevorzugt. Bei „rpart“ ist der einzige Tuningparameter der Komplexitätsparameter, welcher die Größe des Baums bestimmt. Für die Modelle wurde entschieden, keinen Komplexitätsparameter anzugeben, um den optimalen Wert durch R bestimmen zu lassen. Für alle folgenden Modelle wird die beste Accuracy mit dem geringsten Komplexitätsparameter erreicht. Dies zeigt, dass hier durch ein komplexeres Modell ein besseres Resultat erzeugt wurde. Ein größerer Komplexitätsparameter bestraft neue Nodes mehr, weshalb hierdurch kleinere Bäume erzeugt werden, bei einem kleineren Komplexitätsparameter ist es umgekehrt. Es besteht jedoch die Gefahr des Overfittings.
-Um das Modell an unterschiedlichen Stichproben zu testen, verwenden wir die „trainControl“-Methode. Cross Validation wurde ausgewählt, da das Ziel ist, eine bestmögliche Performance des Modells auf neue Daten zu erhalten: Ziel: bestmögliche Generalisierung. Um die Datenmenge des Testsets zu vergrößern, wurde die Anzahl an Folds auf 5 gesetzt. Dadurch soll eine bessere Accuracy bei unbekannten Daten erreicht werden, um keine falschen Klassifizierungen der Tiere zu erreichen.
+Wir verwenden die „trainControl“-Methode zur Crossvalidierung beim Training. Cross Validation wurde ausgewählt, da das Ziel ist, eine bestmögliche Performance des Modells auf neue Daten zu erhalten. Indem bereits im Training das Modell auf unterschiedlichen Subsamples (bei cv 5 = 1/5 aller Trainingsdaten in jedem Fold) getestet wird, sollte das Modell besser generalisieren, als ohne CV. Um die Datenmenge des Validierungssets zu vergrößern, wurde die Anzahl an Folds auf 5 gesetzt. 
 
 ### Decision Tree für Hunde
 
@@ -1022,6 +1021,7 @@ Je Modell ist eine Tabelle der Wichtigkeit einer Variable sowie eine Grafik darg
 Die einfachen Klassifikationsbäume geben bereits einen guten ersten Einblick darin, welche Variablen für die Klassifikation bzw. Splitpunkte vorrangig herangezogen werden. 
 Da sich zeigt, dass über die Tierarten hinweg die Hauptsplitpunkte auf ähnlichen Variablen basieren, soll mithilfe der Variable Importance ermittelt werden, ob noch weitere Zusatzinformationen aus den Modellen gewonnen werden können, die für das Tierheim für das bessere Verständnis von Adoptionsgründen genutzt werden kann. 
 Dafür wird die Variable Importance aus den obig erstellten Bäumen (je Tier) erstellt und beschrieben.
+Bei der Variable Importance wird berechnet, durch welchen Split der Gini-Index am stärksten verringert werden kann, d.h. welche Variable (bzw. der Split darauf) am besten hilft, die Vorhersage zu verbessern. 
 
 ### Variable Importance des Hundemodells
 
@@ -1097,9 +1097,9 @@ data_test_model <- testing_cat[,-c(1:5)]
 ```
 
 ### Random Forrest mit OOB 
-Um die bei den Decision Trees erreichten Accuracies zu verbessern, sollten Random Forests aufgestellt werden. Diese haben den Vorteil, dass sie noch recht nah an Decision Trees sind und dadurch noch vergleichsweise leicht interpretierbar sind. Im Gegensatz zu den Decision Trees wir diesesmal OOB und nicht CV5 verwendet. Das hat den Grund, dass der Datensatz sehr viele Variablen hat und OOB bei der Erstellung eines Random Forrest performanter ist.
+Um die bei den Decision Trees erreichten Accuracies zu verbessern, sollten Random Forests aufgestellt werden. Diese haben den Vorteil, dass sie noch recht nah an Decision Trees sind und dadurch noch vergleichsweise leicht interpretierbar sind. Im Gegensatz zu den Decision Trees wird diesesmal OOB und nicht CV5 verwendet. Das hat den Grund, dass der Datensatz sehr viele Variablen hat und OOB bei der Erstellung eines Random Forrest performanter ist.
 
-Max. Zahl für das tuneGrid (für die Metry) wurde mit 9 gewählt, da üblicherweise das Optimum von m= Wurzel aus p, d.h. Wurzel aus 78=9 (gerundet)
+Max. Zahl für das tuneGrid (für die Metry) wurde mit 9 gewählt, da üblicherweise das Optimum von m die Wurzel aus p, d.h. Wurzel aus 78=9 (gerundet) ist. Das bedeutet, dass jeder Tree nur 9 Variablen (die jeweils für jeden Split random ausgewählt werden) für die Auswahl eines jeden Splits zur Verfügung hat. 
 ```{r eval=FALSE}
 trcOOB <- trainControl(method="oob")
 
@@ -1118,7 +1118,7 @@ conf_matrix_RF_OOB <- confusionMatrix(RF_OOB_predict, data_test_model$outcome_ty
 ```
 
 ### Modell für Katzen
-Der Random Forest mit OOB konnte beispielhaft für ein reduziertes Subsample mit 1000 Cat-Datensätzen gespeichert werden, wird aber nicht weiter herangezogen.
+Der Random Forest mit OOB konnte beispielhaft für ein reduziertes Subsample mit 1000 Cat-Datensätzen gespeichert werden, wird aber nicht weiter herangezogen aufgrund der oben beschriebenen Performanceprobleme.
 ```{r eval=FALSE}
 load("randomforestOOB_cats_n=1000.Rdata")
 ```
@@ -1126,7 +1126,7 @@ load("randomforestOOB_cats_n=1000.Rdata")
 
 ## Neuronales Netzwerk
 
-Die Bäume dienen als gut interpretierbare Modelle für ein besseres Verständnis der Adoptionsgründe. Nun soll noch getestet werden, ob ein Modell, dass stärker auf Vorhersage als auf Interpretierbarkeit abzielt, helfen kann, die Modellaccuracy noch weiter zu steigern. 
+Die Bäume dienen als gut interpretierbare Modelle für ein besseres Verständnis der Adoptionsgründe. Nun soll noch getestet werden, ob ein Modell, das stärker auf Vorhersage als auf Interpretierbarkeit abzielt, helfen kann, die Modellaccuracy noch weiter zu steigern. 
 Bei den neuronalen Netzen wird die Variable `breed` ausgeschlossen, da sie  bei den Bäumen als nicht relevant identifiziert wurde. Außerdem werden die numerischen Variablen `intake_number`, `age_upon_intake_.days.`, `age_upon_outcome_.days.` und `time_in_shelter_days` vorab min-max normalisiert, um die Geschwindigkeit der Berechnung zu erhöhen (für das Hundedatenset konnte ohne Normalisierung aus Computer Performance technischen Gründen gar keine Berechnung  durchgeführt werden). Die Normalisierung ermöglichte dann eine (schnellere) Berechnung.
 Es werden für jede Tierart jeweils zwei neuronale Netze erstellt, einmal mit allen Variablen und einmal mit den Variablen, die im Decision Tree schon als wichtig festgestellt wurden. 
 Als Hyperparameter werden jeweils 3 Hidden Layers und ein Threshold von 1 verwendet, da diese Werte die beste Accuracy beim Fitten der Modelle geliefert haben.
@@ -1479,10 +1479,10 @@ Das Tierheim könnte mit diesen Modellen besser einschätzen, ob und unter welch
 
 
 #Diskussion
-Zur Verbesserung der Ergebnisse hätte der `outcome_subtype` miteinbezogen werden können. Hierdurch hätten die verwendeten Outcome-Types genauer aufgeteilt werden können und ggfs. eine bessere Prediction erreicht werden können. Da jedoch die Fachkenntnis in diesem Bereich teilweise zu wenig vorhanden war, wurde diese Variable nicht berücksichtigt. Ferner ist zu beachten, dass je weiter man die Variable aufgeteilt hätte, desto geringer wäre der Datensatz je Outcome gewesen und die Gefahr von Overfitting steigt. 
+Zur Verbesserung der Ergebnisse hätte der `outcome_subtype` miteinbezogen werden können. Hierdurch hätten die verwendeten Outcome-Types genauer aufgeteilt werden können und ggfs. eine bessere Prediction erreicht werden können. Da jedoch die Fachkenntnis in diesem Bereich teilweise zu wenig vorhanden war, wurde diese Variable nicht berücksichtigt. Ferner ist zu beachten, dass je weiter man die Variable aufgeteilt hätte, desto kleiner wäre der Datensatz je Outcome gewesen, was wiederrum das Training erschwert hätte.
 Durch die Einschränkung des Outcome-Types auf lediglich adoptiert ja/nein kann ebenfalls die Modellqualität gelitten haben, da möglicherweise nicht alle anderen Outcome-Types bedenkenlos in eine Kategorie gesteckt werden dürfen. Hier sind als Beispiel die Ausprägungen Return to Owner, Rto-Adopt und Transfer zu nennen, die insgesamt - im Vergleich zu bspw. Died und Euthansaia - eher positiv annotiert sind und deshalb möglicherweise andere Einflussfaktoren haben, die vom Modell schwerer zu erlernen und von Adoption zu trennen sind.
 
-Eine weitere Variable die noch genauer betrachtet hätte werden können, ist `breed`. Diese wurden in den Decision Trees als nicht relevant identifziert und darum in den Neuronalen Netzen nicht mehr verwendet. Jedoch könnte die Relevanz des Features durch Zusammenfügen mehrere Rassen zu einer Kategorie weitere Erkenntnisse liefern. Zum Beispiel ob Rassekatze eher adoptiert werden als nicht Rassekatze. Um diese einzelnen Kategorien der Rassen zu definieren, wäre jedoch noch eine tiefergehende Recherche im Bereich der Tierassen nötig bzw. wäre es am besten einen Experte auf diesem Gebiet miteinzubeziehen. 
+Eine weitere Variable die noch genauer betrachtet hätte werden können, ist `breed`. Diese wurden in den Decision Trees als nicht relevant identifziert und darum in den Neuronalen Netzen nicht mehr verwendet. Jedoch könnte die Relevanz des Features durch Zusammenfügen mehrere Rassen zu einer Kategorie weitere Erkenntnisse liefern. Zum Beispiel ob Rassekatzen eher adoptiert werden als nicht Rassekatzen. Um diese einzelnen Kategorien der Rassen zu definieren, wäre jedoch noch eine tiefergehende Recherche im Bereich der Tierassen nötig bzw. wäre es am besten, einen Experte auf diesem Gebiet miteinzubeziehen. 
 
 
 Die Aufgabe hätte auch anders angegangen werden können. In der Originalquelle waren auch Datensätze für lediglich Intakes enthalten. Hiermit hätte eine Prediction durchgeführt werden können, die den Outcome ja/nein vorhersagt. Unsere Fragestellung richtete sich jedoch bewusst auf die Adoption sowie die anderen Outcome-Types.  
