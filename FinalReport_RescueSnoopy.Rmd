@@ -115,19 +115,26 @@ summary(aac_intakes_outcomes)
 
 ### Visualisierung der Verteilung numerischer Features
 
-```{r hist,fig.align='center', fig.width=10,  fig.height = 4, echo=FALSE}
-numeric_values = aac_intakes_outcomes[c(7, 8, 11, 12, 30, 31, 34, 35, 15, 16, 41, 18, 38, 39 ) ]
+```{r hist,fig.align='center', fig.width=10,  fig.height = 8, echo=FALSE}
+p1 <- qplot(aac_intakes_outcomes$age_upon_outcome_.days., geom="histogram", ylab = "", xlab = "age_upon_outcome_.days.", bins=30)
+p2 <- qplot(aac_intakes_outcomes$age_upon_intake_.days., geom="histogram", ylab = "", xlab = "age_upon_intake_.days", bins=30)
+p3 <- qplot(aac_intakes_outcomes$age_upon_outcome_.years., geom="histogram", ylab = "", xlab = "age_upon_outcome_.years.", binwidth=0.5)
+p4 <- qplot(aac_intakes_outcomes$age_upon_intake_.years., geom="histogram", ylab = "", xlab = "age_upon_intake_.years.", binwidth=0.5)
+p5 <- qplot(aac_intakes_outcomes$outcome_month, geom="histogram", ylab = "", xlab = "outcome_month", binwidth=0.5)
+p6 <- qplot(aac_intakes_outcomes$intake_month, geom="histogram", ylab = "", xlab = "intake_month", binwidth=0.5)
+p7 <- qplot(aac_intakes_outcomes$outcome_year, geom="histogram", ylab = "", xlab = "outcome_year", binwidth=0.5)
+p8 <- qplot(aac_intakes_outcomes$intake_year, geom="histogram", ylab = "", xlab = "intake_year", binwidth=0.5)
+p9 <- qplot(aac_intakes_outcomes$outcome_hour, geom="histogram",  ylab = "", xlab = "outcome_hour", binwidth=0.5)
+p10 <- qplot(aac_intakes_outcomes$intake_hour, geom="histogram", ylab = "", xlab = "intake_hour", binwidth=0.5)
+p11 <- qplot(aac_intakes_outcomes$outcome_number, geom="histogram", ylab = "", xlab = "outcome_number", binwidth=0.5)
+p12 <- qplot(aac_intakes_outcomes$intake_number, geom="histogram",  ylab = "", xlab = "intake_number", binwidth=0.5)
+p13 <- qplot(aac_intakes_outcomes$dob_year, geom="histogram",  ylab = "", xlab = "dob_year", binwidth=0.5)
+p14 <- qplot(aac_intakes_outcomes$dob_month, geom="histogram",  ylab = "", xlab = "dob_month", binwidth=0.5)
+p15 <- qplot(aac_intakes_outcomes$time_in_shelter_days, geom="histogram", ylab = "", xlab = "time_in_shelter_days", bins=30)
 
-par(mfrow=c(2, 4), mar=c(3, 2, 3, 1) + 0.1)
-
-colnames <- dimnames(numeric_values)[[2]]
-for (i in 1:ncol(numeric_values)) {
-    hist(numeric_values[,i], main=colnames[i], probability=TRUE, col="gray", border="white", xlab = "", cex.main=1.2)
-    
-}
-par(mfrow = c(1,1))
+grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15)
 ```
-Darstellung der relativen Verteilung.
+
 Interpretation der Daten:
 
 * Die Verteilung der Daten in den Variablen `age_upon_outcome` und `age_upon_intake` ist relativ ähnlich. Es werden kaum ältere Tiere (über 2 Jahre) ins Tierheim gebracht sowie aus dem Tierheim entnommen. Ein Großteil der Tiere ist sowohl bei der Einlieferung als auch bei der Entlassung jünger als ca. 1 Jahr. Anhand der Summary ist auch zu sehen, dass es negative Altersangaben gibt (hierauf wird später noch Bezug genommen).  Bei der Betrachtung der Altersangabe in Tagen ist ersichtlich, dass es sowohl bei den Intakes als auch den Outcomes fehlende Werte an denselben Stellen gibt. Woher dies resultiert, sollte mit dem Tierheim abgeklärt werden.
